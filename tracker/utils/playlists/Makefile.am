@@ -8,7 +8,8 @@ AM_CPPFLAGS =                                          \
 
 LDADD =                                                \
 	$(BUILD_LIBS)                                  \
-	$(TOTEM_PL_PARSER_LIBS)
+	$(TOTEM_PL_PARSER_LIBS)                        \
+	-lgio-2.0
 
 playlist2ttl_SOURCES =                                 \
 	playlist2ttl.c
