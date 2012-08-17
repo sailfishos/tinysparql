@@ -24,7 +24,8 @@ LDADD =                                                \
 	$(top_builddir)/tests/common/libtracker-testcommon.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS)                                  \
-	$(LIBTRACKER_COMMON_LIBS)                      
+	$(LIBTRACKER_COMMON_LIBS)                      \
+	-lgthread-2.0
 
 tracker_dbus_SOURCES =                                 \
 	tracker-dbus-test.c                            
