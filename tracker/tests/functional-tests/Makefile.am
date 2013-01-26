@@ -19,8 +19,7 @@ config_SCRIPTS = \
 
 if HAVE_MAEMO
 config_SCRIPTS += \
-	tests.xml \
-	tracker-tests.aegis
+	tests.xml
 endif
 
 dconfdir = $(sysconfdir)/dconf/profile
