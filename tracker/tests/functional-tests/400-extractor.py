@@ -238,11 +238,18 @@ def run_all ():
     else:
         TEST_DATA_PATH = os.path.join (cfg.DATADIR, "tracker-tests",
                                        "test-extraction-data")
+    blacklist = ["video/video-1.expected",
+                 "video/video-2.expected",
+                 "audio/Jazz_Audio_OPLs0.expected"]
+    blacklist = [os.path.join (TEST_DATA_PATH, f) for f in blacklist]
     print "Loading test descriptions from", TEST_DATA_PATH
     extractionTestSuite = ut.TestSuite ()
     for root, dirs, files in os.walk (TEST_DATA_PATH):
          descriptions = [os.path.join (root, f) for f in files if f.endswith ("expected")]
          for descfile in descriptions:
+             if descfile in blacklist:
+                 print "Skipping '%s' - blacklisted (Nemo bug #537)" % descfile
+                 continue
              tc = ExtractionTestCase(descfile=descfile)
              extractionTestSuite.addTest(tc)
     result = ut.TextTestRunner (verbosity=1).run (extractionTestSuite)
