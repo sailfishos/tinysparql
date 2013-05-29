@@ -207,7 +207,12 @@ SQLITE_REQUIRED=3.7.0
 
 # Needed to generate .gir files,
 # see http://live.gnome.org/GnomeGoals/AddGObjectIntrospectionSupport
-GOBJECT_INTROSPECTION_CHECK([0.9.5])
+#GOBJECT_INTROSPECTION_CHECK([0.9.5])
+# Satisfy missing introspection foo
+AM_CONDITIONAL(HAVE_INTROSPECTION, test "0" == "1")
+
+INTROSPECTION_CFLAGS=""
+AC_SUBST(INTROSPECTION_CFLAGS)
 
 # Check for libpng 1.2 or higher
 PKG_CHECK_MODULES(LIBPNG, [libpng >= 1.2])
