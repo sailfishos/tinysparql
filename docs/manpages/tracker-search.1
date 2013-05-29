@@ -1,0 +1,105 @@
+.TH tracker-search 1 "July 2009" GNU "User Commands"
+
+.SH NAME
+tracker-search \- Search all content for keywords
+
+.SH SYNOPSIS
+\fBtracker-search\fR [\fIOPTION\fR...] \fIEXPRESSION\fR [\fIEXPRESSION\fR...]
+
+.SH DESCRIPTION
+.B tracker-search
+searches all indexed content for \fIEXPRESSION\fR. The resource in
+which \fIEXPRESSION\fR matches must exist (see 
+.B \-\-all
+for more information). All results are returned in ascending order. In
+all cases, if no \fIEXPRESSION\fR is given for an argument (like 
+.B \-\-folders
+for example) then ALL items in that category are returned instead.
+.TP
+\fIEXPRESSION\fR
+One or more terms to search. The default operation is a logical AND.
+For logical OR operations, see -r.
+.SH OPTIONS
+.TP
+.B \-?, \-\-help
+Give a short help message.
+.TP
+.B \-l, \-\-limit=N
+Limit search to N results. The default is 512.
+.TP
+.B \-o, \-\-offset=N
+Offset the search results by N. For example, start at item number 10
+in the results. The default is 0.
+.TP
+.B \-r, \-\-or-operator
+Use OR for search terms instead of AND (the default)
+.TP
+.B \-d, \-\-detailed
+Show the unique URN associated with each search result. This does not
+apply to \-\-music\-albums and \-\-music\-artists.
+.TP
+.B \-a, \-\-all
+Show results which might not be available. This might bebecause a
+removable media is not mounted for example. Without this option,
+resources are only shown if they exist. This option applies to all
+command line switches except
+.B \-\-music-albums
+and
+.B \-\-music-artists.
+.TP
+.B \-f, \-\-files
+Search for files of any type matching \fIEXPRESSION\fR (optional).
+.TP
+.B \-e, \-\-folders
+Search for folders matching \fIEXPRESSION\fR (optional).
+.TP
+.B \-m, \-\-music
+Search for music files matching \fIEXPRESSION\fR (optional).
+.TP
+.B      \-\-music\-albums
+Search for music albums matching \fIEXPRESSION\fR (optional).
+.TP
+.B      \-\-music\-artists
+Search for music artists matching \fIEXPRESSION\fR (optional).
+.TP
+.B \-l, \-\-images
+Search for images matching \fIEXPRESSION\fR (optional).
+.TP
+.B \-v, \-\-videos
+Search for videos matching \fIEXPRESSION\fR (optional).
+.TP
+.B \-t, \-\-documents
+Search for documents matching \fIEXPRESSION\fR (optional).
+.TP
+.B \-e, \-\-emails
+Search for emails matching \fIEXPRESSION\fR (optional). Returns a list
+of subjects for emails found.
+.TP
+.B \-c, \-\-contacts
+Search for contacts matching \fIEXPRESSION\fR (optional). Returns a list
+of names and email addresses found.
+.TP
+.B \-\-software
+Search for software installed matching \fIEXPRESSION\fR (optional). Returns a list
+of desktop files and application titles found.
+.TP
+.B \-\-software-categories
+Search for software categories matching \fIEXPRESSION\fR (optional). Returns a list
+of urns and their categories (e.g. Settings, Video, Utility, etc).
+.TP
+.B \-\-feeds
+Search through RSS feed information matching \fIEXPRESSION\fR (optional). Returns a list
+of those found.
+.TP
+.B \-b, \-\-bookmarks
+Search through bookmarks matching \fIEXPRESSION\fR (optional). Returns a list
+titles and links for each bookmark found.
+.TP
+.B \-V, \-\-version
+Print version.
+
+.SH SEE ALSO
+.BR tracker-store (1),
+.BR tracker-stats (1),
+.BR tracker-tag (1),
+.BR tracker-info (1).
