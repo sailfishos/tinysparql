@@ -477,8 +477,6 @@ class MinerFsHelper (Helper):
     BUS_NAME = cfg.MINERFS_BUSNAME
 
     FLAGS = ['--initial-sleep=0']
-    if cfg.haveMaemo:
-        FLAGS.append ('--disable-miner=userguides')
 
     def _stop_process (self):
         if options.is_manual_start ():

@@ -18,10 +18,8 @@ config_noinst = \
 # Services
 service_in_files = \
 	org.freedesktop.Tracker1.service.in \
-	org.freedesktop.Tracker1.Miner.Applications.service.in \
 	org.freedesktop.Tracker1.Miner.EMails.service.in \
 	org.freedesktop.Tracker1.Miner.Files.service.in \
-	org.freedesktop.Tracker1.Miner.Userguides.service.in \
 	org.freedesktop.Tracker1.Miner.Flickr.service.in \
 	org.freedesktop.Tracker1.Miner.RSS.service.in  \
 	org.freedesktop.Tracker1.Extract.service.in \
@@ -39,13 +37,7 @@ service_DATA = \
 
 if HAVE_TRACKER_MINER_FS
 service_DATA += \
-	org.freedesktop.Tracker1.Miner.Files.service \
-	org.freedesktop.Tracker1.Miner.Applications.service
-
-if HAVE_MAEMO
-# Userguides are done in the miner-fs process
-service_DATA += org.freedesktop.Tracker1.Miner.Userguides.service
-endif
+	org.freedesktop.Tracker1.Miner.Files.service
 endif
 
 if HAVE_TRACKER_MINER_EVOLUTION
