@@ -1,0 +1,8 @@
+[Unit]
+Description=Tracker Miner
+After=xorg.target
+Requires=dbus.socket xorg.target tracker-store.service
+
+[Service]
+ExecStart=/usr/libexec/tracker-miner-fs
+

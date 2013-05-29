@@ -1,0 +1,757 @@
+* Thu May 02 2013 Martin Kampas <martin.kampas@tieto.com> - 0.14.4
+- Add tracker-disable-userguide-and-applications-miners.patch
+
+* Mon Apr 29 2013 Martin Kampas <martin.kampas@tieto.com> - 0.14.4
+- Add tracker-tests-exclude-200-backup-restore.patch (NEMO#537)
+
+* Mon Mar 04 2013 Martin Kampas <martin.kampas@tieto.com> - 0.14.4
+- Fix most of NEMO#537
+- Add tracker-tests-do-not-su-meego.patch
+- Add tracker-tests-fix-undefined-function-call.patch
+- Add tracker-tests-synchronous-terminate-pre-step.patch
+- Add tracker-tests-increase-timeout.patch
+- Add tracker-tests-fix-helper-starting-order.patch
+- Add tracker-tests-make-400-extractor-work-with-testrunner.patch
+- Add tracker-tests-allow-reuse-graph-updated-signal-handling.patch
+- Add tracker-forget-removed-files.patch
+- Add tracker-tests-310-fts-indexing-use-graph-updated-signal.patch
+- Add tracker-tests-501-writeback-details-fix-invalid-metadata-key.patch
+- Add tracker-miner-fs-deal-with-data-inserted-by-other-apps.patch
+- Add tracker-tests-400-extractor-skip-unsupported-file-types.patch
+
+* Sat Jan 26 2013 Mohammed Hassan <mohammed.hassan@jollamobile.com> - 0.14.4
+- Drop 0001-Tracker-0.7.23-desktop-files.patch
+- Drop 0003-tracker-0.9.26-create-tests-aegis.patch
+- Enable Qt support
+- Add 0001-Remove-tracker-tests.aegis-from-config_SCRIPTS-if-ma.patch
+
+* Fri Jan 18 2013 Jonni Rainisto <jonni.rainisto@jollamobile.com> - 0.14.4
+- Updated to latest stable upstream
+- Removed tracker-0.10.37-add-userguides-service-for-maemo.patch
+
+* Mon Oct 15 2012 Mohammed Hassan <mohammed.hassan@jollamobile.com> - 0.14.2
+- Updated to latest upstream
+- Added dbus-python as a build requirement (Seems needed for tests somehow)
+- Enable libvorbis support
+- run glib-compile-schemas to compile GSettings schemas
+- enable tracker-fts by default
+
+* Sat Sep 22 2012 Carsten Munk <carsten.munk@jollamobile.com> - 0.10.37
+- Add systemd user session service files
+
+* Fri Aug 17 2012 Marko Saukko <marko.saukko@jollamobile.com> - 0.10.37
+- Fix linking with newer glib. tracker-0.10.37-fix-linking-with-newer-glib.patch
+
+* Wed May 16 2012 Marko Saukko <sage@merproject.org> - 0.10.37
+- Fix python2.6 to python in 0003-tracker-0.9.26-create-tests-aegis.patch
+
+* Mon Feb 20 2012 Marko Saukko <marko.saukko@gmail.com> - 0.10.37
+- Change build dep libpng12 to libpng.
+
+* Mon Jan 09 2012 Marko Saukko <marko.saukko@cybercom.com> - 0.10.37
+- Fixes NEMO#68: Re-enabled --enable-maemo as people application needs it.
+- Added tracker-0.10.37-add-userguides-service-for-maemo.patch for --enable-maemo option.
+
+* Tue Jan 03 2012 Marko Saukko <marko.saukko@cybercom.com> - 0.10.37
+- Update to version 0.10.37
+- Clean up the packaging
+- Removed unrecognized options: --disable-tracker-status-icon, 
+  --disable-tracker-search-tool, --enable-video-extractor, --disable-gstreamer-helix, 
+  --disable-miner-kmail, --disable-libwv2
+- Remove autorecognized options:
+  --enable-poppler, --enable-libexif, --enable-libgsf, --enable-libtiff, --enable-libjpeg,
+  --enable-libgif, --enable-exempi, --enable-qt, --enable-tracker-fts, --enable-playlist,
+  --with-enca, --disable-gdkpixbuf
+- Replaced build dependency from quill to qt-devel.
+- Disabled: --enable-maemo
+- Removed patch that didn't apply to newer version 0004-tracker-extract-gst-hw-codec.patch
+- Added patch to fix linking with newer compilers: tracker-0.10.37-fix-linking-with-newer-toolchain.patch
+
+* Mon Nov 14 2011 Marko Saukko <marko.saukko@cybercom.com> - 0.10.21
+- Removed gtk-doc dependency.
+- Removed gst-plugings-good install time dep. It is really not needed by tracker to run.
+
+* Tue Jul 25 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.10.21
+- BMC#22284, Update to upstream
+- Fixes: GB#654407, libtracker-data: Implement get_property() for n-columns
+- Fixes: GB#654653, libtracker-miner: don't use G_CONST_RETURN
+- libtracker-miner: make tracker_miner_fs_check_file() use high priority
+- tracker-miner-fs: Add priority queues to achieve more prompt indexing on demand
+
+* Mon Jul 18 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.10.20
+- BMC#21327 Update to upstream
+- Corrupted thumbnails are displayed for few minutes when multiple images are deleted 
+- libtracker-data: Shutdown locale in error case
+- tracker-extract: Ignore keywords with invalid UTF-8
+- tracker-extract-mp3: Use guessed ID3v1 8-bit encoding also for ID3v2
+- libtracker-miner: Make TrackerProcessingTask refcounted
+- Disabled full journaling to improve user data privacy
+- libtracker-data: Make sure we don't leak sql_dir on multiple _init() calls
+- libtracker-extract: Avoid division by 0 for GPS coordinates in EXIF tags
+- tracker-store: Improve logging to avoid spamming syslog on startup
+- tracker-miner-fs: Improve logging to avoid spamming syslog on startup
+- tracker indexes Downloads directory
+- Fixes: GB#652433, Progress signal gives faulty value just before finishing
+- Tracker errors with out of disk space for direct (read) only connections
+- Tracker doesn't use MeegoTouch's libicu for collation when we HAVE_MEEGOTOUCH
+- functional-tests: Parse tags correctly from tracker-extract output
+- libtracker-miner: Make sure status property is set to 'Idle' on construct
+- libtracker-miner: Avoid handling or logging anything about .xsession-errors to avoid recursive issues
+- libtracker-miner: Fixed inconsistent status signals where progress and status are set together
+- libtracker-miner: Only use 2% or higher as progress for 'Processing...'
+- libtracker-extract: Support extraction of EXIF/XMP GPS information for images
+- tracker-extract: Use _exit() not g_main_loop_quit() on pre-unmount signals to promptly respond
+- tracker-extract, tracker-writeback, libtracker-extract: Use nfo:heading instead of nmm:direction
+- tracker-miner-fs: Unset nie:url to set our own on file updates
+- tracker-miner-fs: Do not ignore IgnoreNextUpdate for CREATED events on old files
+- tracker-writeback: Always clear existing XMP fields before updating metadata
+- tracker-writeback: Guarantee file updates atomically
+- tracker-control: Don't use ✓ for any progress other than 100%
+
+* Tue Jun 14 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.10.17
+- BMC#19289 Update to upstream
+- Don't (re)instantiate tracker-extract after recent pre-mount signals causing potential unmount failures
+- Race condition when cancelling extraction leads to double free
+- libtracker-bus: Use lazy initialization for D-Bus proxy objects
+- libtracker-sparql: Use GError instead of critical warnings
+- libtracker-miner: Avoid possible race condition when cancelling extraction
+- tracker-miner-fs: Do not insert minimal sparql on cancellation
+
+* Wed Jun 08 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.10.15
+- BMC#18748 Added mime type for ismd hardware decoder to extract video metadata
+
+* Mon Jun 03 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.10.15
+- BMC#18659 Fixes Tracker needs to be updated to 0.10.15
+- Fixes: tracker package contains debug symbols that should be in tracker-dbg 
+- Fixes: GDBusProxy created from threads without own GMainContext may cause memory corruption due to race condition in handling NameOwnerChangedsignal
+- Fixes: tracker-extract crashes when destroying QApplication on shutdown, QApplication shouldn't be destroyed
+- Fixes: tracker-miner-fs initial sleep can be used to shutdown cleanly (e.g. with ctrl+c) when mtime checks are required
+- Fixes: Don't (re)instantiate tracker-extract after recent pre-unmount signals causing potential unmount failures
+- Fixes: Close sparql insert/graph braces on extractor cancellation
+- libtracker-sparql: Fix deadlock on initialization error
+- libtracker-miner: Fixed c++ builds where headers use "private" keyword
+- libtracker-miner: Include missing header tracker-albumart.h in main header
+- libtracker-miner: Do not perform removed files check if crawling was cancelled
+- tracker-store: Reenable signals after failing to load Turtle file
+- tracker-extract: Improve logging around which module is used for extraction per file
+- Fixes: Protect cursor finalization with mutex necessary for parallel queries with direct access
+- libtracker-miner: Fixed including from projects built with g++
+- libtracker-miner: Fixed missing albumart header in main header
+- libtracker-sparql-backend: Fix deadlock on initialization error
+- libtracker-data: Handle EINTR instead of EGAIN when writing journal
+- libtracker-data: Delete empty file if unable to write journal header
+- libtracker-data: Do not trigger a journal replay with invalid ontology journals
+- libtracker-data: Propagate errors for ontology transactions
+- libtracker-bus: Support multiple bus connection objects
+- libtracker-direct: Support multiple bus connection objects
+- libtracker-sparql: Protect singleton weak pointer with mutex
+- libtracker-miner: Cleanup media-art that isn't valid anymore every 30 minutes or so
+- tracker-store: Improved error handling for Data.Manager.init
+- Fixes: Add UID::user and GID::users to aegis files
+
+* Mon May 30 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.10.13
+- BMC#18159 Fixes Tracker cannot index real media
+
+* Mon May 02 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.10.13
+- BMC#18077 Tracker needs to be updated to 0.10.13
+- Build: Package libtracker-miner separately
+- Build: Package libtracker-miner header files
+- Signal batching on update could be more efficient
+- Timezone query with optional geolocation params returns incorrect results
+- Re-add mount points if unmount operation fails
+- libtracker-miner: Cancel TrackerMinerFS cancellables on finalize
+- tracker-store: Use lazy loading for stats to improve start up speed
+- tracker-miner-fs: Default config now copes with new XDG dir changes (see NB#254857) and former config
+- Now tracker-control has --backup and --restore options
+- Now tracker-miner-rss has an --add-feed option
+- Fixes: GB#520670, Timestring not internationalized
+- Fixes: GB#633105, Abiword extractor doesn't extract file contents
+- Fixes: GB#397205, Type icons not updated on icon theme change
+- Application without TrackerReadAccess token can read contacts data
+- Insert nfo:FileDataObject in case extraction of a file fails
+- libtracker-extract: Fixed encoding guessing, make sure we init/shutdown locale module
+- libtracker-miner: Don't load thumbnailer service properties over D-Bus
+- tracker-store: Added checks to Backup method target file so it is a real URI
+- tracker-control: Added --backup and --restore
+- tracker-miner-rss: Fixed crash trying to cast TrackerSparqlConnection to TrackerMinerRSS
+- tracker-miner-rss: Fixed recursive check with mfo:updatedTime GraphUpdated signal
+- tracker-miner-rss: Fixed ASK SPARQL to check true/false not 0/1
+- tracker-miner-rss: Improved logging/debugging
+- Fixes: GB#633108, FLAC extractor doesn't work properly
+- Fixes: GB#632876, Wrong extraction order in MsOffice-XML powerpoint files
+- QSparqlConnection leaks tracker-sparql objects
+- Drop libmeegotouchcore dependency from libtracker-sparql
+- NCO: Add index on nco:phoneNumber
+- Require: Rest >= 0.7 (was 0.6), old packages no longer available on Ubuntu/Fedora
+- tracker ignores file created with 'touch'
+- Ontology: Added maemo:PostalAddress to facilitate TYPE=postal parameters ADR properties in VCARDs
+- Ontology: Removed nrl:InverseFunctionalProperty from nco:phoneNumber
+- libtracker-data: Support ontology changing regarding nrl:InverseFunctionalProperty
+- libtracker-miner: Limit extractions to 10 at any given time
+- libtracker-miner: Limit the number of statements sent to the store per request
+- tracker-extract: Complete relicensing from GPL to LGPL for C++ files missed
+- tracker-extract: Fixed critical about locale when run from command line
+- tracker-extract: Fixed critical when finalizing the controller object
+- tracker-extract: Fixed crash with new QApplication() and passed argv parameter
+- tracker-extract is crashing at tracker_extract_info_free
+- New Feature: Now tracker-info --turtle allows exporting resources in Turtle RDF
+- Fixes: GB#646834, Add support for Turtle output to tracker-info
+- Fixes: GB#647548, Tracker should provide libmeegotouch disabling option
+- After updating tracker & libtracker-sparql (0.10.1-1maemo2+0m6 -> 0.10.3-1maemo2+0m6), direct connection opening fails.
+- tracker-writeback crashes when d-bus connection is not available
+- Meaningless strings shown in a place of location tags
+- tracker-miner-fs fails to generate mtime cache returning NULL values due to broken query
+- tracker_sparql_cursor_get_boolean does not return correct true value for ask query
+- Bug in parser when putting a triple after a GRAPH block in INSERT
+- Missing tracker:id -> iri conversion when using fn:concat on resources
+- Tracker should process pre-unmount signal from usb_moded
+- Ontology: Removed tracker:notify from immutable helper classes nco:Contact, nco:EmailAddress, nco:PhoneNumber and nco:PostalAddress
+- libtracker-common: Re-instate setrlimit() and clamp between 256Mb and 50% memory capacity for RLIMIT_{AS|DATA}
+- libtracker-common: Don't apply setrlimit() constraints to spawned processes (inherited anyway)
+- libtracker-data: Error when OFFSET, LIMIT, GROUP or ORDER are used with ASK queries
+- libtracker-sparql: Fixed libtracker_sparql_LDFLAGS missing "\", causing export of all symbols
+- libtracker-extract: Added new unit test for IPTC records are read correctly
+- tracker-extract: Added a controller thread to be able to shutdown quickly on pre-unmount signals
+- tracker-extract: Cleaned up debugging considerably and print summary on start up
+- debian: Merge 08-linker-fixes-for-libtracker-sparql.patch into patch 09
+- debian: Added patch to work around rpath issues for libtracker-{common|data}
+- debian: Added patch 09 to use usb-moded to fix NB#240681
+- Fixes Break in libtracker-sparql
+- debian: reverted changes to 08-linker-fixes
+- debian: replaced 08-linker-fixes-for-libtracker-sparql by extended 08-linker-fixes
+- debian: Depend on Vala 0.12.0
+- Require: Vala >= 0.12.0 (was 0.11.4), due to introspection issues
+- Require: GObject Introspection >= 0.9.5
+- New Feature: Introspection support for libtracker-{sparql|miner|extract}
+- Fixes: Crashes in sqlite
+- Fixes: "initial-sleep" configuration in miner-fs broken
+- Fixes: Add macro to check Tracker version
+- Fixes: Add a doap file to keep master.gnome.org happy when releasing
+- Fixes: ~/.cache/tracker/no-need-mtime-check.txt is not written if tracker-store is stopped before tracker-miner-fs
+- Fixes: COREWEB: [/usr/bin/call-history,/usr/bin/messaging-ui] 'sqlite3DbMallocRaw sqlite3VdbeMemGrow sqlite3VdbeMemSetStr bindText sqlite3_bind_text'
+- Fixes: Customized album art image not shown in Music application
+- Fixes: Black thumbnail is displayed after delete favourite image
+- Fixes: Some PDF files are not indexed
+- Fixes: GConf should use the GDBus port, as libdbus isn't thread safe and crashes are being seen fetching the configuration values of meegotouch locale
+- Fixes: COREWEB: applications crashing for 'strcmp __dlerror fetch_dlerror _g_module_symbol g_module_symbol'
+- libtracker-sparql: Fixed test case on cancellation error check
+- libtracker-data: Protect tracker_db_cursor_get_* with mutex
+- libtracker-bus: There is no BatchUpdateArray, UpdateArray is always considered a batch operation
+- libtracker-sparql: Fix build from tarball
+- tracker-store: Increase maximum signal size from 1000 to 50000 triples
+- tracker-store: Fix UpdateArray to use low priority request
+- tracker-extract: oasis: Avoid invalid frees on non-NULL pointers
+- Fixes: Messages not saved correctly into tracker
+- Fixes: tracker CUD script is not needed anymore
+
+* Wed Apr 13 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.10.6
+- BMC#15843 (RPM Packaging disables FTS, while it shouldn't)
+- BMC#3271 (Tracker does not index Chinese text correctly)
+
+* Fri Apr 01 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.10.6
+- BMC#15071
+- BMC#15006
+- Require: GStreamer 0.10.31 (was 0.10.12) for GstDateTime
+- msoffice-xml timeouts in case the file has too much content
+- evolution plugin build fails to build since 0.10.5 and evo 2.91.x
+- query callback being called from another thread
+- mlo and slo contain invalid Turtle literals: 'False' instead of 'false'
+- Copied videos are always indexed with time set to 00:00:00
+- Embedded album art not found for MP3 clip
+- fn:to-lower does not handle non-latin characters
+- libtracker-sparql returns datetimes and bools as TRACKER_SPARQL_VALUE_TYPE_STRING
+- New Feature: Added INSERT OR REPLACE SPARQL, using UPDATE gives us ca. 25% speed improvement in some cases
+- libtracker-common: Only use encoding guessing when confidence is > 30%
+- libtracker-data: Added new functions tracker:case-fold() and tracker:lower-case()
+- libtracker-sparql: Handle GSpawnError thrown by GDBus
+- Selected tags displayed twice while editing those from second attempt
+- If async conn opening has failed once, the user's callback is not called when trying it again
+- Callback of tracker_sparql_connection_get_async in wrong thread
+- Don't start miners when querying status in tracker-control
+- Assume --list-processes and --status when running without args in tracker-control
+- Improve extraction of title from filenames with multiple dots in libtracker-extract
+- Fix original resolution conversion in EXIF data for inches/cm
+- Remove --detailed option, always enabled in tracker-control
+- Ontology: Add nfo:lastPlayedPosition to Media elements
+- libtracker-common: Fix localtime handling with historic UTC offsets
+- libtracker-data: Fix graph check for anonymous blank nodes
+- libtracker-sparql: Mark tracker_sparql_builder_drop_graph() as deprecated
+- libtracker-sparql: Don't export symbols which are internal
+- libtracker-miner: Added tracker_miner_manager_new_full() to disable starting miners when querying status
+- tracker-store: Don't start if not running when querying status
+- tracker-miner-fs: Add --no-daemon command line to exit when indexing done
+- tracker-extract: Add parameter to QApplication to allow running without X11
+- tracker-needle: Set proper application icon
+- evolution: Fix use of GRAPH with the nie:DataSource, now indexes properly again
+- functional-tests: Update expectations now that bug has been fixed
+- If async conn opening has failed once, the user's callback is not called when trying it again
+- Callback of tracker_sparql_connection_get_async in wrong thread
+- Some PDF files are not indexed
+- Second tracker_sparql_connection_get_async never returns
+- Using [] notation with identical statements, but in different graphs can result in silent data loss
+- Tracker interprets zoneless XMP timestamps differently than zoneless Exif timestamps
+- functional-tests: Fix XDG directory handling
+- libtracker-miner: Don't assume g_dbus_info_new_for_xml() never fails
+- libtracker-miner: Added missing documentation functions to sections file
+- libtracker-extract: Don't assume g_dbus_info_new_for_xml() never fails
+- add patch 08 to fix libtracker-sparql deadlock on initialization
+- miner-fs not removing files from the store
+- Slight differences with results depending on libtracker-sparql backend
+- nie:ContentCreated is updated when the mtime of a file changes
+- Not able to find applications when language is changed
+- Chinese strings not detected from mp3 downloaded track
+- Ontology: Added nfo:Note for applications like Tomboy
+- functional-tests: Force English locale for tests
+- libtracker-miner: Improve bulk operation speed like deleting (~116s vs ~172s for ~2.6k files on desktop)
+- patch to stay with poppler 0.12.2 removed
+- tracker fails to build with gcc-4.5
+- Handle error propagation in tracker-writeback dispatcher construction properly
+- DRM protected Music files(.pya) files are Listed under videos
+- Make "title-only" search non-case sensitive
+- Fixes for NetworkManager 0.9
+- tracker-extract-pdf.cpp: error: GlobalParams.h: No such file or directory
+- 0.10 tarball doesn't have tracker-search-bar.1 manpage
+- Negative processed stats by tracker-miner-fs
+- Wrong tracker-extract statistics
+
+* Fri Apr 01 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.10.0
+- BMC#13365
+- [REG] Media files from eMMC image are not visible in apps (multiple tracker-miner-fs crashes)
+- Tracker not populating geotag information for image with geotags
+- USB disk not indexed
+- albumArtist information is not provided
+- build: Fixed various unnecessary linking between libraries.
+- libtracker-data: Added full error handling up/down the db/data initialisation stack
+- tracker-extract: FLAC: Fixed memory handling issues.
+- SEV-1: 10776 Music GSM-BTR-1-8108 Music Player: Duplicates in the store when synchronizing with Ovi Suite/WMP
+- tracker-extract segfaults when songs without album or artist metadata is copied to device
+- tracker-miner is crashing frequently
+- Modified album art is not updated after synchronizing with WMP.
+- Unusable emergency contact is found in Search application
+- Generated album art shown for some clips with albumart metadata
+- after ~440 smses tracker does not respond any longer
+- tracker_sparql_connection_get_direct should fail if direct access is not possible
+- "too many sql variables" when "filter ?sth in (long list)"
+- Double-click on application result should start the application
+- ontology: Make nie:url an inverse functional property (essentially making it unique)
+- functional-tests: Kill/stop the store in a realistic way for backup/restore
+- documentation: Various fixes for libtracker-{client|miner|extract|sparql}
+- libtracker-data: Added unit tests for IN with > 20 elements
+- libtracker-data: Improve error handling on initialization (especially if the WAL PRAGMA fails)
+- libtracker-data: Fixed a race condition on shutdown causing criticals with  g_object_unref()
+- tracker-store: Increase maximum D-Bus result size (1 Mb to 10 Mb)
+- tracker-store: Don't send unmapped errors in D-Bus replies
+- New feature: Don't do mtime checks on start up (dramatically reduces start time for miner-fs)
+- Always send CHANGES_DONE_HINT after a move from a non-monitored location to a monitored one in GFileMonitor
+- Don't crash in 'tracker_miner_init', support GInitable and handle errors gracefully
+- tracker-control should have options to pause and resume the miners
+- tracker-miner is too heavy to start
+- GLIB CRITICAL ** GLib-GIO - g_dbus_proxy_call: assertion `parameters == NULL || g_variant_is_of_type (parameters, G_VARIANT_TYPE_TUPLE)' failed
+- tracker-miner-fs crawls open files
+- Don't crash in tracker-extract when using QImage for SVG files
+- Extract track numbers from MP3 ID3v2.2 frames
+- Tracker should update mtime of the "db-version.txt" stamp file after a backup restoration
+- --enable-guarantee-metadata and PNG: no nie:contentCreated
+- libunistring and glib collations break fn:starts-with
+- drop status icon use
+- Change the 3 days time for removable media information deletion to a configuration value
+- Get rid of Bonobo
+- Added tests for interaction with applications creating content
+
+* Tue Mar 29 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.9.34
+- BMC #13450: remove dependency on w3m and o3read
+
+* Thu Feb 17 2011 Lionel Landwerlin <lionel.g.landwerlin@linux.intel.com> 0.9.34
+- BMC - 13204
+
+* Thu Jan 27 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.9.34
+- BMC - 12977
+
+* Tue Jan 18 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.9.34
+- BMC - 11199
+- libtracker-data: Fix double free in ontology cache code
+- libtracker-miner: Improve SPARQL connection error handling
+- libtracker-data: Update domain indexes on type statement insert
+- tracker-store: Reinitialize signals after failed backup or restore
+- libtracker-data: Update rdf:type table when deleting type statements
+- SLO: Fixed maxCardinality of some properties
+- Fix assertion failure when ontology cache fails to load
+- Ontology: Make SLO an ontology that is installed by default
+- Ontology: Fixed maxCardinality and deprecated annotations in MLO
+- libtracker-data: Fix double unref on shutdown
+- libtracker-data: Fix memory leak in gvdb writing
+- libtracker-data: Update statistics when bypassing buffer for deletes
+- libtracker-data: Fix tracker_ontologies_get_classes
+- libtracker-sparql: Shutdown backends when finalizing connection
+- libtracker-common: Improve tracker_dbus_request_* API
+- tracker-extract: Relicense from GPL to LGPL
+- tracker-extract: TIFF: SLO ontology porting
+- tracker-extract: PNG: SLO ontology porting
+- tracker-extract: PDF: SLO ontology porting
+- tracker-extract: JPEG SLO ontology porting
+- tracker-extract: GIF: SLO ontology porting
+- tracker-writeback: SLO ontology porting
+
+* Fri Jan 14 2011 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.9.33
+- BMC - 11929
+- SPARQL: Do not use nested subquery for EXISTS / NOT EXISTS
+- SPARQL: Improve predicate variable support
+- SPARQL: Implicitly convert fn:concat arguments to string
+- libtracker-data: Fix memory leak in cursor_next_async
+- libtracker-data: Fix gvdb lookup for not existing ontology resources
+- Ontology: Remove tracker:isAnnotation property
+- SPARQL: Support graph retrieval using property functions
+- SPARQL: Accept semicolon as separator between update operations
+- SPARQL: Add support for INSERT/DELETE DATA
+- SPARQL: Fix WITH support
+- SPARQL: Drop deprecated support for DROP GRAPH
+- libtracker-data: Add ontology cache
+- libtracker-data: Bypass update buffer for rdf:type deletes if possible
+- tracker-store, libtracker-data: Enhance signal behaviour for batch updates
+- libtracker-common: Print PID of process in dbus requests
+- libtracker-miner: Set proper nfo:belongsToContainer on file move operations
+- libtracker-miner: Skip IgnoreNextUpdate requests on CREATED events
+- libtracker-miner: When deleting resources, first mark unavailable and then fully remove them
+- libtracker-miner: Make sure original monitors are removed during a move operation
+- libtracker-miner: On directory remove, first remove monitors, then notify event
+- libtracker-miner: When a moved dir event detected, cancel all monitors in the dir
+- libtracker-miner: Don't add monitors when renaming a directory to a hidden name
+- tracker-extract-gstreamer: Fix undefined references
+- tracker-extract-txt: Support text files encoded in UTF-16 if BOM available
+- tracker-writeback: XMP: Take into account mlo:asPostalAddress
+- tracker-writeback: Fix a memoryleak on unwanted_results and cleanup
+- tracker-writeback, libtracker-miner: Don't writeback non-strict mined values
+- tracker-miner-fs won't index new pictures taken with
+  geotags, due to an IgnoreNextUpdate request
+- tracker-extract-gstreamer: Fix undefined references
+- libtracker-sparql doesn't return results if multiple async queries are run in parallel in direct back-end
+- Union query of All images & videos taken with device camera is too slow
+- debian: clean changelog
+- debian: patch configure.ac to downgrade required python version
+- Require: autoconf >= 2.64 was 2.59
+- Require: libtool >= 2.2 (previously no required version)
+- build: Require Dia with --enable-gtk-doc
+- build: Require Python >= 2.6 with --enable-functional-test
+- build: Binaries built now use *stable* named versions only (i.e. 0.10 not 0.9)
+- Require dia if we want to generate the documentation
+- Port tracker to gtk+ 3.0
+- tracker-0.9.30 linking errors
+- Include libtracker-data.vapi in tarball
+- tracker-status-icon grabs control+alt+S keybinding unconditionally which causes issues for emacs
+- Use upstream gettext instead the Glib one
+- Use autoreconf instead gnome-autogen.sh
+- Ontology: Added nmm:MusicAlbumDisk, nmm:musicAlbumDisk, nmm:albumDiskAlbum classes
+- Ontology: Changed nmm:performer rdfs:domain from nmm:MusicAlbum to nmm:MusicAlbumDisk
+- Ontology: Changed nmm:setNumber rdfs:domain from nmm:MusicAlbum to nmm:MusicAlbumDisk
+- Ontology: Changed nmm:internationalStandardRecordingCode rdfs:domain from nmm:MusicAlbum to nmm:MusicPiece
+- libtracker-sparql: Fixed documentation to include tracker_sparql_get_uuid_urn()
+- libtracker-miner: Fixed documentation missing but written
+- tracker-extract: Fixed GUPNP-DLNA extractor, was using "nfo.channels" not "nfo:channels"
+- functional-tests: Don't hardcode python version in scripts
+- Requires Vala 0.11.2 was 0.11.1
+- Requires libgconf2-6 for MeeGoTouch locale changes
+- Classes slo:Landmark, slo:LandmarkCategory and slo:GeoLocation should qualify for notifications
+- libtracker-sparql: cannot run 2 async queries at the same time
+- Critical in miner-fs when msyncd and Ovi Suite in operation
+- missing test file in tarball
+- build fails - missing .vapi files?
+- Added domainIndex nie:contentCreated to nfo:Visual
+- Ontolgoy: Added tracker:notify true for slo:LandmarkCategory, slo:Landmark and slo:GeoLocation
+- SPARQL: Use WITH/INTO/FROM clause in WHERE pattern of updates
+- Support MeeGoTouch Locale, recalculating indexes on locale changes
+- data-generators: Diversify the content creation times
+- data-generators: Support nfo:Equipment correctly
+- data-generators: Small fixes to the music data
+- libtracker-data: Disable fn:starts-with test for !libicu cases
+- libtracker-data: Document the TRACKER_PRAGMAS_FILE environment variable
+- libtracker-direct: Make singleton connection thread-safe
+- libtracker-bus: Reduce D-Bus proxy initialization time
+- libtracker-sparql: Reduce D-Bus proxy initialization time
+- tracker-extract, albumart: Don't assume that g_file_get_parent() returns non-NULL
+- tracker-miner-applications: Re-extract desktop files when locale change detected
+- tracker-status: Added more granularity to the tracker-store status reporting for the journal replay
+
+* Sun Jan 09 2011 Vivian Zhang <vivian.zhang@intel.com> - 0.9.29
+- Add hw codec support in tracker gstreamer extractor, add patch 0008-tracker-extract-gst-hw-codec.patch from chen,zhenqiang(BMC #12137)
+
+* Mon Dec 14 2010 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.9.29
+- BMC - 11270
+- Use MaxBytes from tracker-extract.cfg for msoffice 2007 files
+- MsOffice metadata extractor is not unicode aware
+- Missing test file in tarball
+- Correction in the --enable-tracker-search-tool configuration flag management
+- libtracker-sparql, libtracker-client: Fix URI escaping
+- tracker-miner-fs crawls open files
+- Ontology: Add index on tracker:added
+- tracker-extract: Fixed nested use of anonymous blank nodes
+- Composer label not extracted in ID3v2.3 mp3 files
+- All libtracker-miner section names in CamelCase in documentation
+- SPARQL: Do not ignore GRAPH around rdf:type statements
+- Ontology: Add index on nco:nameFamily
+- SPARQL: Support \u escape sequence in string literals
+- SPARQL: Fix INSERT/DELETE and SELECT * with WHERE without variables
+- SPARQL: Use proper collation for string literals and fn:starts-with
+- libtracker-data: Make it easier to test the PRAGMAs for SQLite
+- libtracker-bus: Fix handling of priority in update_async
+- libtracker-sparql: Add function to generate a uuid urn to the client library
+- tracker-store: Fix crash on client exit and task without destroy notify
+- tracker-extract: Split msoffice and msoffice-xml extractors and refactor code
+- tracker-extract-mp3: Fix memory leak
+- tracker-miner-applications: Fix encoding issues and handling of nie:dataSource
+- tracker-miner-fs: Use low priority for update_async calls
+- tracker-search: New --software and --software-categories options
+- Add userguide content to tracker index
+- Require Vala 0.11.1
+- Require GLib 2.26
+- Require Automake 1.11 and use Vala features
+- NEW feature: GDBus support
+- New feature: Added utils/tracker-sql to run SQL on the databases directly
+- NEW feature: Neo ontology added for Zeitgeist
+- GIF extractor doesn't extract comments
+- Cardinality change from 1 to N in the ontology is not working fine
+- Use gdbus in Vala to improve communications in Tracker
+- Cannot create backup while updates are being inserted in the journal
+- After backup restore operation: Tracker-CRITICAL **: tracker_class_has_insert_events: assertion `TRACKER_IS_CLASS (class)' failed
+- Tracker store segfaults during backup Restore operation
+- Remove rdfs:subClassOf from a class is not working
+- build: Fixed check for tracker-preferences which used "text" not "test"
+- Ontology: Updated mfo:image for mfo:FeedSettings to be in domain mfo:FeedElement
+- Ontology: Added tracker:indexed true for nmm:artistName
+- Ontology: Added tracker:domainIndex for nie:title on nmm:MusicAlbum
+- Ontology: Deprecated nmm:albumTitle for nie:title
+- functional-tests: Fixed and enabled property range date->string test
+- functional-tests: Fixed expected failures with new journal
+- functional-tests: Added property promotion/relegation tests
+- functional-tests: Added properties in basic ontology to test new changes
+- functional-tests: Added changing the superclass of a class test
+- libtracker-data: Combine INSERT and UPDATE statements into one INSERT
+- libtracker-data: Fixed ontology change coping for tracker:domainIndex
+- libtracker-miner: Added documentation for _manager_reindex_by_mimetype() and _manager_index_file()
+- tracker-store: Queue queries while backup is taking place
+
+* Sat Nov 27 2010 Jean-Luc Lamadon <jean-luc.lamadon@nokia.com> 0.9.26
+- Qtcontacts-tracker needs update (BMC#10290)
+- Added patches 0006 and 0007 to set configuration option --enable-maemo
+
+* Thu Nov 25 2010 Mishra Maitrey <ext-maitrey.mishra@nokia.com> 0.9.26
+- BMC#10287
+- Removed --enable-gstreamer-tagreadbin form the ConfigOptions
+
+* Thu Nov 11 2010 Wang Quanxian <quanxian.wang@intel.com> 0.9.26
+- BMC#8807
+- Since icu is upgrade to 4.5.2, the pc mechanism is changed, change
+- to adapt icu 4.5.2
+
+* Wed Nov 03 2010 Maitrey Mishra <ext-maitrey.mishra@nokia.com> - 0.9.26
+- BMC - 6350
+- Added the patch for she-bang in functional tests
+- Renamed the patches
+- Restructured tracker packages into 3 subpackages tracker-devel, tracker-tests and tracker-utils
+- Updated the version to 0.9.26
+
+* Mon Sep 27 2010 Vivian Zhang <vivian.zhang@intel.com> - 0.9.16
+- Add requires: sqlite >= 3.6.23, fixed BMC #7191
+
+* Wed Sep 22 2010 Todd Brandt <todd.e.brandt@intel.com> - 0.9.16
+- set tracker:notify on nmm:ImageList, nmm:MusicAlbum, and nmm:Artist
+- Bugzilla issue #7202
+
+* Tue Aug 24 2010 Jean-Luc Lamadon <jean-luc.lamadon@nokia.com> - 0.9.16
+- Update to 0.9.16
+
+* Fri Aug 13 2010 Vivian Zhang <vivian.zhang@intel.com> - 0.9.11
+- Add BuildRequires: giflib-devel, libtiff-devel to enable gif photos support, partially fix BMC #1503
+
+* Wed Jul 14 2010 Vivian Zhang <vivian.zhang@intel.com> - 0.9.11
+- Add X-IVI in desktop file
+- Remove file_uri_cache and per-dir-cache patch to fix BMC #3822
+
+* Thu Jul 08 2010 Priya Vijayan <priya.vijayan@intel.com> - 0.9.11
+- Rename MEEGO-NB to X-MEEGO-NB  and X-DUI to X-MEEGO-HS in .desktop file
+
+* Tue Jul 06 2010 Bernd Wachter <ext-bernd.wachter@nokia.com> - 0.9.11
+- Update to 0.9.11
+- Remove 0001-enable-maemo-had-no-effect.patch included upstream
+- Remove older unused patches
+- Fix sheband and permissions in test scripts
+
+* Wed Jun 9 2010 Kaitlin Rupert <kaitlin.rupert@intel.com> - 0.9.6
+- Update to release 0.9.6
+- Remove skip_unnecessary_check.patch - fix is upstream
+- Remove fix-51-display-unavailable-data.patch - fix is upstream
+- Convert spec file to spectacle format
+
+* Wed Apr 21 2010 Vivian Zhang <vivian.zhang@intel.com> - 0.7.25
+- Merged upstream patch to fix unavailable data issue(BMC #51)
+
+* Mon Apr 12 2010 Vivian Zhang <vivian.zhang@intel.com> - 0.7.25
+- Add per-dir-cache patch from chen, zhenqiang
+
+* Sat Apr 10 2010 Anas Nashif <anas.nashif@intel.com> - 0.7.25
+- Fixed rpmlint errors
+
+* Wed Apr 07 2010 Vivian Zhang <vivian.zhang@intel.com> - 0.7.25
+- Add X-DUI in onlyShowin item of desktop file to ensure tracker-miner-fs can be auto-launched in handset image(BMC#1)
+
+* Tue Mar 30 2010 Vivian Zhang <vivian.zhang@intel.com> - 0.7.25
+- Add 3 patches from chen,zhenqiang for the workaround of #155 and performance improvement
+
+* Wed Mar 17 2010 Anas Nashif <anas.nashif@intel.com> - 0.7.25
+- Do not compile demos
+- Remove explicit dependencies
+
+* Mon Mar 15 2010 Anas Nashif <anas.nashif@intel.com> - 0.7.25
+- Remove requirement on catdoc which pulls tk for no good reason
+
+* Fri Mar 12 2010  <vivian.zhang@intel.com> - 0.7.25
+- Upgrade to 0.7.25 to fix MB #9877, #9879
+- Drop nologging patch since unused statistics signal has been removed
+- Add patch to fix the link failure
+
+* Thu Mar 04 2010 Damien Lespiau <damien.lespiau@intel.com> - 0.7.23
+- Re-add the miner destkop file to startup, but with the late priority
+
+* Tue Mar 2 2010 Vivian Zhang <vivian.zhang@intel.com> - 0.7.23
+- Update to 0.7.23
+- Remove upstreamed patch
+
+* Wed Feb 24 2010 Damien Lespiau <damien.lespiau@intel.com> - 0.7.21
+- Don't build neither the status icon nor the deskbar applet
+- Don't put any desktop files in the XDG autostart directory
+
+* Mon Feb 22 2010 Damien Lespiau <damien.lespiau@intel.com> - 0.7.21
+- Add a patch to fix tracker.h's inclusion of glib-object.h
+
+* Sun Feb 21 2010 Damien Lespiau <damien.lespiau@intel.com> - 0.7.21
+- Update to 0.7.21
+- remove upstreamed patch
+
+* Fri Feb 19 2010 Arjan van de Ven <arjan@linux.intel.com> - 0.7.19
+- convert buildrequires to pkgconfig
+- disable various common messages logged to xsession-errors/syslog,
+  these useless messages cost a bunch of power.
+
+* Wed Feb 10 2010 Damien Lespiau <damien.lespiau@intel.com> - 0.7.19
+- Add libjpeg-devel dependency for JPEG support and totem-pl-parser to
+  support indexing playlists
+
+* Mon Feb 08 2010 Damien Lespiau <damien.lespiau@intel.com> - 0.7.19
+- Add two patches: "Parses the filename to get the video metadata" and
+  "The MediaArt Spec says that media art should be generated using
+  artistname-albumname"
+
+* Sun Jan 31 2010 Vivian Zhang <vivian.zhang@intel.com> - 0.7.19
+- Update to 0.7.19
+
+* Wed Aug 19 2009 Yi Yang <yi.y.yang@intel.com> 0.6.95
+- Update to 0.6.95 because of gmime update
+
+* Tue May 19 2009 Todd Brandt <todd.e.brandt@intel.com> 0.6.94-1
+- Pulled in the K3 source drop with new source and patches
+
+* Thu Oct 23 2008 Jimmy Huang <jimmy.huang@intel.com> - 0.6.6-2
+- Pulled tracker into moblin, integrated WindRiver patches, <filter.patch>, <watch-dir.patch>.
+
+* Fri Mar 14 2008 Deji Akingunola <dakingun@gmail.com> - 0.6.6-2
+- BR poppler-glib-devel instead of poppler-devel for pdf extract module (Thanks to Karsten Hopp mass rebuild work for bringing this to light)
+
+* Sun Mar 02 2008 Deji Akingunola <dakingun@gmail.com> - 0.6.6-1
+- New release 0.6.6
+
+* Thu Feb 28 2008 Deji Akingunola <dakingun@gmail.com> - 0.6.5-1
+- New release 0.6.5
+
+* Fri Feb 22 2008 Deji Akingunola <dakingun@gmail.com> - 0.6.4-7
+- Ship the tracker-applet program in the tracker-search-tool subpackage
+  (Bug #434551)
+
+* Sun Feb 10 2008 Deji Akingunola <dakingun@gmail.com> - 0.6.4-6
+- Rebuild for gcc43
+
+* Thu Jan 24 2008 Deji Akingunola <dakingun@gmail.com> - 0.6.4-5
+- Backport assorted fixes from upstream svn (Fix Fedora bug 426060)
+
+* Mon Jan 21 2008 Deji Akingunola <dakingun@gmail.com> - 0.6.4-4
+- Now require the externally packaged o3read to provide o3totxt
+
+* Fri Dec 14 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.4-3
+- Undo the patch, seems to be issues (bug #426060)
+
+* Fri Dec 14 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.4-2
+- Backport crasher fixes from upstream svn trunk
+
+* Mon Dec 11 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.4-1
+- Version 0.6.4
+
+* Tue Dec 04 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.3-3
+- Rebuild for exempi-1.99.5
+
+* Sun Nov 25 2007 Brian Pepple <bpepple@fedoraproject.org> - 0.6.3-2
+- Add missing gtk+ icon cache scriptlets.
+
+* Tue Sep 25 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.3-1
+- Version 0.6.3
+
+* Tue Sep 11 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.2-2
+- Make trackerd start on x86_64 (Bug #286361, fix by Will Woods)
+
+* Wed Sep 05 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.2-1
+- Version 0.6.2
+
+* Sat Aug 25 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.1-2
+- Rebuild
+
+* Wed Aug 08 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.1-1
+- Update to 0.6.1
+
+* Fri Aug 03 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.0-3
+- License tag update
+
+* Wed Jul 25 2007 Jeremy Katz <katzj@redhat.com> - 0.6.0-2.1
+- rebuild for toolchain bug
+
+* Mon Jul 23 2007 Deji Akingunola <dakingun@gmail.com> - 0.6.0-1
+- Update to 0.6.0
+- Manually specify path to deskbar-applet handler directory, koji can't find it
+
+* Mon Jan 29 2007 Deji Akingunola <dakingun@gmail.com> - 0.5.4-2
+- Split out tracker-search-tool sub-packages, for the GUI facility
+- Add proper requires for the -devel subpackage
+- Deal with the rpmlint complaints on rpath
+
+* Sat Jan 27 2007 Deji Akingunola <dakingun@gmail.com> - 0.5.4-1
+- Update to 0.5.4
+
+* Tue Dec 26 2006 Deji Akingunola <dakingun@gmail.com> - 0.5.3-1
+- Update to 0.5.3
+
+* Mon Nov 27 2006 Deji Akingunola <dakingun@gmail.com> - 0.5.2-2
+- Apply patch on Makefile.am instead of Makefile.in
+- Add libtool to BR
+
+* Mon Nov 06 2006 Deji Akingunola <dakingun@gmail.com> - 0.5.2-1
+- Update to 0.5.2
+
+* Mon Nov 06 2006 Deji Akingunola <dakingun@gmail.com> - 0.5.1-1
+- Update to new version
+
+* Mon Nov 06 2006 Deji Akingunola <dakingun@gmail.com> - 0.5.0-7
+- Have the devel subpackage require pkgconfig
+- Make the description field not have more than 76 characters on a line
+- Fix up the RPM group
+
+* Mon Nov 06 2006 Deji Akingunola <dakingun@gmail.com> - 0.5.0-6
+- Explicitly require dbus-devel and dbus-glib (needed for FC < 6)
+
+* Sun Nov 05 2006 Deji Akingunola <dakingun@gmail.com> - 0.5.0-5
+- Remove unneeded BRs (gnome-utils-devel and openssl-devel)
+
+* Sun Nov 05 2006 Deji Akingunola <dakingun@gmail.com> - 0.5.0-4
+- Add autostart desktop file.
+- Edit the package description as suggested in review
+
+* Sat Nov 04 2006 Deji Akingunola <dakingun@gmail.com> - 0.5.0-3
+- More cleaups to the spec file.
+
+* Sat Nov 04 2006 Deji Akingunola <dakingun@gmail.com> - 0.5.0-2
+- Add needed BRs
