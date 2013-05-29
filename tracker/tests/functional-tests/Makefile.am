@@ -42,7 +42,6 @@ standard_tests += \
 	15-statistics.py \
 	16-collation.py \
 	17-ontology-changes.py  \
-	200-backup-restore.py \
 	300-miner-basic-ops.py \
 	301-miner-resource-removal.py
 if HAVE_TRACKER_FTS
