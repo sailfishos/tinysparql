@@ -1,0 +1,53 @@
+.TH tracker-info 1 "Oct 2008" GNU "User Commands"
+
+.SH NAME
+tracker-info \- Retrieve all information available for a certain file.
+
+.SH SYNOPSIS
+\fBtracker-info\fR [\fIOPTION\fR...] \fIFILE\fR...
+
+.SH DESCRIPTION
+.B tracker-info
+asks for all the known metadata available for the given \fIFILE\fR.
+
+Multiple \fIFILE\fR arguments can be provided to retrieve information
+about multiple files.
+
+The \fIFILE\fR argument can be either a local path or a URI. It also
+does not have to be an absolute path.
+
+.SH OPTIONS
+.TP
+.B \-?, \-\-help
+Show summary of options.
+.TP
+.B \-V, \-\-version
+Print version.
+.TP
+.B \-f, \-\-full\-namespaces
+By default, all keys and values reported about any given \fIFILE\fR
+are returned in shortened form, for example, \fInie:title\fR is shown
+instead of
+\fIhttp://www.semanticdesktop.org/ontologies/2007/01/19/nie#title\fR.
+This makes things much easier to see generally and the output is less
+cluttered. This option reverses that so FULL namespaces are shown
+instead.
+.TP
+.B \-c, \-\-plain\-text\-content
+If the resource being displayed has nie:PlainTextContent (i.e.
+information about the content of the resource, which could be the
+contents of a file on the disk), then this option displays that in the
+output.
+.TP
+.B \-t, \-\-turtle
+Output results as Turtle RDF. If \-f is enabled, full URIs are shown
+for subjects, predicates and objects; otherwise, shortened URIs are
+used, and all the prefixes Tracker knows about are printed at the top
+of the output.
+.SH SEE ALSO
+.BR tracker-store (1),
+.BR tracker-sparql (1).
+.TP
+.BR http://nepomuk.semanticdesktop.org/
+.TP
+.BR http://www.w3.org/TR/rdf-sparql-query/

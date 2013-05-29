@@ -1,0 +1,6 @@
+[Desktop Entry]
+_Name=File System
+_Comment=File system data miner
+Icon=folder
+DBusName=org.freedesktop.Tracker1.Miner.Files
+DBusPath=/org/freedesktop/Tracker1/Miner/Files
