@@ -168,6 +168,8 @@ cp -a %{SOURCE3} %{buildroot}%{_libdir}/systemd/user/
 # >> install post
 rm -rf %{buildroot}/%{_datadir}/icons/hicolor/
 rm -rf %{buildroot}/%{_datadir}/gtk-doc
+# this is 160MB of test data, let's create that during rpm install
+rm -f %{buildroot}/%{_datadir}/tracker-tests/ttl/*
 # << install post
 
 %find_lang %{name}
@@ -185,6 +187,20 @@ glib-compile-schemas   /usr/share/glib-2.0/schemas/
 # >> postun
 glib-compile-schemas   /usr/share/glib-2.0/schemas/
 # << postun
+
+%preun tests
+# >> preun tests
+# created during post install
+rm -f /usr/share/tracker-tests/ttl/*
+rm -f /usr/share/tracker-tests/source-data.pkl
+# << preun tests
+
+%post tests
+# >> post tests
+# this creates ~160MB of test data for the auto tests
+cd /usr/share/tracker-tests/
+/opt/tests/tracker/bin/generate /opt/tests/tracker/bin/max.cfg
+# << post tests
 
 %files -f %{name}.lang
 %defattr(-,root,root,-)
@@ -221,6 +237,7 @@ glib-compile-schemas   /usr/share/glib-2.0/schemas/
 # >> files tests
 %{_datadir}/tracker-tests/*
 %{_sysconfdir}/dconf/profile/trackertest
+/opt/tests/tracker/bin/*
 # << files tests
 
 %files utils
