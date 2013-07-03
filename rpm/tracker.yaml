@@ -31,6 +31,8 @@ Description: |
 Requires:
     - gst-plugins-base >= 0.10
     - unzip
+    - systemd
+    - systemd-user-session-targets
 PkgBR:
     - gettext
     - giflib-devel

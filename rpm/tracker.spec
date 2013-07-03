@@ -22,6 +22,8 @@ Source3:    tracker-miner-fs.service
 Source100:  tracker.yaml
 Requires:   gst-plugins-base >= 0.10
 Requires:   unzip
+Requires:   systemd
+Requires:   systemd-user-session-targets
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
@@ -166,6 +168,10 @@ cp -a %{SOURCE3} %{buildroot}%{_libdir}/systemd/user/
 
 
 # >> install post
+mkdir -p %{buildroot}%{_libdir}/systemd/user/user-session.target.wants
+ln -s ../tracker-store.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
+ln -s ../tracker-miner-fs.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
+
 rm -rf %{buildroot}/%{_datadir}/icons/hicolor/
 rm -rf %{buildroot}/%{_datadir}/gtk-doc
 # this is 160MB of test data, let's create that during rpm install
@@ -180,12 +186,20 @@ rm -f %{buildroot}/%{_datadir}/tracker-tests/ttl/*
 /sbin/ldconfig
 # >> post
 glib-compile-schemas   /usr/share/glib-2.0/schemas/
+if [ "$1" -ge 1 ]; then
+systemctl-user daemon-reload || :
+systemctl-user restart tracker-store.service tracker-miner-fs.service || :
+fi
 # << post
 
 %postun
 /sbin/ldconfig
 # >> postun
 glib-compile-schemas   /usr/share/glib-2.0/schemas/
+if [ "$1" -eq 0 ]; then
+systemctl-user stop tracker-miner-fs.service tracker-store.service || :
+systemctl-user daemon-reload || :
+fi
 # << postun
 
 %preun tests
@@ -230,6 +244,8 @@ cd /usr/share/tracker-tests/
 %config %{_sysconfdir}/xdg/autostart/tracker-store.desktop
 %{_libdir}/systemd/user/tracker-miner-fs.service
 %{_libdir}/systemd/user/tracker-store.service
+%{_libdir}/systemd/user/user-session.target.wants/tracker-miner-fs.service
+%{_libdir}/systemd/user/user-session.target.wants/tracker-store.service
 # << files
 
 %files tests
