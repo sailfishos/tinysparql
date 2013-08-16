@@ -42,7 +42,6 @@ PkgBR:
     - perl-XML-Parser
     - pygobject2
     - python >= 2.6
-    - qt-devel
     - dbus-python
 PkgConfigBR:
     - dbus-glib-1 >= 0.60
@@ -70,7 +69,7 @@ PkgConfigBR:
     - libvala-0.16
     - vorbis
     - zlib
-    - QtGui
+    - Qt5Gui
 SetupOptions: -q -n %{name}-%{version}/%{name}
 Configure: configure
 ConfigOptions:

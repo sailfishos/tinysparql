@@ -51,7 +51,7 @@ BuildRequires:  pkgconfig(uuid)
 BuildRequires:  pkgconfig(libvala-0.16)
 BuildRequires:  pkgconfig(vorbis)
 BuildRequires:  pkgconfig(zlib)
-BuildRequires:  pkgconfig(QtGui)
+BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  gettext
 BuildRequires:  giflib-devel
 BuildRequires:  intltool
@@ -60,7 +60,6 @@ BuildRequires:  libtiff-devel >= 3.8.2
 BuildRequires:  perl-XML-Parser
 BuildRequires:  pygobject2
 BuildRequires:  python >= 2.6
-BuildRequires:  qt-devel
 BuildRequires:  dbus-python
 BuildRequires:  fdupes
 

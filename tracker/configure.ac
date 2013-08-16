@@ -170,7 +170,7 @@ LIBNOTIFY_REQUIRED=0.4.3
 HAL_REQUIRED=0.5
 UPOWER_REQUIRED=0.9.0
 GDKPIXBUF_REQUIRED=2.12.0
-QT_REQUIRED=4.7.1
+QT_REQUIRED=5.0.0
 MEEGOTOUCH_REQUIRED=0.20
 POPPLER_REQUIRED=0.16.0
 CAIRO_REQUIRED=1.0
@@ -1630,11 +1630,11 @@ selected_for_media_art="no  (disabled)"
 
 if test "x$enable_qt" != "xno" && test "x$enable_gdkpixbuf" != "xyes"; then
    PKG_CHECK_MODULES(QT,
-                     [QtGui >= $QT_REQUIRED],
+                     [Qt5Gui >= $QT_REQUIRED],
                      [have_qt=yes],
                      [have_qt=no])
 
-   TRACKER_EXTRACT_CFLAGS="$TRACKER_EXTRACT_CFLAGS $QT_CFLAGS"
+   TRACKER_EXTRACT_CFLAGS="$TRACKER_EXTRACT_CFLAGS $QT_CFLAGS -fPIC"
    TRACKER_EXTRACT_LIBS="$TRACKER_EXTRACT_LIBS $QT_LIBS"
 
    if test "x$have_qt" = "xyes"; then
