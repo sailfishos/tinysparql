@@ -26,7 +26,7 @@
 #include <QBuffer>
 #include <QImageReader>
 #include <QImageWriter>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QColor>
 #include <QPainter>
 
@@ -36,7 +36,7 @@
 
 G_BEGIN_DECLS
 
-static QApplication *app = NULL;
+static QCoreApplication *app = NULL;
 
 void
 tracker_media_art_plugin_init (void)
@@ -44,7 +44,7 @@ tracker_media_art_plugin_init (void)
 	int argc = 0;
 	char *argv[2] = { NULL, NULL };
 
-	app = new QApplication (argc, argv, QApplication::Tty);
+	app = new QCoreApplication (argc, argv);
 }
 
 void
