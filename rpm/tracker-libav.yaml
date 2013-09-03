@@ -1,0 +1,122 @@
+Name: tracker
+Summary: An object database, tag/metadata database, search tool and indexer
+Version: 0.14.4
+Release: 1
+Group: Data Management/Content Framework
+License: GPLv2+
+URL: http://ftp.gnome.org/pub/GNOME/sources/tracker/0.10/
+Sources:
+    - http://ftp.gnome.org/pub/GNOME/sources/%{name}/0.14/%{name}-%{version}.tar.xz
+    - tracker-rpmlintrc
+
+ExtraSources:
+    - tracker-store.service;%{_libdir}/systemd/user/
+    - tracker-miner-fs.service;%{_libdir}/systemd/user/
+
+Description: |
+    Tracker is a powerful desktop-neutral first class object database,
+    tag/metadata database, search tool and indexer.
+
+    It consists of a common object database that allows entities to have an
+    almost infinte number of properties, metadata (both embedded/harvested as
+    well as user definable), a comprehensive database of keywords/tags and
+    links to other entities.
+
+    It provides additional features for file based objects including context
+    linking and audit trails for a file object.
+
+    It has the ability to index, store, harvest metadata. retrieve and search
+    all types of files and other first class objects
+
+Requires:
+    - unzip
+    - systemd
+    - systemd-user-session-targets
+PkgBR:
+    - gettext
+    - giflib-devel
+    - intltool
+    - libjpeg-devel
+    - libtiff-devel >= 3.8.2
+    - perl-XML-Parser
+    - pygobject2
+    - python >= 2.6
+    - dbus-python
+PkgConfigBR:
+    - dbus-glib-1 >= 0.60
+    - enca
+    - exempi-2.0
+    - gconf-2.0
+    - gee-1.0
+    - glib-2.0 >= 2.26.0
+    - gmime-2.6
+    - icu-uc
+    - id3tag
+    - libexif
+    - libgsf-1
+    - libiptcdata
+    - libpng
+    - libxml-2.0
+    - ossp-uuid
+    - poppler-glib
+    - sqlite3 >= 3.7
+    - taglib
+    - totem-plparser
+    - uuid
+    - libvala-0.16
+    - vorbis
+    - zlib
+    - Qt5Gui
+    - libavcodec
+    - libavformat
+    - libavutil
+SetupOptions: -q -n %{name}-%{version}/%{name}
+Configure: configure
+ConfigOptions:
+    - --with-compile-warnings=no
+    - --disable-gtk-doc
+    - --disable-tracker-preferences
+    - --disable-tracker-search-bar
+    - --disable-tracker-explorer
+    - --enable-unit-tests
+    - --enable-functional-tests
+    - --disable-miner-evolution
+    - --disable-miner-flickr
+    - --disable-miner-rss
+    - --enable-maemo
+    - --enable-guarantee-metadata
+    - --with-unicode-support=libicu
+    - --disable-tracker-needle
+    - --enable-libvorbis
+    - --enable-tracker-fts
+    - --enable-qt
+Builder: make
+LocaleName: "%{name}"
+RunFdupes:
+    - "%{_datadir}/"
+AutoSubPackages:
+- devel
+SubPackages:
+    - Name: tests
+      Summary: Tests for tracker
+      Group: System/X11
+      Description: |
+          Functional tests for tracker to be run once tracker is installed in
+          the final environment.
+      Requires:
+          - dbus-python
+          - pygobject2
+          - python >= 2.6
+
+    - Name: utils
+      Summary: Tracker command line applications to lookup data
+      Group: Development/Tools
+      Description: |
+           Tracker command line applications to lookup data
+           Included utilities for Tracker are as follows
+            tracker-import      Import TTL files.
+            tracker-info        Display all information known about an entity.
+            tracker-search      Search for entites (files, folders, videos, etc)
+            tracker-sparql      Run a SPARQL query against the databases.
+            tracker-stats       Get statistics on how many entities are indexed.
+            tracker-tag         Add, remove, list tags for entities.
