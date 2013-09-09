@@ -90,6 +90,7 @@ ConfigOptions:
     - --enable-libvorbis
     - --enable-tracker-fts
     - --enable-qt
+    - --enable-generic-media-extractor=libav
 Builder: make
 LocaleName: "%{name}"
 RunFdupes:
