@@ -26,25 +26,31 @@
 #include <QBuffer>
 #include <QImageReader>
 #include <QImageWriter>
-#include <QCoreApplication>
 #include <QColor>
 #include <QPainter>
 
 #include <glib.h>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+# include <QGuiApplication>
+#else
+# include <QApplication>
+# define QGuiApplication QApplication
+#endif
+
 #include "tracker-media-art-generic.h"
 
 G_BEGIN_DECLS
 
-static QCoreApplication *app = NULL;
+static QGuiApplication *app = NULL;
 
 void
 tracker_media_art_plugin_init (void)
 {
-	int argc = 0;
-	char *argv[2] = { NULL, NULL };
+	int argc = 1;
+	char *argv[2] = { "tracker-extract", NULL };
 
-	app = new QCoreApplication (argc, argv);
+	app = new QGuiApplication (argc, argv);
 }
 
 void
