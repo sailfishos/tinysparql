@@ -5,6 +5,7 @@ Requires=dbus.socket tracker-store.service
 
 [Service]
 ExecStart=/usr/libexec/tracker-miner-fs
+OOMScoreAdjust=100
 
 [Install]
 WantedBy=user-session.target
