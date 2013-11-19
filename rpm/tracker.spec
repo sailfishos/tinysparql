@@ -54,6 +54,7 @@ BuildRequires:  pygobject2
 BuildRequires:  python >= 2.6
 BuildRequires:  dbus-python
 BuildRequires:  fdupes
+BuildRequires:  libtool
 
 %description
 Tracker is a powerful desktop-neutral first class object database,
