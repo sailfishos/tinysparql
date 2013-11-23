@@ -25,7 +25,7 @@ Boston, MA  02110-1301, USA.
       <_description>Log verbosity.</_description>
     </key>
     <key name="graphupdated-delay" type="i">
-      <default>1000</default>
+      <default>350</default>
       <_summary>GraphUpdated delay</_summary>
       <_description>Delay in ms. at which GraphUpdated will happen when signalling data is available.</_description>
     </key>
