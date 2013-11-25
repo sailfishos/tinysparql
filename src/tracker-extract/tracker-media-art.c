@@ -80,6 +80,9 @@ static gboolean disable_requests;
 static TrackerStorage *media_art_storage;
 static GHashTable *media_art_cache;
 static GDBusConnection *connection;
+#ifdef HAVE_NEMO
+static GHashTable *mark_table;
+#endif
 
 static void
 albumart_queue_cb (GObject      *source_object,
@@ -650,14 +653,24 @@ media_art_heuristic (const gchar         *artist,
 			}
 
 			g_debug ("Album art (PNG) found in same directory being used:'%s'", art_file_path);
-			retval = convert_from_other_format (art_file_path, target, album_art_file_path, artist);
+				retval = convert_from_other_format (art_file_path, target, album_art_file_path, artist);
 		}
+
+#ifdef HAVE_NEMO
+		if (retval) {
+			g_hash_table_insert (mark_table,
+			                     g_strdup (art_file_path),
+			                     GINT_TO_POINTER(TRUE));
+			/*here*/ 
+		}
+#endif
 
 		g_free (art_file_path);
 		g_free (album_art_file_path);
 	}
 
-	g_free (target);
+
+	g_free (target);	
 	g_free (artist_stripped);
 	g_free (title_stripped);
 
@@ -952,6 +965,14 @@ tracker_media_art_init (void)
 	                                         (GDestroyNotify) g_free,
 	                                         NULL);
 
+#ifdef HAVE_NEMO
+	/* Cache to know if we have already handled uris */
+	mark_table = g_hash_table_new_full (g_str_hash,
+	                                    g_str_equal,
+	                                    (GDestroyNotify) g_free,
+	                                    NULL);
+#endif
+
 	/* Signal handler for new album art from the extractor */
 	connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
 
@@ -980,6 +1001,11 @@ tracker_media_art_shutdown (void)
 		g_hash_table_unref (media_art_cache);
 	}
 
+#ifdef HAVE_NEMO
+	if (mark_table) {
+		g_hash_table_unref (mark_table);
+	}
+#endif
 	if (media_art_storage) {
 		g_object_unref (media_art_storage);
 	}
@@ -1127,3 +1153,46 @@ tracker_media_art_process (const unsigned char *buffer,
 
 	return processed;
 }
+
+#ifdef HAVE_NEMO
+gboolean tracker_media_art_ismarked (const char *filename)
+{
+	gboolean marked = (gboolean) g_hash_table_lookup (mark_table, filename);
+
+	if (!marked) {
+		gchar *file_name_strdown, *name_utf8 = g_filename_to_utf8 (filename, -1, NULL, NULL, NULL);
+
+		if (!name_utf8) {
+			g_debug ("Could not convert filename '%s' to UTF-8", filename);
+			return FALSE;
+		}
+
+		file_name_strdown = g_utf8_strdown (name_utf8, -1);
+
+		if (strstr (file_name_strdown, "cover") ||
+		    strstr (file_name_strdown, "front")) {
+			g_free (file_name_strdown);
+			g_free (name_utf8);
+			return TRUE;
+		}
+
+		if (strstr (file_name_strdown, "albumart")) {
+			if (strstr (file_name_strdown, "large")) {
+				g_free (file_name_strdown);
+				g_free (name_utf8);
+				return TRUE;
+			} else if (strstr (file_name_strdown, "small")) {
+				g_free (file_name_strdown);
+				g_free (name_utf8);
+				return TRUE;
+			}
+		}
+
+		g_free (file_name_strdown);
+		g_free (name_utf8);
+	}
+
+	return marked;
+}
+#endif
+
