@@ -55,7 +55,7 @@ tracker_media_art_plugin_init (void)
 	char *argv[2] = { "tracker-extract", NULL };
 
 #ifdef NEMO
-	setenv("QT_QPA_PLATFORM", "eglfs", 1);
+	setenv("QT_QPA_PLATFORM", "minimal", 1);
 #endif
 
 	app = new QGuiApplication (argc, argv);
