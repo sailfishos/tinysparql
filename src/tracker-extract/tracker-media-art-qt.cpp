@@ -31,6 +31,10 @@
 
 #include <glib.h>
 
+#ifdef NEMO
+#include <stdlib.h>
+#endif
+
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 # include <QGuiApplication>
 #else
@@ -49,6 +53,10 @@ tracker_media_art_plugin_init (void)
 {
 	int argc = 1;
 	char *argv[2] = { "tracker-extract", NULL };
+
+#ifdef NEMO
+	setenv("QT_QPA_PLATFORM", "eglfs", 1);
+#endif
 
 	app = new QGuiApplication (argc, argv);
 }
