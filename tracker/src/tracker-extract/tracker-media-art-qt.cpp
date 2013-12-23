@@ -31,7 +31,7 @@
 
 #include <glib.h>
 
-#ifdef NEMO
+#ifdef HAVE_NEMO
 #include <stdlib.h>
 #endif
 
@@ -54,7 +54,7 @@ tracker_media_art_plugin_init (void)
 	int argc = 1;
 	char *argv[2] = { "tracker-extract", NULL };
 
-#ifdef NEMO
+#ifdef HAVE_NEMO
 	setenv("QT_QPA_PLATFORM", "minimal", 1);
 #endif
 
