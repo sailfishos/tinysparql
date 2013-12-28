@@ -658,6 +658,22 @@ if test "x$enable_maemo" = "xyes" ; then
 fi
 
 ####################################################################
+# Check if we should install nemo specific ontologies
+####################################################################
+
+AC_ARG_ENABLE(nemo,
+              AS_HELP_STRING([--enable-nemo],
+                             [enable nemo ontology [[default=no]]]),
+             [enable_nemo="$enableval"],
+             [enable_nemo=no])
+
+AM_CONDITIONAL(HAVE_NEMO, test "x$enable_nemo" = "xyes")
+
+if test "x$enable_nemo" = "xyes" ; then
+   AC_DEFINE(HAVE_NEMO, 1, [Define if we enable Nemo specific features])
+fi
+
+####################################################################
 # Check if we should disable the journal
 ####################################################################
 
@@ -2545,6 +2561,7 @@ Writeback:
 Frameworks / Options:
 
 	Support Maemo                           $enable_maemo
+	Support Nemo                            $enable_nemo
 	Support libmeegotouch                   $have_meegotouch
 	Support Guaranteed Metadata             $enable_guarantee_metadata (e.g. guess nie:title from files)
 
