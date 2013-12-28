@@ -20,6 +20,8 @@
  * Philip Van Hoof <philip@codeminded.be>
  */
 
+#include "config.h"
+
 #include "tracker-main.h"
 
 #include <QFile>
@@ -30,6 +32,10 @@
 #include <QPainter>
 
 #include <glib.h>
+
+#ifdef HAVE_NEMO
+#include <stdlib.h>
+#endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 # include <QGuiApplication>
@@ -49,6 +55,10 @@ tracker_media_art_plugin_init (void)
 {
 	int argc = 1;
 	char *argv[2] = { "tracker-extract", NULL };
+
+#ifdef HAVE_NEMO
+	setenv("QT_QPA_PLATFORM", "minimal", 1);
+#endif
 
 	app = new QGuiApplication (argc, argv);
 }
