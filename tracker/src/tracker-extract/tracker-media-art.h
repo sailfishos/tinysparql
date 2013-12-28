@@ -42,6 +42,10 @@ gboolean tracker_media_art_process  (const unsigned char *buffer,
                                      const gchar         *title,
                                      const gchar         *uri);
 
+#if HAVE_NEMO
+gboolean tracker_media_art_ismarked (const char *filename);
+#endif
+
 G_END_DECLS
 
 #endif /* __TRACKER_EXTRACT_MEDIA_ART_H__ */

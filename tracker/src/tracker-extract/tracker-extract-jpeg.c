@@ -34,6 +34,7 @@
 #include <libtracker-sparql/tracker-sparql.h>
 
 #include "tracker-main.h"
+#include "tracker-media-art.h"
 
 #define CM_TO_INCH              0.393700787
 
@@ -170,9 +171,9 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	}
 
 	f = tracker_file_open (filename);
-	g_free (filename);
 
 	if (!f) {
+		g_free (filename);
 		return FALSE;
 	}
 
@@ -788,6 +789,13 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 		tracker_sparql_builder_object_double (metadata, value);
 	}
 
+#if HAVE_NEMO
+	if (tracker_media_art_ismarked (filename)) {
+		tracker_sparql_builder_predicate (metadata, "nemo:isMediaArt");
+		tracker_sparql_builder_object_boolean (metadata, TRUE);
+	}
+#endif
+
 	jpeg_destroy_decompress (&cinfo);
 
 	tracker_exif_free (ed);
@@ -796,6 +804,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	g_free (comment);
 
 fail:
+	g_free (filename);
 	tracker_file_close (f, FALSE);
 	g_free (uri);
 
