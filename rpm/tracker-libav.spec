@@ -130,7 +130,7 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --disable-miner-evolution \
     --disable-miner-flickr \
     --disable-miner-rss \
-    --enable-maemo \
+    --enable-maemo --enable-nemo \
     --enable-guarantee-metadata \
     --with-unicode-support=libicu \
     --disable-tracker-needle \
