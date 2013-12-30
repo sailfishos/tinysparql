@@ -15,6 +15,7 @@ Source3:    tracker-miner-fs.service
 Requires:   unzip
 Requires:   systemd
 Requires:   systemd-user-session-targets
+Requires:   qt5-plugin-platform-minimal
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
