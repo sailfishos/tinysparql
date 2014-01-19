@@ -27,7 +27,6 @@
 #include "tracker-crawler.h"
 #include "tracker-miner-object.h"
 #include "tracker-miner-manager.h"
-#include "tracker-marshal.h"
 #include "tracker-miner-dbus.h"
 
 /**
@@ -124,7 +123,7 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 	                                                       G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 
 	/**
-	 * TrackerMinerManager::miner-progress
+	 * TrackerMinerManager::miner-progress:
 	 * @manager: the #TrackerMinerManager
 	 * @miner: miner reference
 	 * @status: miner status
@@ -142,14 +141,14 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerManagerClass, miner_progress),
 		              NULL, NULL,
-		              tracker_marshal_VOID__STRING_STRING_DOUBLE_INT,
+		              NULL,
 		              G_TYPE_NONE, 4,
 		              G_TYPE_STRING,
 		              G_TYPE_STRING,
 		              G_TYPE_DOUBLE,
 		              G_TYPE_INT);
 	/**
-	 * TrackerMinerManager::miner-paused
+	 * TrackerMinerManager::miner-paused:
 	 * @manager: the #TrackerMinerManager
 	 * @miner: miner reference
 	 *
@@ -164,11 +163,11 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerManagerClass, miner_paused),
 		              NULL, NULL,
-		              g_cclosure_marshal_VOID__STRING,
+		              NULL,
 		              G_TYPE_NONE, 1,
 		              G_TYPE_STRING);
 	/**
-	 * TrackerMinerManager::miner-resumed
+	 * TrackerMinerManager::miner-resumed:
 	 * @manager: the #TrackerMinerManager
 	 * @miner: miner reference
 	 *
@@ -183,11 +182,11 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerManagerClass, miner_resumed),
 		              NULL, NULL,
-		              g_cclosure_marshal_VOID__STRING,
+		              NULL,
 		              G_TYPE_NONE, 1,
 		              G_TYPE_STRING);
 	/**
-	 * TrackerMinerManager::miner-activated
+	 * TrackerMinerManager::miner-activated:
 	 * @manager: the #TrackerMinerManager
 	 * @miner: miner reference
 	 *
@@ -203,11 +202,11 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerManagerClass, miner_activated),
 		              NULL, NULL,
-		              g_cclosure_marshal_VOID__STRING,
+		              NULL,
 		              G_TYPE_NONE, 1,
 		              G_TYPE_STRING);
 	/**
-	 * TrackerMinerManager::miner-deactivated
+	 * TrackerMinerManager::miner-deactivated:
 	 * @manager: the #TrackerMinerManager
 	 * @miner: miner reference
 	 *
@@ -223,7 +222,7 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerManagerClass, miner_deactivated),
 		              NULL, NULL,
-		              g_cclosure_marshal_VOID__STRING,
+		              NULL,
 		              G_TYPE_NONE, 1,
 		              G_TYPE_STRING);
 
@@ -739,6 +738,7 @@ crawler_check_file_cb (TrackerCrawler *crawler,
 
 	priv->miners = g_list_prepend (priv->miners, data);
 
+	g_key_file_free (key_file);
 	g_free (path);
 
 	return TRUE;
@@ -784,6 +784,7 @@ initialize_miners_data (TrackerMinerManager *manager)
 
 	g_main_loop_run (main_loop);
 
+	g_main_loop_unref (main_loop);
 	g_object_unref (crawler);
 }
 
@@ -1479,34 +1480,18 @@ tracker_miner_manager_reindex_by_mimetype (TrackerMinerManager  *manager,
 	return FALSE;
 }
 
-/**
- * tracker_miner_manager_index_file:
- * @manager: a #TrackerMinerManager
- * @file: a URL valid in GIO of a file to give to the miner for processing
- * @error: (out callee-allocates) (transfer full) (allow-none): return location for errors
- *
- * Tells the filesystem miner to index the @file.
- *
- * On failure @error will be set.
- *
- * Returns: %TRUE on success, otherwise %FALSE.
- *
- * Since: 0.10
- **/
-gboolean
-tracker_miner_manager_index_file (TrackerMinerManager  *manager,
-                                  GFile                *file,
-                                  GError              **error)
+static gboolean
+miner_manager_index_file_sync (TrackerMinerManager *manager,
+                               GFile               *file,
+                               GCancellable        *cancellable,
+                               GError             **error)
 {
 	TrackerMinerManagerPrivate *priv;
 	gchar *uri;
 	GVariant *v;
 	GError *new_error = NULL;
 
-	g_return_val_if_fail (TRACKER_IS_MINER_MANAGER (manager), FALSE);
-	g_return_val_if_fail (G_IS_FILE (file), FALSE);
-
-	if (!g_file_query_exists (file, NULL)) {
+	if (!g_file_query_exists (file, cancellable)) {
 		g_set_error_literal (error,
 		                     TRACKER_MINER_MANAGER_ERROR,
 		                     TRACKER_MINER_MANAGER_ERROR_NOENT,
@@ -1536,7 +1521,7 @@ tracker_miner_manager_index_file (TrackerMinerManager  *manager,
 	                                 NULL,
 	                                 G_DBUS_CALL_FLAGS_NONE,
 	                                 -1,
-	                                 NULL,
+	                                 cancellable,
 	                                 &new_error);
 
 	g_free (uri);
@@ -1549,4 +1534,96 @@ tracker_miner_manager_index_file (TrackerMinerManager  *manager,
 	g_variant_unref (v);
 
 	return FALSE;
+}
+
+static void
+miner_manager_index_file_thread (GTask *task,
+                                 gpointer source_object,
+                                 gpointer task_data,
+                                 GCancellable *cancellable)
+{
+	TrackerMinerManager *manager = source_object;
+	GFile *file = task_data;
+	GError *error = NULL;
+
+	miner_manager_index_file_sync (manager, file, cancellable, &error);
+	if (error != NULL) {
+		g_task_return_error (task, error);
+	} else {
+		g_task_return_boolean (task, TRUE);
+	}
+}
+
+/**
+ * tracker_miner_manager_index_file:
+ * @manager: a #TrackerMinerManager
+ * @file: a URL valid in GIO of a file to give to the miner for processing
+ * @error: (out callee-allocates) (transfer full) (allow-none): return location for errors
+ *
+ * Tells the filesystem miner to index the @file.
+ *
+ * On failure @error will be set.
+ *
+ * Returns: %TRUE on success, otherwise %FALSE.
+ *
+ * Since: 0.10
+ **/
+gboolean
+tracker_miner_manager_index_file (TrackerMinerManager  *manager,
+                                  GFile                *file,
+                                  GError              **error)
+{
+	g_return_val_if_fail (TRACKER_IS_MINER_MANAGER (manager), FALSE);
+	g_return_val_if_fail (G_IS_FILE (file), FALSE);
+
+	return miner_manager_index_file_sync (manager, file, NULL, error);
+}
+
+/**
+ * tracker_miner_manager_index_file_async:
+ * @manager: a #TrackerMinerManager
+ * @file: a URL valid in GIO of a file to give to the miner for processing
+ * @cancellable: (allow-none): a #GCancellable, or %NULL
+ * @callback: (scope async): a #GAsyncReadyCallback to call when the request is satisfied
+ * @user_data: the data to pass to the callback function
+ *
+ * Tells the filesystem miner to index the @file. When the operation is called,
+ * @callback will be called. You can then call tracker_miner_manager_index_file_finish()
+ * to get the result of the operation.
+ *
+ * Since: 0.16
+ **/
+void
+tracker_miner_manager_index_file_async (TrackerMinerManager *manager,
+                                        GFile               *file,
+                                        GCancellable        *cancellable,
+                                        GAsyncReadyCallback  callback,
+                                        gpointer             user_data)
+{
+	GTask *task = g_task_new (manager, cancellable, callback, user_data);
+	g_task_set_task_data (task, g_object_ref (file), (GDestroyNotify) g_object_unref);
+	g_task_run_in_thread (task, miner_manager_index_file_thread);
+	g_object_unref (task);
+}
+
+/**
+ * tracker_miner_manager_index_file_finish:
+ * @manager: a #TrackerMinerManager
+ * @result: a #GAsyncResult
+ * @error: (out callee-allocates) (transfer full) (allow-none): return location for errors
+ *
+ * Finishes a request to index a file. See tracker_miner_manager_index_file_async()
+ *
+ * On failure @error will be set.
+ *
+ * Returns: %TRUE on success, otherwise %FALSE.
+ *
+ * Since: 0.16
+ **/
+gboolean
+tracker_miner_manager_index_file_finish (TrackerMinerManager *manager,
+                                         GAsyncResult        *result,
+                                         GError             **error)
+{
+	return g_task_propagate_boolean (G_TASK (result), error);
 }

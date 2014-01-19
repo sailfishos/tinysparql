@@ -26,7 +26,6 @@
 #include <libtracker-common/tracker-dbus.h>
 #include <libtracker-common/tracker-type-utils.h>
 
-#include "tracker-marshal.h"
 #include "tracker-miner-object.h"
 #include "tracker-miner-dbus.h"
 
@@ -108,6 +107,7 @@ static const gchar introspection_xml[] =
   "    <signal name='Progress'>"
   "      <arg type='s' name='status' />"
   "      <arg type='d' name='progress' />"
+  "      <arg type='i' name='remaining_time' />"
   "    </signal>"
   "  </interface>"
   "</node>";
@@ -236,7 +236,7 @@ tracker_miner_class_init (TrackerMinerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerClass, started),
 		              NULL, NULL,
-		              g_cclosure_marshal_VOID__VOID,
+		              NULL,
 		              G_TYPE_NONE, 0);
 	/**
 	 * TrackerMiner::stopped:
@@ -254,7 +254,7 @@ tracker_miner_class_init (TrackerMinerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerClass, stopped),
 		              NULL, NULL,
-		              g_cclosure_marshal_VOID__VOID,
+		              NULL,
 		              G_TYPE_NONE, 0);
 	/**
 	 * TrackerMiner::paused:
@@ -273,7 +273,7 @@ tracker_miner_class_init (TrackerMinerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerClass, paused),
 		              NULL, NULL,
-		              g_cclosure_marshal_VOID__VOID,
+		              NULL,
 		              G_TYPE_NONE, 0);
 	/**
 	 * TrackerMiner::resumed:
@@ -291,7 +291,7 @@ tracker_miner_class_init (TrackerMinerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerClass, resumed),
 		              NULL, NULL,
-		              g_cclosure_marshal_VOID__VOID,
+		              NULL,
 		              G_TYPE_NONE, 0);
 	/**
 	 * TrackerMiner::progress:
@@ -316,7 +316,7 @@ tracker_miner_class_init (TrackerMinerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerClass, progress),
 		              NULL, NULL,
-		              tracker_marshal_VOID__STRING_DOUBLE_INT,
+		              NULL,
 		              G_TYPE_NONE, 3,
 		              G_TYPE_STRING,
 		              G_TYPE_DOUBLE,
@@ -339,7 +339,7 @@ tracker_miner_class_init (TrackerMinerClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerClass, ignore_next_update),
 		              NULL, NULL,
-		              g_cclosure_marshal_VOID__BOXED,
+		              NULL,
 		              G_TYPE_NONE, 1,
 		              G_TYPE_STRV);
 

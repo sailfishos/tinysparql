@@ -44,9 +44,9 @@ tracker_extract_get_metadata (TrackerExtractInfo *info_)
 	gchar *filename;
 	OsinfoLoader *loader = NULL;
 	OsinfoMedia *media;
-	OsinfoMedia *matched_media;
 	OsinfoDb *db;
 	OsinfoOs *os;
+	OsinfoOsVariantList *variants;
 
 	/* Data input */
 	gboolean bootable;
@@ -87,7 +87,8 @@ tracker_extract_get_metadata (TrackerExtractInfo *info_)
 	g_warn_if_fail (loader != NULL);
 
 	db = osinfo_loader_get_db (loader);
-	os = osinfo_db_guess_os_from_media (db, media, &matched_media);
+	osinfo_db_identify_media (db, media);
+	os = osinfo_media_get_os (media);
 
 	if (os == NULL)
 		goto unknown_os;
@@ -95,18 +96,28 @@ tracker_extract_get_metadata (TrackerExtractInfo *info_)
 	tracker_sparql_builder_predicate (metadata, "a");
 	tracker_sparql_builder_object (metadata, "nfo:FilesystemImage");
 
-	name = osinfo_product_get_name (OSINFO_PRODUCT (os));
+	variants = osinfo_media_get_os_variants (media);
+	if (osinfo_list_get_length (OSINFO_LIST (variants)) > 0) {
+		OsinfoEntity *variant;
+
+		/* FIXME: Assuming first variant from multivariant medias. */
+		variant = osinfo_list_get_nth (OSINFO_LIST (variants), 0);
+		name = osinfo_os_variant_get_name (OSINFO_OS_VARIANT (variant));
+	} else {
+		name = osinfo_product_get_name (OSINFO_PRODUCT (os));
+	}
+
 	if (name != NULL) {
 		tracker_sparql_builder_predicate (metadata, "nie:title");
 		tracker_sparql_builder_object_string (metadata, name);
 	}
 
-	if (osinfo_media_get_live (matched_media)) {
+	if (osinfo_media_get_live (media)) {
 		tracker_sparql_builder_predicate (metadata, "a");
 		tracker_sparql_builder_object (metadata, "nfo:OperatingSystem");
 	}
 
-	if (osinfo_media_get_installer (matched_media)) {
+	if (osinfo_media_get_installer (media)) {
 		tracker_sparql_builder_predicate (metadata, "a");
 		tracker_sparql_builder_object (metadata, "osinfo:Installer");
 	}
@@ -120,7 +131,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info_)
 		tracker_sparql_builder_object_string (metadata, id);
 	}
 
-        id = osinfo_entity_get_id (OSINFO_ENTITY (matched_media));
+        id = osinfo_entity_get_id (OSINFO_ENTITY (media));
 	if (id != NULL) {
 		tracker_sparql_builder_predicate (metadata, "osinfo:mediaId");
 		tracker_sparql_builder_object_string (metadata, id);

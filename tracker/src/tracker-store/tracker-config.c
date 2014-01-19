@@ -31,6 +31,8 @@
 
 #include "tracker-config.h"
 
+#define GRAPHUPDATED_DELAY_DEFAULT	1000
+
 static void config_set_property         (GObject       *object,
                                          guint          param_id,
                                          const GValue  *value,
@@ -49,7 +51,7 @@ enum {
 };
 
 static TrackerConfigMigrationEntry migration[] = {
-	{ G_TYPE_ENUM, "General", "Verbosity", "verbosity" },
+	{ G_TYPE_ENUM, "General", "Verbosity", "verbosity", FALSE, FALSE },
 	{ G_TYPE_INT, "General", "GraphUpdatedDelay", "graphupdated-delay" },
 	{ 0 }
 };
@@ -82,7 +84,7 @@ tracker_config_class_init (TrackerConfigClass *klass)
 	                                                    "GraphUpdated delay in ms. (1000)",
 	                                                    0,
 	                                                    G_MAXINT,
-	                                                    1000,
+	                                                    GRAPHUPDATED_DELAY_DEFAULT,
 	                                                    G_PARAM_READWRITE));
 
 }
@@ -194,7 +196,7 @@ tracker_config_set_verbosity (TrackerConfig *config,
 gint
 tracker_config_get_graphupdated_delay (TrackerConfig *config)
 {
-	g_return_val_if_fail (TRACKER_IS_CONFIG (config), 0);
+	g_return_val_if_fail (TRACKER_IS_CONFIG (config), GRAPHUPDATED_DELAY_DEFAULT);
 
 	return g_settings_get_int (G_SETTINGS (config), "graphupdated-delay");
 }

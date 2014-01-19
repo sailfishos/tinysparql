@@ -3,7 +3,6 @@ include $(top_srcdir)/Makefile.decl
 noinst_PROGRAMS = $(TEST_PROGS)
 
 TEST_PROGS +=                                          \
-	tracker-type-utils                             \
 	tracker-dbus                                   \
 	tracker-file-utils                             \
 	tracker-utils				       \
@@ -29,8 +28,6 @@ LDADD =                                                \
 
 tracker_dbus_SOURCES =                                 \
 	tracker-dbus-test.c                            
-
-tracker_type_utils_SOURCES = tracker-type-utils-test.c
 
 tracker_file_utils_SOURCES = tracker-file-utils-test.c
 

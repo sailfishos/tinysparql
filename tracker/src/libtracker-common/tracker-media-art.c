@@ -223,7 +223,6 @@ tracker_media_art_get_path (const gchar  *artist,
                             gchar       **local_uri)
 {
 	const gchar *space_checksum = "7215ee9c7d9dc229d2921a40e899ec5f";
-	const gchar *a, *b;
 
 	gchar *art_filename;
 	gchar *dir;
@@ -272,15 +271,10 @@ tracker_media_art_get_path (const gchar  *artist,
 		g_mkdir_with_parents (dir, 0770);
 	}
 
-	if (artist) {
-		a = artist_checksum;
-		b = title ? title_checksum : space_checksum;
-	} else {
-		a = title_checksum;
-		b = space_checksum;
-	}
-
-	art_filename = g_strdup_printf ("%s-%s-%s.jpeg", prefix ? prefix : "album", a, b);
+	art_filename = g_strdup_printf ("%s-%s-%s.jpeg",
+	                                prefix ? prefix : "album",
+	                                artist ? artist_checksum : space_checksum,
+	                                title ? title_checksum : space_checksum);
 
 	if (artist) {
 		g_free (artist_checksum);

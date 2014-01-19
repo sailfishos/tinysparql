@@ -48,11 +48,6 @@ if HAVE_TRACKER_MINER_RSS
 service_DATA += org.freedesktop.Tracker1.Miner.RSS.service
 endif
 
-if HAVE_TRACKER_MINER_FLICKR
-service_DATA += org.freedesktop.Tracker1.Miner.Flickr.service
-endif
-
-
 EXTRA_DIST = \
 	$(service_in_files) \
 	$(config_DATA) \
