@@ -26,8 +26,7 @@ SUBDIRS =                                              \
 	tracker-control                                \
 	tracker-utils                                  \
 	tracker-extract                                \
-	tracker-writeback                              \
-	vapi
+	tracker-writeback
 
 if HAVE_TRACKER_PREFERENCES
 SUBDIRS += tracker-preferences
@@ -35,12 +34,4 @@ endif
 
 if HAVE_TRACKER_NEEDLE
 SUBDIRS += tracker-needle
-endif
-
-if HAVE_TRACKER_SEARCH_BAR
-SUBDIRS += tracker-search-bar
-endif
-
-if HAVE_TRACKER_EXPLORER
-SUBDIRS += tracker-explorer
 endif

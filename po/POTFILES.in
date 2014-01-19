@@ -11,9 +11,7 @@ data/miners/tracker-miner-userguides.desktop.in.in
 data/miners/tracker-miner-applications.desktop.in.in
 data/miners/tracker-miner-evolution.desktop.in.in
 data/miners/tracker-miner-files.desktop.in.in
-data/miners/tracker-miner-flickr.desktop.in.in
 data/miners/tracker-miner-rss.desktop.in.in
-data/tracker-miner-flickr.desktop.in.in
 data/tracker-miner-fs.desktop.in.in
 data/tracker-miner-rss.desktop.in.in
 data/tracker-store.desktop.in.in
@@ -34,7 +32,6 @@ src/tracker-control/tracker-control.c
 src/tracker-control/tracker-control-general.c
 src/tracker-control/tracker-control-miners.c
 src/tracker-control/tracker-control-status.c
-[type: gettext/glade]src/tracker-explorer/tracker-explorer.ui
 src/tracker-extract/tracker-extract.c
 src/tracker-extract/tracker-main.c
 src/tracker-needle/tracker-needle.desktop.in.in
@@ -48,10 +45,6 @@ src/tracker-needle/tracker-view.vala
 src/tracker-preferences/tracker-preferences.desktop.in.in
 [type: gettext/glade]src/tracker-preferences/tracker-preferences.ui
 src/tracker-preferences/tracker-preferences.vala
-src/tracker-search-bar/org.gnome.panel.SearchBar.panel-applet.in.in
-src/tracker-search-bar/tracker-applet.c
-src/tracker-search-bar/tracker-results-window.c
-[type: gettext/glade]src/tracker-search-bar/tracker-search-bar.ui
 src/tracker-store/tracker-main.vala
 src/tracker-utils/tracker-import.c
 src/tracker-utils/tracker-info.c

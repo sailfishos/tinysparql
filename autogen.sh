@@ -3,7 +3,7 @@
 #
 # NOTE: compare_versions() is stolen from gnome-autogen.sh
 
-REQUIRED_VALA_VERSION=0.13.4
+REQUIRED_VALA_VERSION=0.16.0
 
 # Usage:
 #     compare_versions MIN_VERSION ACTUAL_VERSION
@@ -48,7 +48,7 @@ test -n "$srcdir" || srcdir=.
 (
   cd "$srcdir" &&
   touch ChangeLog && # Automake requires that ChangeLog exist
-  gtkdocize &&
+  gtkdocize --flavour no-tmpl &&
   autopoint --force &&
   AUTOPOINT='intltoolize --automake --copy' autoreconf --verbose --force --install
 ) || exit

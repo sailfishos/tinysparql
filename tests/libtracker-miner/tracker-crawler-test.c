@@ -17,6 +17,10 @@
  * 02110-1301, USA.
  */
 
+#include "config.h"
+
+#include <locale.h>
+
 #include <libtracker-miner/tracker-miner.h>
 
 typedef struct CrawlerTest CrawlerTest;
@@ -286,6 +290,8 @@ test_crawler_crawl_n_signals_non_recursive (void)
 	CrawlerTest test = { 0 };
 	GFile *file;
 
+	setlocale (LC_ALL, "");
+
 	test.main_loop = g_main_loop_new (NULL, FALSE);
 
 	crawler = tracker_crawler_new ();
@@ -319,7 +325,6 @@ int
 main (int    argc,
       char **argv)
 {
-	g_type_init ();
 	g_test_init (&argc, &argv, NULL);
 
 	g_test_message ("Testing filesystem crawler");

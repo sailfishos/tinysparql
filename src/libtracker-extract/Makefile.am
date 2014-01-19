@@ -5,10 +5,17 @@ AM_CPPFLAGS =                                          \
 	-I$(top_srcdir)/src                            \
 	-I$(top_builddir)/src                          \
 	-DSHAREDIR=\""$(datadir)"\"                    \
-	-DTRACKER_EXTRACTOR_RULES_DIR=\""$(datadir)/tracker/extract-rules"\" \
+	-DTRACKER_EXTRACTOR_RULES_DIR=\""$(extractrulesdir)"\" \
+	-DTRACKER_EXTRACTORS_DIR=\""$(extractmodulesdir)"\" \
 	$(LIBTRACKER_EXTRACT_CFLAGS)
 
 lib_LTLIBRARIES = libtracker-extract-@TRACKER_API_VERSION@.la
+
+libtracker_extract_@TRACKER_API_VERSION@_la_LIBADD =   \
+	$(top_builddir)/src/libtracker-sparql-backend/libtracker-sparql-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-common/libtracker-common.la \
+	$(BUILD_LIBS)                                  \
+	$(LIBTRACKER_EXTRACT_LIBS)
 
 libtracker_extractincludedir=$(includedir)/tracker-$(TRACKER_API_VERSION)/libtracker-extract/
 
@@ -58,15 +65,19 @@ libtracker_extract_@TRACKER_API_VERSION@_la_SOURCES += \
 	tracker-encoding-meegotouch.h
 endif
 
+if HAVE_LIBICU
+libtracker_extract_@TRACKER_API_VERSION@_la_SOURCES += \
+	tracker-encoding-libicu.c                      \
+	tracker-encoding-libicu.h
+AM_CPPFLAGS +=                                         \
+	$(LIBICU_CFLAGS)
+libtracker_extract_@TRACKER_API_VERSION@_la_LIBADD +=  \
+	$(LIBICU_LIBS)
+endif
+
 libtracker_extract_@TRACKER_API_VERSION@_la_LDFLAGS =  \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	-export-symbols-regex '^tracker_.*'
-
-libtracker_extract_@TRACKER_API_VERSION@_la_LIBADD =   \
-	$(top_builddir)/src/libtracker-sparql-backend/libtracker-sparql-@TRACKER_API_VERSION@.la \
-	$(top_builddir)/src/libtracker-common/libtracker-common.la \
-	$(BUILD_LIBS)                                  \
-	$(LIBTRACKER_EXTRACT_LIBS)
 
 # Introspection foo
 -include $(INTROSPECTION_MAKEFILE)

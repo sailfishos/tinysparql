@@ -20,6 +20,7 @@
 #include "config.h"
 
 #define _XOPEN_SOURCE
+#define _XOPEN_SOURCE_EXTENDED 1	/* strptime is XPG4v2 */
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -877,34 +878,7 @@ my_igetdelim (gchar  **linebuf,
 	return idx;
 }
 
-/**
- * tracker_getline:
- * @lineptr: Buffer to write into
- * @n: Max bytes of linebuf
- * @stream: Filestream to read from
- *
- * Reads an entire line from stream, storing the address of the buffer
- * containing  the  text into *lineptr.  The buffer is null-terminated
- * and includes the newline character, if one was found.
- *
- * Read GNU getline()'s manpage for more information
- *
- * Returns: the number of characters read, including the delimiter
- * character, but not including the terminating %NULL byte. This value
- * can be used to handle embedded %NULL bytes in the line read. Upon
- * failure, -1 is returned.
- *
- * Since: 0.10
- **/
-gssize
-tracker_getline (gchar **lineptr,
-                 gsize  *n,
-                 FILE   *stream)
-{
-	return my_igetdelim (lineptr, n, '\n', stream);
-}
-
-#else
+#endif /* HAVE_GETLINE */
 
 /**
  * tracker_getline:
@@ -930,11 +904,12 @@ tracker_getline (gchar **lineptr,
                  gsize  *n,
                  FILE *stream)
 {
+#ifndef HAVE_GETLINE
+	return my_igetdelim (lineptr, n, '\n', stream);
+#else  /* HAVE_GETLINE */
 	return getline (lineptr, n, stream);
-}
-
 #endif /* HAVE_GETLINE */
-
+}
 
 /**
  * tracker_keywords_parse:

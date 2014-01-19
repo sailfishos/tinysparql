@@ -26,7 +26,6 @@
 #include <libtracker-common/tracker-utils.h>
 
 #include "tracker-crawler.h"
-#include "tracker-marshal.h"
 #include "tracker-miner-fs.h"
 #include "tracker-media-art.h"
 #include "tracker-monitor.h"
@@ -402,7 +401,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerFSClass, process_file),
 		              NULL, NULL,
-		              tracker_marshal_BOOLEAN__OBJECT_OBJECT_OBJECT,
+		              NULL,
 		              G_TYPE_BOOLEAN,
 		              3, G_TYPE_FILE, TRACKER_SPARQL_TYPE_BUILDER, G_TYPE_CANCELLABLE);
 
@@ -438,7 +437,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerFSClass, process_file_attributes),
 		              NULL, NULL,
-		              tracker_marshal_BOOLEAN__OBJECT_OBJECT_OBJECT,
+		              NULL,
 		              G_TYPE_BOOLEAN,
 		              3, G_TYPE_FILE, TRACKER_SPARQL_TYPE_BUILDER, G_TYPE_CANCELLABLE);
 
@@ -468,7 +467,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerFSClass, ignore_next_update_file),
 		              NULL, NULL,
-		              tracker_marshal_BOOLEAN__OBJECT_OBJECT_OBJECT,
+		              NULL,
 		              G_TYPE_BOOLEAN,
 		              3, G_TYPE_FILE, TRACKER_SPARQL_TYPE_BUILDER, G_TYPE_CANCELLABLE);
 
@@ -492,7 +491,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerFSClass, finished),
 		              NULL, NULL,
-		              tracker_marshal_VOID__DOUBLE_UINT_UINT_UINT_UINT,
+		              NULL,
 		              G_TYPE_NONE,
 		              5,
 		              G_TYPE_DOUBLE,
@@ -506,7 +505,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 	 * @miner_fs: the #TrackerMinerFS
 	 * @file: a #GFile
 	 * @rdf_types: the set of RDF types
-	 * @results: a set of results prepared by the preparation query
+	 * @results: (element-type GStrv): a set of results prepared by the preparation query
 	 * @cancellable: a #GCancellable
 	 *
 	 * The ::writeback-file signal is emitted whenever a file must be written
@@ -523,7 +522,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 		              G_STRUCT_OFFSET (TrackerMinerFSClass, writeback_file),
 		              NULL,
 		              NULL,
-		              tracker_marshal_BOOLEAN__OBJECT_BOXED_BOXED_OBJECT,
+		              NULL,
 		              G_TYPE_BOOLEAN,
 		              4,
 		              G_TYPE_FILE,
@@ -545,6 +544,9 @@ tracker_miner_fs_init (TrackerMinerFS *object)
 
 	priv->timer = g_timer_new ();
 	priv->extraction_timer = g_timer_new ();
+
+	g_timer_stop (priv->timer);
+	g_timer_stop (priv->extraction_timer);
 
 	priv->timer_stopped = TRUE;
 	priv->extraction_timer_stopped = TRUE;
@@ -1292,10 +1294,11 @@ item_add_or_update (TrackerMinerFS *fs,
 	sparql = tracker_sparql_builder_new_update ();
 	g_object_ref (file);
 
-	if (!is_new) {
-		urn = tracker_file_notifier_get_file_iri (fs->priv->file_notifier,
-		                                          file);
-	}
+	/* Always query. No matter we are notified the file was just
+	 * created, its meta data might already be in the store
+	 * (possibly inserted by other application) - in such a case
+	 * we have to UPDATE, not INSERT. */
+	urn = tracker_file_notifier_get_file_iri (fs->priv->file_notifier, file);
 
 	if (!tracker_indexing_tree_file_is_root (fs->priv->indexing_tree, file)) {
 		parent = g_file_get_parent (file);
@@ -1350,7 +1353,7 @@ item_remove (TrackerMinerFS *fs,
 		flags = TRACKER_BULK_MATCH_EQUALS;
 	} else {
 		tracker_thumbnailer_remove_add (uri, NULL);
-		tracker_media_art_queue_removal (uri, NULL);
+		tracker_media_art_queue_remove (uri, NULL);
 	}
 
 	/* FIRST:
@@ -2268,7 +2271,7 @@ item_queue_handlers_cb (gpointer user_data)
 				process_stop (fs);
 
 				tracker_thumbnailer_send ();
-				tracker_media_art_execute_queue (tracker_miner_get_connection (TRACKER_MINER (fs)));
+				tracker_media_art_queue_empty (tracker_miner_get_connection (TRACKER_MINER (fs)));
 			} else {
 				/* Flush any possible pending update here */
 				tracker_sparql_buffer_flush (fs->priv->sparql_buffer,
@@ -3152,7 +3155,7 @@ tracker_miner_fs_check_file_with_priority (TrackerMinerFS *fs,
  * @fs: a #TrackerMinerFS
  * @file: #GFile for the file to check
  * @rdf_types: A #GStrv with rdf types
- * @results: A array of results from the preparation query
+ * @results: (element-type GStrv): A array of results from the preparation query
  *
  * Tells the filesystem miner to writeback a file.
  *
