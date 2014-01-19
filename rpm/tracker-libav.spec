@@ -3,7 +3,7 @@ Name:       tracker
 %define enable_demo 0
 
 Summary:    An object database, tag/metadata database, search tool and indexer
-Version:    0.14.4
+Version:    0.17.1
 Release:    1
 Group:      Data Management/Content Framework
 License:    GPLv2+
@@ -23,7 +23,7 @@ BuildRequires:  pkgconfig(enca)
 BuildRequires:  pkgconfig(exempi-2.0)
 BuildRequires:  pkgconfig(gconf-2.0)
 BuildRequires:  pkgconfig(gee-1.0)
-BuildRequires:  pkgconfig(glib-2.0) >= 2.26.0
+BuildRequires:  pkgconfig(glib-2.0) >= 2.32.0
 BuildRequires:  pkgconfig(gmime-2.6)
 BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  pkgconfig(id3tag)
@@ -232,7 +232,7 @@ cd /usr/share/tracker-tests/
 %files tests
 %defattr(-,root,root,-)
 %{_datadir}/tracker-tests/*
-%{_sysconfdir}/dconf/profile/trackertest
+#%{_sysconfdir}/dconf/profile/trackertest
 /opt/tests/tracker/bin/*
 
 
