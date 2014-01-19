@@ -62,6 +62,7 @@ test_password_provider_getting (void)
 	                                                   &username,
 	                                                   &error);
 
+	g_assert_no_error (error);
 	g_assert_cmpstr (username, ==, TEST_USERNAME);
 	g_assert_cmpstr (password, ==, TEST_PASSWORD);
 
@@ -103,8 +104,6 @@ main (int argc, char **argv)
 {
 	const gchar *current_dir;
 	gint retval;
-
-	g_type_init ();
 
 	g_test_init (&argc, &argv, NULL);
 

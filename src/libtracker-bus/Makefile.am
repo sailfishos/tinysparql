@@ -7,13 +7,12 @@ AM_VALAFLAGS =                                         \
 	--header tracker-bus.h                         \
 	--vapi tracker-bus.vapi                        \
 	--pkg gio-2.0 --pkg gio-unix-2.0 --pkg posix   \
-	--vapidir $(top_srcdir)/src/vapi               \
 	$(BUILD_VALAFLAGS)                             \
 	$(top_srcdir)/src/libtracker-common/libtracker-common.vapi \
 	$(top_srcdir)/src/libtracker-sparql/tracker-sparql-$(TRACKER_API_VERSION).vapi
 
 AM_CPPFLAGS =                                          \
-	$(BUILD_CFLAGS)                                \
+	$(BUILD_VALACFLAGS)                            \
 	-I$(top_srcdir)/src                            \
 	-I$(top_builddir)/src                          \
 	-DNO_LIBDBUS                                   \

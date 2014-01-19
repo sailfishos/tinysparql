@@ -2,8 +2,6 @@ include $(top_srcdir)/Makefile.decl
 
 # Include list of shared sources:
 #  Defines:
-#    $(libtracker_miner_marshal_sources)
-#    $(libtracker_miner_marshal_headers)
 #    $(libtracker_miner_monitor_sources)
 #    $(libtracker_miner_monitor_headers)
 #
@@ -29,7 +27,7 @@ TEST_PROGS +=                                          \
 	tracker-indexing-tree-test
 
 AM_CPPFLAGS = \
-	$(BUILD_CFLAGS) \
+	$(BUILD_VALACFLAGS) \
 	-DTEST \
 	-DLIBEXEC_PATH=\""$(libexecdir)"\" \
 	-DTEST_DATA_DIR=\""$(abs_top_srcdir)/tests/libtracker-miner/data"\" \
@@ -95,7 +93,6 @@ tracker_monitor_test_SOURCES =                         \
 if !ENABLE_GCOV
 # If gcov is enabled, libtracker-miner exports all symbols and this is not needed.
 tracker_monitor_test_SOURCES +=			       \
-	$(libtracker_miner_marshal_sources)            \
 	$(libtracker_miner_monitor_sources)
 endif
 
@@ -115,7 +112,6 @@ tracker_file_notifier_test_SOURCES = \
 	tracker-file-notifier-test.c
 
 noinst_HEADERS =                                       \
-	$(libtracker_miner_marshal_headers)            \
 	$(libtracker_miner_monitor_headers)            \
 	tracker-miner-mock.h                           \
 	thumbnailer-mock.h                             \

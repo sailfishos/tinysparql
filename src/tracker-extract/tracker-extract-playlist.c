@@ -55,7 +55,7 @@ typedef struct {
 static void
 playlist_started (TotemPlParser         *parser,
                   gchar                 *to_uri,
-                  GHashTable            *to_metadata,
+                  TotemPlParserMetadata *to_metadata,
                   gpointer               user_data)
 {
 	PlaylistMetadata *data;
