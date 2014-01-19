@@ -1529,6 +1529,8 @@ main (int argc, char **argv)
 	GError *error = NULL;
 	gchar *summary;
 
+	g_type_init();
+
 	setlocale (LC_ALL, "");
 
 	bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);

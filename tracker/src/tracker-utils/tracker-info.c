@@ -338,6 +338,8 @@ main (int argc, char **argv)
 	GHashTable *prefixes;
 	gchar **p;
 
+	g_type_init();
+
 	setlocale (LC_ALL, "");
 
 	bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);

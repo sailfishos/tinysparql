@@ -859,6 +859,8 @@ main (int argc, char **argv)
 	GError *error = NULL;
 	const gchar *failed = NULL;
 
+	g_type_init();
+
 	setlocale (LC_ALL, "");
 
 	bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
