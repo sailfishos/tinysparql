@@ -26,6 +26,7 @@
 #include <libtracker-common/tracker-utils.h>
 
 #include "tracker-crawler.h"
+#include "tracker-marshal.h"
 #include "tracker-miner-fs.h"
 #include "tracker-media-art.h"
 #include "tracker-monitor.h"
@@ -401,7 +402,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerFSClass, process_file),
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_BOOLEAN__OBJECT_OBJECT_OBJECT,
 		              G_TYPE_BOOLEAN,
 		              3, G_TYPE_FILE, TRACKER_SPARQL_TYPE_BUILDER, G_TYPE_CANCELLABLE);
 
@@ -437,7 +438,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerFSClass, process_file_attributes),
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_BOOLEAN__OBJECT_OBJECT_OBJECT,
 		              G_TYPE_BOOLEAN,
 		              3, G_TYPE_FILE, TRACKER_SPARQL_TYPE_BUILDER, G_TYPE_CANCELLABLE);
 
@@ -467,7 +468,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerFSClass, ignore_next_update_file),
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_BOOLEAN__OBJECT_OBJECT_OBJECT,
 		              G_TYPE_BOOLEAN,
 		              3, G_TYPE_FILE, TRACKER_SPARQL_TYPE_BUILDER, G_TYPE_CANCELLABLE);
 
@@ -491,7 +492,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (TrackerMinerFSClass, finished),
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__DOUBLE_UINT_UINT_UINT_UINT,
 		              G_TYPE_NONE,
 		              5,
 		              G_TYPE_DOUBLE,
@@ -522,7 +523,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 		              G_STRUCT_OFFSET (TrackerMinerFSClass, writeback_file),
 		              NULL,
 		              NULL,
-		              NULL,
+		              tracker_marshal_BOOLEAN__OBJECT_BOXED_BOXED_OBJECT,
 		              G_TYPE_BOOLEAN,
 		              4,
 		              G_TYPE_FILE,

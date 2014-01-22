@@ -28,6 +28,7 @@
 
 #include "tracker-storage.h"
 #include "tracker-utils.h"
+#include "tracker-marshal.h"
 
 /**
  * SECTION:tracker-storage
@@ -113,7 +114,7 @@ tracker_storage_class_init (TrackerStorageClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              0,
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__STRING_STRING_STRING_BOOLEAN_BOOLEAN,
 		              G_TYPE_NONE,
 		              5,
 		              G_TYPE_STRING,
@@ -128,7 +129,7 @@ tracker_storage_class_init (TrackerStorageClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              0,
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__STRING_STRING,
 		              G_TYPE_NONE,
 		              2,
 		              G_TYPE_STRING,
