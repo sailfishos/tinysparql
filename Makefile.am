@@ -51,6 +51,7 @@ coverage-report: coverage
 		libstemmer/stem_UTF_8_* \
 		tracker-control/tracker-miner-files-index-client.h \
 		"*.vapi"                               \
+		"tracker-marshal.*"
 	rm -rf $(top_builddir)/coverage
 	$(MKDIR_P) $(top_builddir)/coverage
 	genhtml --title "@PACKAGE_STRING@" --output-directory $(top_builddir)/coverage $(top_builddir)/lcov.info

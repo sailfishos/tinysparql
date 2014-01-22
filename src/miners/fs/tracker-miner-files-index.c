@@ -24,6 +24,7 @@
 #include <libtracker-miner/tracker-miner-dbus.h>
 
 #include "tracker-miner-files-index.h"
+#include "tracker-marshal.h"
 
 
 static const gchar introspection_xml[] =

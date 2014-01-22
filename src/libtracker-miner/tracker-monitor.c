@@ -31,6 +31,7 @@
 #endif
 
 #include "tracker-monitor.h"
+#include "tracker-marshal.h"
 
 #define TRACKER_MONITOR_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE ((obj), TRACKER_TYPE_MONITOR, TrackerMonitorPrivate))
 
@@ -159,7 +160,7 @@ tracker_monitor_class_init (TrackerMonitorClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              0,
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__OBJECT_BOOLEAN,
 		              G_TYPE_NONE,
 		              2,
 		              G_TYPE_OBJECT,
@@ -170,7 +171,7 @@ tracker_monitor_class_init (TrackerMonitorClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              0,
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__OBJECT_BOOLEAN,
 		              G_TYPE_NONE,
 		              2,
 		              G_TYPE_OBJECT,
@@ -181,7 +182,7 @@ tracker_monitor_class_init (TrackerMonitorClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              0,
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__OBJECT_BOOLEAN,
 		              G_TYPE_NONE,
 		              2,
 		              G_TYPE_OBJECT,
@@ -192,7 +193,7 @@ tracker_monitor_class_init (TrackerMonitorClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              0,
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__OBJECT_BOOLEAN,
 		              G_TYPE_NONE,
 		              2,
 		              G_TYPE_OBJECT,
@@ -203,7 +204,7 @@ tracker_monitor_class_init (TrackerMonitorClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              0,
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__OBJECT_OBJECT_BOOLEAN_BOOLEAN,
 		              G_TYPE_NONE,
 		              4,
 		              G_TYPE_OBJECT,

@@ -42,6 +42,7 @@
 
 #include "tracker-media-art.h"
 #include "tracker-extract.h"
+#include "tracker-marshal.h"
 #include "tracker-media-art-generic.h"
 
 #define ALBUMARTER_SERVICE    "com.nokia.albumart"

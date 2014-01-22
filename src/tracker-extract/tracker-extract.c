@@ -35,6 +35,7 @@
 
 #include "tracker-extract.h"
 #include "tracker-main.h"
+#include "tracker-marshal.h"
 
 #ifdef HAVE_LIBSTREAMANALYZER
 #include "tracker-topanalyzer.h"

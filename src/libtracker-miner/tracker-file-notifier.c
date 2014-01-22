@@ -28,6 +28,7 @@
 #include "tracker-file-system.h"
 #include "tracker-crawler.h"
 #include "tracker-monitor.h"
+#include "tracker-marshal.h"
 
 static GQuark quark_property_crawled = 0;
 static GQuark quark_property_queried = 0;
@@ -1161,7 +1162,7 @@ tracker_file_notifier_class_init (TrackerFileNotifierClass *klass)
 		              G_STRUCT_OFFSET (TrackerFileNotifierClass,
 		                               file_created),
 		              NULL, NULL,
-		              NULL,
+		              g_cclosure_marshal_VOID__OBJECT,
 		              G_TYPE_NONE,
 		              1, G_TYPE_FILE);
 	signals[FILE_UPDATED] =
@@ -1171,7 +1172,7 @@ tracker_file_notifier_class_init (TrackerFileNotifierClass *klass)
 		              G_STRUCT_OFFSET (TrackerFileNotifierClass,
 		                               file_updated),
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__OBJECT_BOOLEAN,
 		              G_TYPE_NONE,
 		              2, G_TYPE_FILE, G_TYPE_BOOLEAN);
 	signals[FILE_DELETED] =
@@ -1181,7 +1182,7 @@ tracker_file_notifier_class_init (TrackerFileNotifierClass *klass)
 		              G_STRUCT_OFFSET (TrackerFileNotifierClass,
 		                               file_deleted),
 		              NULL, NULL,
-		              NULL,
+		              g_cclosure_marshal_VOID__OBJECT,
 		              G_TYPE_NONE,
 		              1, G_TYPE_FILE);
 	signals[FILE_MOVED] =
@@ -1191,7 +1192,7 @@ tracker_file_notifier_class_init (TrackerFileNotifierClass *klass)
 		              G_STRUCT_OFFSET (TrackerFileNotifierClass,
 		                               file_moved),
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__OBJECT_OBJECT,
 		              G_TYPE_NONE,
 		              2, G_TYPE_FILE, G_TYPE_FILE);
 	signals[DIRECTORY_STARTED] =
@@ -1201,7 +1202,7 @@ tracker_file_notifier_class_init (TrackerFileNotifierClass *klass)
 		              G_STRUCT_OFFSET (TrackerFileNotifierClass,
 		                               directory_started),
 		              NULL, NULL,
-		              NULL,
+		              g_cclosure_marshal_VOID__OBJECT,
 		              G_TYPE_NONE,
 		              1, G_TYPE_FILE);
 	signals[DIRECTORY_FINISHED] =
@@ -1211,7 +1212,7 @@ tracker_file_notifier_class_init (TrackerFileNotifierClass *klass)
 		              G_STRUCT_OFFSET (TrackerFileNotifierClass,
 		                               directory_finished),
 		              NULL, NULL,
-		              NULL,
+		              tracker_marshal_VOID__OBJECT_UINT_UINT_UINT_UINT,
 		              G_TYPE_NONE,
 		              5, G_TYPE_FILE, G_TYPE_UINT,
 		              G_TYPE_UINT, G_TYPE_UINT, G_TYPE_UINT);
@@ -1222,7 +1223,7 @@ tracker_file_notifier_class_init (TrackerFileNotifierClass *klass)
 		              G_STRUCT_OFFSET (TrackerFileNotifierClass,
 		                               finished),
 		              NULL, NULL,
-		              NULL,
+		              g_cclosure_marshal_VOID__VOID,
 		              G_TYPE_NONE, 0, G_TYPE_NONE);
 
 	g_object_class_install_property (object_class,
