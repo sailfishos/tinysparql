@@ -124,7 +124,7 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 	                                                       G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 
 	/**
-	 * TrackerMinerManager::miner-progress
+	 * TrackerMinerManager::miner-progress:
 	 * @manager: the #TrackerMinerManager
 	 * @miner: miner reference
 	 * @status: miner status
@@ -149,7 +149,7 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 		              G_TYPE_DOUBLE,
 		              G_TYPE_INT);
 	/**
-	 * TrackerMinerManager::miner-paused
+	 * TrackerMinerManager::miner-paused:
 	 * @manager: the #TrackerMinerManager
 	 * @miner: miner reference
 	 *
@@ -168,7 +168,7 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 		              G_TYPE_NONE, 1,
 		              G_TYPE_STRING);
 	/**
-	 * TrackerMinerManager::miner-resumed
+	 * TrackerMinerManager::miner-resumed:
 	 * @manager: the #TrackerMinerManager
 	 * @miner: miner reference
 	 *
@@ -187,7 +187,7 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 		              G_TYPE_NONE, 1,
 		              G_TYPE_STRING);
 	/**
-	 * TrackerMinerManager::miner-activated
+	 * TrackerMinerManager::miner-activated:
 	 * @manager: the #TrackerMinerManager
 	 * @miner: miner reference
 	 *
@@ -207,7 +207,7 @@ tracker_miner_manager_class_init (TrackerMinerManagerClass *klass)
 		              G_TYPE_NONE, 1,
 		              G_TYPE_STRING);
 	/**
-	 * TrackerMinerManager::miner-deactivated
+	 * TrackerMinerManager::miner-deactivated:
 	 * @manager: the #TrackerMinerManager
 	 * @miner: miner reference
 	 *
@@ -739,6 +739,7 @@ crawler_check_file_cb (TrackerCrawler *crawler,
 
 	priv->miners = g_list_prepend (priv->miners, data);
 
+	g_key_file_free (key_file);
 	g_free (path);
 
 	return TRUE;
@@ -784,6 +785,7 @@ initialize_miners_data (TrackerMinerManager *manager)
 
 	g_main_loop_run (main_loop);
 
+	g_main_loop_unref (main_loop);
 	g_object_unref (crawler);
 }
 

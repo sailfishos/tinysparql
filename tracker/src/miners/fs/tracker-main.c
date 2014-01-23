@@ -817,8 +817,9 @@ main (gint argc, gchar *argv[])
 	gboolean force_mtime_checking = FALSE;
 	gboolean store_available;
 
+	g_type_init();
+
 	main_loop = NULL;
-	g_type_init ();
 
 	setlocale (LC_ALL, "");
 
@@ -858,8 +859,6 @@ main (gint argc, gchar *argv[])
 		return EXIT_SUCCESS;
 	}
 
-	g_print ("Initializing tracker-miner-fs...\n");
-
 	initialize_signal_handler ();
 
 	/* Initialize logging */
@@ -875,8 +874,10 @@ main (gint argc, gchar *argv[])
 
 	tracker_log_init (tracker_config_get_verbosity (config),
 	                  &log_filename);
-	g_print ("Starting log:\n  File:'%s'\n", log_filename);
-	g_free (log_filename);
+	if (log_filename) {
+		g_message ("Using log file:'%s'", log_filename);
+		g_free (log_filename);
+	}
 
 	sanity_check_option_values (config);
 

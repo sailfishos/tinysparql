@@ -19,6 +19,8 @@
 
 #include "config.h"
 
+#include <locale.h>
+
 #include <libtracker-sparql/tracker-sparql.h>
 
 typedef struct {
@@ -167,11 +169,6 @@ test_tracker_sparql_cursor_next_async_cb (GObject      *source,
 			g_main_loop_quit (main_loop);
 		}
 	} else {
-		tracker_sparql_cursor_next_async (cursor,
-		                                  cancellables[query],
-		                                  test_tracker_sparql_cursor_next_async_cb,
-		                                  user_data);
-
 		next++;
 
 		/* Random number here for next_count_to_cancel is "2",
@@ -184,6 +181,11 @@ test_tracker_sparql_cursor_next_async_cb (GObject      *source,
 			         next);
 			g_cancellable_cancel (cancellables[query]);
 		}
+
+		tracker_sparql_cursor_next_async (cursor,
+		                                  cancellables[query],
+		                                  test_tracker_sparql_cursor_next_async_cb,
+		                                  user_data);
 	}
 }
 
@@ -357,7 +359,8 @@ main (gint argc, gchar **argv)
 {
 	int result;
 
-	g_type_init ();
+	setlocale (LC_ALL, "");
+
 	g_test_init (&argc, &argv, NULL);
 
 #if HAVE_TRACKER_FTS

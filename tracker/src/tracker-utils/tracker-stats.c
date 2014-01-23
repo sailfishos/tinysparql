@@ -58,6 +58,8 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	GError *error = NULL;
 
+	g_type_init();
+
 	setlocale (LC_ALL, "");
 
 	bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
@@ -78,8 +80,6 @@ main (int argc, char **argv)
 	}
 
 	g_option_context_free (context);
-
-	g_type_init ();
 
 	connection = tracker_sparql_connection_get (NULL, &error);
 
@@ -116,6 +116,9 @@ main (int argc, char **argv)
 		}
 
 		if (count == 0) {
+			/* To translators: This is to say there are no
+			 * statistics found. We use a "Statistics:
+			 * None" with multiple print statements */
 			g_print ("  %s\n", _("None"));
 		}
 

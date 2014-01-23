@@ -506,7 +506,7 @@ tracker_miner_fs_class_init (TrackerMinerFSClass *klass)
 	 * @miner_fs: the #TrackerMinerFS
 	 * @file: a #GFile
 	 * @rdf_types: the set of RDF types
-	 * @results: a set of results prepared by the preparation query
+	 * @results: (element-type GStrv): a set of results prepared by the preparation query
 	 * @cancellable: a #GCancellable
 	 *
 	 * The ::writeback-file signal is emitted whenever a file must be written
@@ -1295,14 +1295,11 @@ item_add_or_update (TrackerMinerFS *fs,
 	sparql = tracker_sparql_builder_new_update ();
 	g_object_ref (file);
 
-	/* Always query. No matter we are notified the file was just created, its
-	 * meta data might already be in the store (possibly inserted by other
-	 * application) - in such a case we have to UPDATE, not INSERT.
-	 */
-	//if (!is_new) {
-		urn = tracker_file_notifier_get_file_iri (fs->priv->file_notifier,
-		                                          file);
-	//}
+	/* Always query. No matter we are notified the file was just
+	 * created, its meta data might already be in the store
+	 * (possibly inserted by other application) - in such a case
+	 * we have to UPDATE, not INSERT. */
+	urn = tracker_file_notifier_get_file_iri (fs->priv->file_notifier, file);
 
 	if (!tracker_indexing_tree_file_is_root (fs->priv->indexing_tree, file)) {
 		parent = g_file_get_parent (file);
@@ -1357,7 +1354,7 @@ item_remove (TrackerMinerFS *fs,
 		flags = TRACKER_BULK_MATCH_EQUALS;
 	} else {
 		tracker_thumbnailer_remove_add (uri, NULL);
-		tracker_media_art_queue_removal (uri, NULL);
+		tracker_media_art_queue_remove (uri, NULL);
 	}
 
 	/* FIRST:
@@ -2275,7 +2272,7 @@ item_queue_handlers_cb (gpointer user_data)
 				process_stop (fs);
 
 				tracker_thumbnailer_send ();
-				tracker_media_art_execute_queue (tracker_miner_get_connection (TRACKER_MINER (fs)));
+				tracker_media_art_queue_empty (tracker_miner_get_connection (TRACKER_MINER (fs)));
 			} else {
 				/* Flush any possible pending update here */
 				tracker_sparql_buffer_flush (fs->priv->sparql_buffer,
@@ -3159,7 +3156,7 @@ tracker_miner_fs_check_file_with_priority (TrackerMinerFS *fs,
  * @fs: a #TrackerMinerFS
  * @file: #GFile for the file to check
  * @rdf_types: A #GStrv with rdf types
- * @results: A array of results from the preparation query
+ * @results: (element-type GStrv): A array of results from the preparation query
  *
  * Tells the filesystem miner to writeback a file.
  *

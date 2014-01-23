@@ -163,6 +163,7 @@ read_toc (PopplerIndexIter  *index,
 			case POPPLER_ACTION_GOTO_REMOTE:
 			case POPPLER_ACTION_RENDITION:
 			case POPPLER_ACTION_OCG_STATE:
+			case POPPLER_ACTION_JAVASCRIPT:
 				/* Do nothing */
 				break;
 		}
@@ -359,7 +360,7 @@ extract_content_parent_process (PopplerDocument *document,
 			perror ("select()");
 			finished = TRUE;
 		} else if (retval == 1) {
-			gsize bytes_remaining;
+			gsize bytes_remaining = bytes_expected;
 			gboolean read_finished = FALSE;
 
 			if (g_timer_elapsed (timer, NULL) >= EXTRACTION_PROCESS_TIMEOUT) {
@@ -462,10 +463,8 @@ extract_content_child_cleanup (int action)
 	pid_t child_pid;
 	int status;
 
-	g_debug ("Parent: Zombies, say hello to my little friend!");
-	while ((child_pid = waitpid (-1, &status, WNOHANG)) > 0) {
-		g_debug ("Parent:   Zombie %d reaped", child_pid);
-	}
+	while ((child_pid = waitpid (-1, &status, WNOHANG)) > 0)
+		;
 }
 
 static gchar *
@@ -574,8 +573,6 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	gchar *contents = NULL;
 	gsize len;
 	struct stat st;
-
-	g_type_init ();
 
 	metadata = tracker_extract_info_get_metadata_builder (info);
 	preupdate = tracker_extract_info_get_preupdate_builder (info);

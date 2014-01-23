@@ -58,9 +58,11 @@ test_string_to_date (void)
 	result = g_date_new ();
 	g_date_set_time_t (result, result_time_t);
 
-	g_setenv ("TZ", timezone, TRUE);
 	if (timezone) {
+		g_setenv ("TZ", timezone, TRUE);
 		g_free (timezone);
+	} else {
+		g_unsetenv ("TZ");
 	}
 
 	g_assert_cmpint (g_date_get_year (expected), ==, g_date_get_year (result));
@@ -162,7 +164,7 @@ test_date_time_from_string ()
         g_assert_cmpint (tracker_date_time_get_offset (&value), ==, -10800);
 
         /* No offset */
-        tracker_date_time_set_from_string (&value, "2011-10-28T17:43:00", &error);
+        tracker_date_time_set_from_string (&value, "2011-10-28T17:43:00Z", &error);
         g_assert (!error);
         g_assert_cmpint (tracker_date_time_get_time (&value), ==, 1319823780);
         g_assert_cmpint (tracker_date_time_get_offset (&value), ==, 0);
@@ -223,7 +225,6 @@ test_date_time_get_local_time ()
 gint
 main (gint argc, gchar **argv) 
 {
-        g_type_init ();
         g_test_init (&argc, &argv, NULL);
 
         g_test_add_func ("/libtracker-common/date-time/date_to_string",

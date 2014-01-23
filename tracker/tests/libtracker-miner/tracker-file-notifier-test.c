@@ -18,9 +18,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+
+#include "config.h"
+
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <locale.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -345,12 +349,13 @@ test_common_context_expect_results (TestCommonContext   *fixture,
 			id = g_timeout_add_seconds (max_timeout,
 						    (GSourceFunc) timeout_expired_cb,
 						    fixture);
+			fixture->expire_timeout_id = id;
 		}
 
 		g_main_loop_run (fixture->main_loop);
 
-		if (max_timeout != 0) {
-			g_source_remove (id);
+		if (max_timeout != 0 && fixture->expire_timeout_id != 0) {
+			g_source_remove (fixture->expire_timeout_id);
 		}
 	}
 
@@ -742,7 +747,8 @@ gint
 main (gint    argc,
       gchar **argv)
 {
-	g_type_init ();
+	setlocale (LC_ALL, "");
+
 	g_test_init (&argc, &argv, NULL);
 
 	g_test_message ("Testing file notifier");

@@ -362,10 +362,11 @@ public class Tracker.View : ScrolledWindow {
 				markup = Markup.escape_text (text);
 
 				if (subtext != null) {
+					subtext = subtext.replace ("\n", " ");
 					markup += "\n<small><span color='grey'>%s</span></small>".printf (Markup.escape_text (subtext));
 				}
 			} else {
-				markup = "<span color='grey'>%s</span>\n".printf (_("Loading..."));
+				markup = "<span color='grey'>%s</span>\n".printf (_("Loading…"));
 			}
 		}
 
@@ -431,7 +432,7 @@ public class Tracker.View : ScrolledWindow {
 			detail = tracker_time_format_from_seconds (detail);
 			break;
 		case Tracker.Query.Type.DOCUMENTS:
-			detail = detail + " " + _("Pages");
+			detail = ngettext ("%d Page", "%d Pages", detail.to_int()).printf (detail.to_int());
 			break;
 		case Tracker.Query.Type.IMAGES:
 			detail = GLib.format_size_for_display (int.parse (detail));
@@ -455,7 +456,7 @@ public class Tracker.View : ScrolledWindow {
 		var separator = new SeparatorMenuItem ();
 		context_menu.append (separator);
 
-		item = new Gtk.MenuItem.with_mnemonic (_("_Tags..."));
+		item = new Gtk.MenuItem.with_mnemonic (_("_Tags…"));
 		item.activate.connect (context_menu_tags_clicked);
 		context_menu.append (item);
 

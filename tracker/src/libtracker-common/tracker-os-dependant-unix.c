@@ -26,6 +26,11 @@
 #include <unistd.h>
 #include <sys/resource.h>
 
+#if defined (__OpenBSD__)
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#endif
+
 #include <glib.h>
 
 #include "tracker-log.h"
@@ -225,6 +230,22 @@ tracker_create_permission_string (struct stat finfo)
 static glong
 get_memory_total (void)
 {
+#if defined (__OpenBSD__)
+	glong total = 0;
+	int64_t physmem;
+	size_t len;
+	static gint mib[] = { CTL_HW, HW_PHYSMEM64 };
+
+	len = sizeof (physmem);
+
+	if (sysctl (mib, G_N_ELEMENTS (mib), &physmem, &len, NULL, 0) == -1) {
+		g_critical ("Couldn't get memory information: %d", errno);
+	} else {
+		total = physmem;
+	}
+#elif defined (__sun)
+	glong total = (glong)sysconf(_SC_PAGESIZE) * (glong)sysconf(_SC_PHYS_PAGES);
+#else
 	GError      *error = NULL;
 	const gchar *filename;
 	gchar       *contents = NULL;
@@ -258,6 +279,7 @@ get_memory_total (void)
 		}
 		g_free (contents);
 	}
+#endif
 
 	return total;
 }
@@ -313,13 +335,8 @@ tracker_memory_setrlimits (void)
 		} else {
 			gchar *str1, *str2;
 
-#if GLIB_CHECK_VERSION (2,30,0)
 			str1 = g_format_size (total);
 			str2 = g_format_size (limit);
-#else
-			str1 = g_format_size_for_display (total);
-			str2 = g_format_size_for_display (limit);
-#endif
 
 			g_message ("Setting memory limitations: total is %s, minimum is 256 MB, recommended is ~1 GB", str1);
 			g_message ("  Virtual/Heap set to %s (50%% of total or MAXLONG)", str2);
@@ -332,3 +349,12 @@ tracker_memory_setrlimits (void)
 
 	return TRUE;
 }
+
+#ifndef HAVE_STRNLEN
+size_t
+strnlen (const char *str, size_t max)
+{
+	const char *end = memchr (str, 0, max);
+	return end ? (size_t)(end - str) : max;
+}
+#endif /* HAVE_STRNLEN */

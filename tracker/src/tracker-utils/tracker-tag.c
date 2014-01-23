@@ -53,19 +53,19 @@ static gboolean print_version;
 static GOptionEntry entries[] = {
 	{ "limit", 'l', 0, G_OPTION_ARG_INT, &limit,
 	  N_("Limit the number of results shown"),
-	  N_("512")
+	  "512"
 	},
 	{ "offset", 'o', 0, G_OPTION_ARG_INT, &offset,
 	  N_("Offset the results"),
-	  N_("0")
+	  "0"
 	},
 	{ "or-operator", 'r', 0, G_OPTION_ARG_NONE, &or_operator,
 	  N_("Use OR for search terms instead of AND (the default)"),
 	  NULL
 	},
 	{ "list", 't', 0, G_OPTION_ARG_NONE, &list,
-	  N_("List all tags (using FILTER if specified)"),
-	  NULL,
+	  N_("List all tags (using FILTER if specified; FILTER always uses logical OR)"),
+	  N_("FILTER"),
 	},
 	{ "show-files", 's', 0, G_OPTION_ARG_NONE, &show_files,
 	  N_("Show files associated with each tag (this is only used with --list)"),
@@ -87,8 +87,7 @@ static GOptionEntry entries[] = {
 	  N_("Print version"),
 	  NULL
 	},
-	{ G_OPTION_REMAINING, 0,
-	  G_OPTION_FLAG_FILENAME,
+	{ G_OPTION_REMAINING, 0, 0,
 	  G_OPTION_ARG_FILENAME_ARRAY, &files,
 	  N_("FILE…"),
 	  N_("FILE [FILE…]")},
@@ -147,49 +146,6 @@ get_escaped_sparql_string (const gchar *str)
 	g_string_append_c (sparql, '"');
 
 	return g_string_free (sparql, FALSE);
-}
-
-static gchar *
-get_fts_string (GStrv    search_words,
-                gboolean use_or_operator,
-                gboolean for_regex,
-                gboolean use_asterisk)
-{
-	GString *fts;
-	gint i, len;
-
-	if (!search_words) {
-		return NULL;
-	}
-
-	len = g_strv_length (search_words);
-	fts = g_string_new ("");
-
-	for (i = 0; i < len; i++) {
-		g_string_append (fts, search_words[i]);
-
-		if (use_asterisk) {
-			g_string_append_c (fts, '*');
-		}
-
-		if (i < len - 1) {
-			if (for_regex) {
-				if (use_or_operator) {
-					g_string_append (fts, " || ");
-				} else {
-					g_string_append (fts, " && ");
-				}
-			} else {
-				if (use_or_operator) {
-					g_string_append (fts, " OR ");
-				} else {
-					g_string_append (fts, " ");
-				}
-			}
-		}
-	}
-
-	return g_string_free (fts, FALSE);
 }
 
 static gchar *
@@ -367,6 +323,8 @@ get_all_tags_show_tag_id (TrackerSparqlConnection *connection,
 	}
 
 	if (!cursor) {
+		/* To translators: This is to say there are no
+		 * tags found with a particular unique ID. */
 		g_print ("    %s\n", _("None"));
 		return;
 	}
@@ -389,12 +347,18 @@ get_all_tags (TrackerSparqlConnection *connection,
 {
 	TrackerSparqlCursor *cursor;
 	GError *error = NULL;
-	gchar *fts;
 	gchar *query;
 
-	fts = get_fts_string (files, use_or_operator, TRUE, FALSE);
+	if (files && g_strv_length (files) > 0) {
+		gchar *filter;
 
-	if (fts) {
+		/* e.g. '?label IN ("foo", "bar")' */
+		filter = g_strjoinv ("\",\"", files);
+
+		/* You might be asking, why not logical AND here, why
+		 * logical OR for FILTER, well, tags can't have
+		 * multiple labels is the simple answer.
+		 */
 		query = g_strdup_printf ("SELECT ?tag ?label nao:description(?tag) COUNT(?urns) AS urns "
 		                         "WHERE {"
 		                         "  ?tag a nao:Tag ;"
@@ -402,15 +366,16 @@ get_all_tags (TrackerSparqlConnection *connection,
 		                         "  OPTIONAL {"
 		                         "     ?urns nao:hasTag ?tag"
 		                         "  } ."
-		                         "  FILTER (?label = \"%s\")"
+		                         "  FILTER (?label IN (\"%s\"))"
 		                         "} "
 		                         "GROUP BY ?tag "
 		                         "ORDER BY ASC(?label) "
 		                         "OFFSET %d "
 		                         "LIMIT %d",
-		                         fts,
+		                         filter,
 		                         search_offset,
 		                         search_limit);
+		g_free (filter);
 	} else {
 		query = g_strdup_printf ("SELECT ?tag ?label nao:description(?tag) COUNT(?urns) AS urns "
 		                         "WHERE {"
@@ -427,8 +392,6 @@ get_all_tags (TrackerSparqlConnection *connection,
 		                         search_offset,
 		                         search_limit);
 	}
-
-	g_free (fts);
 
 	cursor = tracker_sparql_connection_query (connection, query, NULL, &error);
 	g_free (query);
@@ -491,6 +454,13 @@ get_all_tags (TrackerSparqlConnection *connection,
 		}
 
 		if (count == 0) {
+			/* To translators: This is to say there are no
+			 * files found associated with this tag, e.g.:
+			 *
+			 *   Tags (shown by name):
+			 *     None
+			 *
+			 */
 			g_print ("  %s\n", _("None"));
 		}
 
@@ -863,6 +833,13 @@ get_tags_by_file (TrackerSparqlConnection *connection,
 		}
 
 		if (count == 0) {
+			/* To translators: This is to say there are no
+			 * tags found for a particular file, e.g.:
+			 *
+			 *   /path/to/some/file:
+			 *     None
+			 *
+			 */
 			g_print ("  %s\n", _("None"));
 		}
 
@@ -881,6 +858,8 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	GError *error = NULL;
 	const gchar *failed = NULL;
+
+	g_type_init();
 
 	setlocale (LC_ALL, "");
 
@@ -930,8 +909,6 @@ main (int argc, char **argv)
 	}
 
 	g_option_context_free (context);
-
-	g_type_init ();
 
 	connection = tracker_sparql_connection_get (NULL, &error);
 
