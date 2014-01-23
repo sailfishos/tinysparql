@@ -38,7 +38,7 @@ BuildRequires:  pkgconfig(sqlite3) >= 3.7
 BuildRequires:  pkgconfig(taglib)
 BuildRequires:  pkgconfig(totem-plparser)
 BuildRequires:  pkgconfig(uuid)
-BuildRequires:  pkgconfig(libvala-0.16)
+#BuildRequires:  pkgconfig(libvala-0.16)
 BuildRequires:  pkgconfig(vorbis)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(Qt5Gui)
@@ -46,6 +46,7 @@ BuildRequires:  pkgconfig(libavcodec)
 BuildRequires:  pkgconfig(libavformat)
 BuildRequires:  pkgconfig(libavutil)
 BuildRequires:  gettext
+BuildRequires: vala-devel >= 0.16
 BuildRequires:  giflib-devel
 BuildRequires:  intltool
 BuildRequires:  libjpeg-devel
