@@ -56,6 +56,7 @@ BuildRequires:  pygobject2
 BuildRequires:  python >= 2.6
 BuildRequires:  dbus-python
 BuildRequires:  fdupes
+BuildRequires:  giflib-devel
 
 %description
 Tracker is a powerful desktop-neutral first class object database,
@@ -141,7 +142,8 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --enable-qt \
     --enable-generic-media-extractor=libav \
     --with-enca \
-    --disable-journal
+    --disable-journal \
+    --enable-libgif
 
 make %{?jobs:-j%jobs}
 
