@@ -141,7 +141,7 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --enable-tracker-fts \
     --enable-qt \
     --enable-generic-media-extractor=libav \
-    --with-enca \
+    --disable-enca \
     --disable-journal \
     --enable-libgif
 

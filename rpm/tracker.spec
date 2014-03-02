@@ -141,7 +141,7 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --enable-libvorbis \
     --enable-tracker-fts \
     --enable-qt \
-    --with-enca \
+    --disable-enca \
     --disable-journal \
     --enable-libgif
 
