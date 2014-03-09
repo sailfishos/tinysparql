@@ -686,7 +686,7 @@ media_art_set (const unsigned char *buffer,
                const gchar         *title,
                const gchar         *uri)
 {
-	gchar *local_path;
+	gchar *local_path = NULL;
 	gboolean retval = FALSE;
 
 	g_return_val_if_fail (type > TRACKER_MEDIA_ART_NONE && type < TRACKER_MEDIA_ART_TYPE_COUNT, FALSE);
@@ -702,6 +702,12 @@ media_art_set (const unsigned char *buffer,
 		retval = tracker_media_art_buffer_to_jpeg (buffer, len, mime, local_path);
 	} else {
 		gchar *album_path;
+
+		if (!title) {
+			g_warning ("Could not save embedded album art, not enough metadata supplied");
+			g_free (local_path);
+			return FALSE;
+		}
 
 		tracker_media_art_get_path (NULL, title, media_art_type_name[type], NULL, &album_path, NULL);
 
