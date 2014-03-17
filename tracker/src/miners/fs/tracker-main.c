@@ -817,8 +817,6 @@ main (gint argc, gchar *argv[])
 	gboolean force_mtime_checking = FALSE;
 	gboolean store_available;
 
-	g_type_init();
-
 	main_loop = NULL;
 
 	setlocale (LC_ALL, "");

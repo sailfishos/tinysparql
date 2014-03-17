@@ -58,8 +58,6 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	GError *error = NULL;
 
-	g_type_init();
-
 	setlocale (LC_ALL, "");
 
 	bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
