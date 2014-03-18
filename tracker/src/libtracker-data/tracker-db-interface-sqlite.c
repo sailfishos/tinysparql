@@ -33,6 +33,7 @@
 
 #if HAVE_TRACKER_FTS
 #include <libtracker-fts/tracker-fts.h>
+#include <libtracker-fts/tracker-parser.h>
 #endif
 
 #ifdef HAVE_LIBUNISTRING
@@ -615,6 +616,78 @@ function_sparql_case_fold (sqlite3_context *context,
 	sqlite3_result_text16 (context, zOutput, written * 2, free);
 }
 
+static void
+function_sparql_normalize (sqlite3_context *context,
+                           int              argc,
+                           sqlite3_value   *argv[])
+{
+	const gchar *nfstr;
+	const uint16_t *zInput;
+	uint16_t *zOutput;
+	size_t written = 0;
+	int nInput;
+	uninorm_t nf;
+
+	if (argc != 2) {
+		sqlite3_result_error (context, "Invalid argument count", -1);
+		return;
+	}
+
+	zInput = sqlite3_value_text16 (argv[0]);
+
+	if (!zInput) {
+		return;
+	}
+
+	nfstr = sqlite3_value_text (argv[1]);
+	if (g_ascii_strcasecmp (nfstr, "nfc") == 0)
+		nf = UNINORM_NFC;
+	else if (g_ascii_strcasecmp (nfstr, "nfd") == 0)
+		nf = UNINORM_NFD;
+	else if (g_ascii_strcasecmp (nfstr, "nfkc") == 0)
+		nf = UNINORM_NFKC;
+	else if (g_ascii_strcasecmp (nfstr, "nfkd") == 0)
+		nf = UNINORM_NFKD;
+	else {
+		sqlite3_result_error (context, "Invalid normalization specified, options are 'nfc', 'nfd', 'nfkc' or 'nfkd'", -1);
+		return;
+	}
+
+	nInput = sqlite3_value_bytes16 (argv[0]);
+
+	zOutput = u16_normalize (nf, zInput, nInput/2, NULL, &written);
+
+	sqlite3_result_text16 (context, zOutput, written * 2, free);
+}
+
+static void
+function_sparql_unaccent (sqlite3_context *context,
+                          int              argc,
+                          sqlite3_value   *argv[])
+{
+	const gchar *zInput;
+	gchar *zOutput;
+	gsize written = 0;
+	int nInput;
+
+	g_assert (argc == 1);
+
+	zInput = sqlite3_value_text (argv[0]);
+
+	if (!zInput) {
+		return;
+	}
+
+	nInput = sqlite3_value_bytes (argv[0]);
+
+	zOutput = u8_normalize (UNINORM_NFKD, zInput, nInput, NULL, &written);
+
+	/* Unaccenting is done in place */
+	tracker_parser_unaccent_nfkd_string (zOutput, &written);
+
+	sqlite3_result_text (context, zOutput, written, free);
+}
+
 #elif HAVE_LIBICU
 
 static void
@@ -700,66 +773,110 @@ function_sparql_case_fold (sqlite3_context *context,
 
 	sqlite3_result_text16 (context, zOutput, -1, sqlite3_free);
 }
-#else /* GLib based */
 
 static void
-function_sparql_lower_case (sqlite3_context *context,
-                            int              argc,
-                            sqlite3_value   *argv[])
-{
-	const gchar *zInput;
-	gchar *zOutput;
-	int nInput;
-
-	g_assert (argc == 1);
-
-	/* GLib API works with UTF-8, so use the UTF-8 functions of SQLite too */
-
-	zInput = (const gchar*) sqlite3_value_text (argv[0]);
-
-	if (!zInput) {
-		return;
-	}
-
-	nInput = sqlite3_value_bytes (argv[0]);
-
-	if (!zOutput) {
-		return;
-	}
-
-	zOutput = g_utf8_strdown (zInput, nInput);
-
-	sqlite3_result_text (context, zOutput, -1, g_free);
-}
-
-static void
-function_sparql_case_fold (sqlite3_context *context,
+function_sparql_normalize (sqlite3_context *context,
                            int              argc,
                            sqlite3_value   *argv[])
 {
-	const gchar *zInput;
-	gchar *zOutput;
+	const gchar *nfstr;
+	const uint16_t *zInput;
+	uint16_t *zOutput;
 	int nInput;
+	int nOutput;
+	UNormalizationMode nf;
+	UErrorCode status = U_ZERO_ERROR;
 
-	g_assert (argc == 1);
+	if (argc != 2) {
+		sqlite3_result_error (context, "Invalid argument count", -1);
+		return;
+	}
 
-	/* GLib API works with UTF-8, so use the UTF-8 functions of SQLite too */
-
-	zInput = (const gchar*) sqlite3_value_text (argv[0]);
+	zInput = sqlite3_value_text16 (argv[0]);
 
 	if (!zInput) {
 		return;
 	}
 
-	nInput = sqlite3_value_bytes (argv[0]);
+	nfstr = sqlite3_value_text (argv[1]);
+	if (g_ascii_strcasecmp (nfstr, "nfc") == 0)
+		nf = UNORM_NFC;
+	else if (g_ascii_strcasecmp (nfstr, "nfd") == 0)
+		nf = UNORM_NFD;
+	else if (g_ascii_strcasecmp (nfstr, "nfkc") == 0)
+		nf = UNORM_NFKC;
+	else if (g_ascii_strcasecmp (nfstr, "nfkd") == 0)
+		nf = UNORM_NFKD;
+	else {
+		sqlite3_result_error (context, "Invalid normalization specified", -1);
+		return;
+	}
+
+	nInput = sqlite3_value_bytes16 (argv[0]);
+
+	nOutput = nInput * 2 + 2;
+	zOutput = sqlite3_malloc (nOutput);
 
 	if (!zOutput) {
 		return;
 	}
 
-	zOutput = g_utf8_casefold (zInput, nInput);
+	unorm_normalize (zInput, nInput/2, nf, 0, zOutput, nOutput/2, &status);
+	if (!U_SUCCESS (status)) {
+		char zBuf[128];
+		sqlite3_snprintf (128, zBuf, "ICU error: unorm_normalize: %s", u_errorName (status));
+		zBuf[127] = '\0';
+		sqlite3_free (zOutput);
+		sqlite3_result_error (context, zBuf, -1);
+		return;
+	}
 
-	sqlite3_result_text (context, zOutput, -1, g_free);
+	sqlite3_result_text16 (context, zOutput, -1, sqlite3_free);
+}
+
+static void
+function_sparql_unaccent (sqlite3_context *context,
+                          int              argc,
+                          sqlite3_value   *argv[])
+{
+	const gchar *nfstr;
+	const uint16_t *zInput;
+	uint16_t *zOutput;
+	int nInput;
+	gsize nOutput;
+	UErrorCode status = U_ZERO_ERROR;
+
+	g_assert (argc == 1);
+
+	zInput = sqlite3_value_text16 (argv[0]);
+
+	if (!zInput) {
+		return;
+	}
+
+	nInput = sqlite3_value_bytes16 (argv[0]);
+
+	nOutput = nInput * 2 + 2;
+	zOutput = sqlite3_malloc (nOutput);
+
+	if (!zOutput) {
+		return;
+	}
+
+	nOutput = unorm_normalize (zInput, nInput/2, UNORM_NFKD, 0, zOutput, nOutput/2, &status);
+	if (!U_SUCCESS (status)) {
+		char zBuf[128];
+		sqlite3_snprintf (128, zBuf, "ICU error: unorm_normalize: %s", u_errorName (status));
+		zBuf[127] = '\0';
+		sqlite3_free (zOutput);
+		sqlite3_result_error (context, zBuf, -1);
+		return;
+	}
+
+	/* Unaccenting is done in place */
+	tracker_parser_unaccent_nfkd_string (zOutput, &nOutput);
+
+	sqlite3_result_text16 (context, zOutput, -1, sqlite3_free);
 }
 
 #endif
@@ -884,6 +1001,14 @@ open_database (TrackerDBInterface  *db_interface,
 
 	sqlite3_create_function (db_interface->db, "SparqlCaseFold", 1, SQLITE_ANY,
 	                         db_interface, &function_sparql_case_fold,
+	                         NULL, NULL);
+
+	sqlite3_create_function (db_interface->db, "SparqlNormalize", 2, SQLITE_ANY,
+	                         db_interface, &function_sparql_normalize,
+	                         NULL, NULL);
+
+	sqlite3_create_function (db_interface->db, "SparqlUnaccent", 1, SQLITE_ANY,
+	                         db_interface, &function_sparql_unaccent,
 	                         NULL, NULL);
 
 	sqlite3_create_function (db_interface->db, "SparqlFormatTime", 1, SQLITE_ANY,
@@ -1021,19 +1146,17 @@ tracker_db_interface_sqlite_fts_init (TrackerDBInterface  *db_interface,
                                       gboolean             create)
 {
 #if HAVE_TRACKER_FTS
-	GStrv fts_columns = NULL;
+	GStrv fts_columns;
 
-	tracker_fts_init_db (db_interface->db);
-
-	if (properties) {
-		fts_columns = _fts_create_properties (properties);
-	}
+	tracker_fts_init_db (db_interface->db, properties);
 
 	if (create &&
 	    !tracker_fts_create_table (db_interface->db, "fts",
 				       properties, multivalued)) {
 		g_warning ("FTS tables creation failed");
 	}
+
+	fts_columns = _fts_create_properties (properties);
 
 	if (fts_columns) {
 		GString *insert, *select;
@@ -1973,6 +2096,10 @@ tracker_db_cursor_iter_next (TrackerDBCursor *cursor,
                              GCancellable    *cancellable,
                              GError         **error)
 {
+	if (!cursor) {
+		return FALSE;
+	}
+
 	return db_cursor_iter_next (cursor, cancellable, error);
 }
 

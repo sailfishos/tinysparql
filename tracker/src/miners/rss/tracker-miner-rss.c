@@ -24,6 +24,7 @@
 
 #include <libgrss.h>
 
+#include <libtracker-common/tracker-dbus.h>
 #include <libtracker-common/tracker-ontologies.h>
 
 #include <glib/gi18n.h>
@@ -85,7 +86,7 @@ static void         feed_ready_cb                   (GrssFeedsPool             *
                                                      gpointer               user_data);
 static const gchar *get_message_url                 (GrssFeedItem              *item);
 
-G_DEFINE_TYPE (TrackerMinerRSS, tracker_miner_rss, TRACKER_TYPE_MINER)
+G_DEFINE_TYPE (TrackerMinerRSS, tracker_miner_rss, TRACKER_TYPE_MINER_ONLINE)
 
 static void
 tracker_miner_rss_finalize (GObject *object)
@@ -109,11 +110,19 @@ tracker_miner_rss_finalize (GObject *object)
 	G_OBJECT_CLASS (tracker_miner_rss_parent_class)->finalize (object);
 }
 
+static gboolean
+miner_connected (TrackerMinerOnline *miner,
+		 TrackerNetworkType  network)
+{
+	return (network == TRACKER_NETWORK_TYPE_LAN);
+}
+
 static void
 tracker_miner_rss_class_init (TrackerMinerRSSClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	TrackerMinerClass *miner_class = TRACKER_MINER_CLASS (klass);
+	TrackerMinerOnlineClass *miner_online_class = TRACKER_MINER_ONLINE_CLASS (klass);
 
 	object_class->finalize = tracker_miner_rss_finalize;
 
@@ -121,6 +130,8 @@ tracker_miner_rss_class_init (TrackerMinerRSSClass *klass)
 	miner_class->stopped = miner_stopped;
 	miner_class->paused  = miner_paused;
 	miner_class->resumed = miner_resumed;
+
+	miner_online_class->connected = miner_connected;
 
 	g_type_class_add_private (object_class, sizeof (TrackerMinerRSSPrivate));
 }
@@ -135,7 +146,7 @@ tracker_miner_rss_init (TrackerMinerRSS *object)
 
 	priv = TRACKER_MINER_RSS_GET_PRIVATE (object);
 
-	priv->connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+	priv->connection = g_bus_get_sync (TRACKER_IPC_BUS, NULL, &error);
 
 	if (!priv->connection) {
 		g_critical ("Could not connect to the D-Bus session bus, %s",

@@ -24,7 +24,10 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 
-#include <libtracker-common/tracker-media-art.h>
+#ifdef HAVE_LIBMEDIAART
+#include <libmediaart/mediaart.h>
+#endif
+
 #include <libtracker-sparql/tracker-sparql.h>
 
 #include "tracker-media-art.h"
@@ -46,6 +49,7 @@ on_query_finished (GObject      *source_object,
                    GAsyncResult *res,
                    gpointer      user_data)
 {
+#ifdef HAVE_LIBMEDIAART
 	GError *error = NULL;
 	TrackerSparqlCursor *cursor = NULL;
 	GDir *dir = NULL;
@@ -90,18 +94,18 @@ on_query_finished (GObject      *source_object,
 		artist = tracker_sparql_cursor_get_value_type (cursor, 1) != TRACKER_SPARQL_VALUE_TYPE_UNBOUND ? tracker_sparql_cursor_get_string (cursor, 1, NULL) : NULL;
 
 		/* The get_path API does stripping itself */
-		tracker_media_art_get_path (artist,
-		                            album,
-		                            "album", NULL,
-		                            &target, NULL);
+		media_art_get_path (artist,
+		                    album,
+		                    "album", NULL,
+		                    &target, NULL);
 
 		g_hash_table_replace (table, target, target);
 
 		/* Also add the file to which the symlinks are made */
-		tracker_media_art_get_path (NULL,
-		                            album,
-		                            "album", NULL,
-		                            &album_path, NULL);
+		media_art_get_path (NULL,
+		                    album,
+		                    "album", NULL,
+		                    &album_path, NULL);
 
 
 		g_hash_table_replace (table, album_path, album_path);
@@ -153,6 +157,7 @@ on_error:
 		            error->message ? error->message : "No error given");
 		g_error_free (error);
 	}
+#endif /* HAVE_LIBMEDIAART */
 }
 /**
  * tracker_media_art_queue_remove:

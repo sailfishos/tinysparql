@@ -1,5 +1,3 @@
-include $(top_srcdir)/Makefile.decl
-
 AM_CPPFLAGS = \
 	$(BUILD_CFLAGS) \
 	-I$(top_srcdir)/src \
@@ -26,11 +24,11 @@ libtracker_common_la_SOURCES = \
 	tracker-keyfile-object.c \
 	tracker-log.c \
 	tracker-sched.c \
+	tracker-storage.c \
 	tracker-type-utils.c \
 	tracker-utils.c \
 	tracker-crc32.c \
-	tracker-locale.c \
-	tracker-media-art.c
+	tracker-locale.c
 
 noinst_HEADERS = \
 	tracker-dbus.h \
@@ -45,11 +43,11 @@ noinst_HEADERS = \
 	tracker-keyfile-object.h \
 	tracker-ontologies.h \
 	tracker-sched.h \
+	tracker-storage.h \
 	tracker-type-utils.h \
 	tracker-utils.h \
 	tracker-crc32.h \
-	tracker-locale.h \
-	tracker-media-art.h
+	tracker-locale.h
 
 if HAVE_TRACKER_FTS
 libtracker_common_la_SOURCES += tracker-language.c
@@ -60,9 +58,6 @@ if HAVE_MEEGOTOUCH
 libtracker_common_la_SOURCES += tracker-locale-gconfdbus.c
 noinst_HEADERS += tracker-locale-gconfdbus.h
 endif
-
-libtracker_common_la_LDFLAGS = \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libtracker_common_la_LIBADD = \
 	$(BUILD_LIBS) \
