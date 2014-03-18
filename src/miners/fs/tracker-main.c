@@ -31,6 +31,7 @@
 #include <glib-object.h>
 #include <glib/gi18n.h>
 
+#include <libtracker-common/tracker-dbus.h>
 #include <libtracker-common/tracker-ioprio.h>
 #include <libtracker-common/tracker-log.h>
 #include <libtracker-common/tracker-ontologies.h>
@@ -768,7 +769,7 @@ store_is_available (void)
 	GDBusProxy *proxy;
 	gchar *name_owner;
 
-	connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
+	connection = g_bus_get_sync (TRACKER_IPC_BUS, NULL, NULL);
 
 	if (!connection) {
 		return FALSE;
@@ -1081,8 +1082,6 @@ main (gint argc, gchar *argv[])
 	miners = g_slist_prepend (miners, miner_files);
 	miners = g_slist_prepend (miners, miner_applications);
 
-	tracker_thumbnailer_init ();
-
 	miner_handle_first (config, do_mtime_checking);
 
 	/* Go, go, go! */
@@ -1104,8 +1103,6 @@ main (gint argc, gchar *argv[])
 	g_main_loop_unref (main_loop);
 	g_object_unref (config);
 	g_object_unref (miner_files_index);
-
-	tracker_thumbnailer_shutdown ();
 
 	g_slist_foreach (miners, (GFunc) finalize_miner, NULL);
 	g_slist_free (miners);

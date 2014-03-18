@@ -669,7 +669,7 @@ tracker_file_system_register_property (GQuark             prop,
 		properties = g_hash_table_new (NULL, NULL);
 	}
 
-	if (g_hash_table_lookup (properties, GUINT_TO_POINTER (prop))) {
+	if (g_hash_table_contains (properties, GUINT_TO_POINTER (prop))) {
 		g_warning ("FileSystem: property '%s' has been already registered",
 		           g_quark_to_string (prop));
 		return;
@@ -794,7 +794,7 @@ tracker_file_system_unset_property (TrackerFileSystem *file_system,
 {
 	FileNodeData *data;
 	FileNodeProperty property, *match;
-	GDestroyNotify destroy_notify;
+	GDestroyNotify destroy_notify = NULL;
 	GNode *node;
 	guint index;
 
@@ -832,7 +832,7 @@ tracker_file_system_unset_property (TrackerFileSystem *file_system,
 	/* Find out the index from memory positions */
 	index = (guint) ((FileNodeProperty *) match -
 	                 (FileNodeProperty *) data->properties->data);
-	g_assert (index >= 0 && index < data->properties->len);
+	g_assert (index < data->properties->len);
 
 	g_array_remove_index (data->properties, index);
 }
