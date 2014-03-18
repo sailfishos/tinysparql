@@ -3,7 +3,7 @@ Name:       tracker
 %define enable_demo 0
 
 Summary:    An object database, tag/metadata database, search tool and indexer
-Version:    0.17.1
+Version:    0.17.6
 Release:    1
 Group:      Data Management/Content Framework
 License:    GPLv2+
@@ -12,6 +12,7 @@ Source0:    http://ftp.gnome.org/pub/GNOME/sources/%{name}/0.14/%{name}-%{versio
 Source1:    tracker-rpmlintrc
 Source2:    tracker-store.service
 Source3:    tracker-miner-fs.service
+Requires:   libmediaart >= 0.3.0
 Requires:   gst-plugins-base >= 0.10
 Requires:   unzip
 Requires:   systemd
@@ -19,12 +20,13 @@ Requires:   systemd-user-session-targets
 Requires:   qt5-plugin-platform-minimal
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
+BuildRequires:  pkgconfig(libmediaart) >= 0.3.0
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
 BuildRequires:  pkgconfig(enca)
 BuildRequires:  pkgconfig(exempi-2.0)
 BuildRequires:  pkgconfig(gconf-2.0)
 BuildRequires:  pkgconfig(gee-1.0)
-BuildRequires:  pkgconfig(glib-2.0) >= 2.32.0
+BuildRequires:  pkgconfig(glib-2.0) >= 2.38.0
 BuildRequires:  pkgconfig(gmime-2.6)
 BuildRequires:  pkgconfig(gstreamer-0.10)
 BuildRequires:  pkgconfig(gstreamer-plugins-base-0.10)
