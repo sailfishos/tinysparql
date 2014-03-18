@@ -1,14 +1,16 @@
-include $(top_srcdir)/Makefile.decl
+#
+# _RULES_DIR = $(datadir)/tracker/extract-rules
+#
+rulesdir = $(TRACKER_EXTRACT_RULES_DIR)
 
 module_flags = -module -avoid-version -no-undefined
-rulesdir = $(extractrulesdir)
 
 AM_CPPFLAGS = \
 	$(BUILD_CFLAGS) \
 	-I$(top_srcdir)/src \
 	-I$(top_builddir)/src \
 	-DLOCALEDIR=\""$(localedir)"\" \
-	-DTRACKER_EXTRACTORS_DIR=\""$(extractmodulesdir)"\" \
+	-DTRACKER_EXTRACTORS_DIR=\""$(TRACKER_EXTRACT_MODULES_DIR)"\" \
 	$(TRACKER_EXTRACT_CFLAGS)
 
 # NOTE: The rules are here and not in another sub-directory because we
@@ -41,17 +43,22 @@ rules_files = \
 	11-msoffice-xml.rule \
 	15-gstreamer-guess.rule \
 	15-playlist.rule \
-	90-gstreamer-generic.rule \
+	90-gstreamer-image-generic.rule \
+	90-gstreamer-audio-generic.rule \
+	90-gstreamer-video-generic.rule \
 	90-text-generic.rule \
-        90-libav-generic.rule \
+	90-libav-audio-generic.rule \
+	90-libav-video-generic.rule \
 	91-gstreamer-generic-dlna.rule \
-	92-xine-generic.rule \
-	93-mplayer-generic.rule \
-	93-totem-generic.rule
+	93-mplayer-generic.rule
 
 # NOTE:
 # We don't always link with libtracker-common, we only link
 # against it if we directly use functions in the .so
+#
+# _MODULES_DIR = $(libdir)/tracker-$(TRACKER_API_VERSION)/extract-modules
+#
+extractmodulesdir = $(TRACKER_EXTRACT_MODULES_DIR)
 extractmodules_LTLIBRARIES = # Empty
 rules_DATA = # Empty
 
@@ -111,7 +118,7 @@ endif
 
 if HAVE_GSTREAMER
 extractmodules_LTLIBRARIES += libextract-gstreamer.la
-rules_DATA += 10-svg.rule 15-gstreamer-guess.rule 90-gstreamer-generic.rule
+rules_DATA += 10-svg.rule 15-gstreamer-guess.rule 90-gstreamer-image-generic.rule 90-gstreamer-audio-generic.rule 90-gstreamer-video-generic.rule
 endif
 
 # Gstreamer with GUPnP-DLNA backend?
@@ -119,15 +126,9 @@ if HAVE_GUPNP_DLNA
 rules_DATA += 91-gstreamer-generic-dlna.rule
 endif
 
-if HAVE_LIBXINE
-extractmodules_LTLIBRARIES += libextract-xine.la
-rules_DATA += 92-xine-generic.rule
-endif
-
 if USING_EXTERNAL_GENERIC_MEDIA_PLAYER
-extractmodules_LTLIBRARIES +=	libextract-mplayer.la \
-				libextract-totem.la
-rules_DATA += 93-mplayer-generic.rule 93-totem-generic.rule
+extractmodules_LTLIBRARIES +=	libextract-mplayer.la
+rules_DATA += 93-mplayer-generic.rule
 endif
 
 if HAVE_TOTEM_PL_PARSER
@@ -177,7 +178,7 @@ endif
 
 if HAVE_LIBAV
 extractmodules_LTLIBRARIES += libextract-libav.la
-rules_DATA += 90-libav-generic.rule
+rules_DATA += 90-libav-audio-generic.rule 90-libav-video-generic.rule
 endif
 
 extractmodules_LTLIBRARIES += libextract-bmp.la
@@ -188,7 +189,7 @@ libextract_abw_la_SOURCES = tracker-extract-abw.c
 libextract_abw_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS)
 libextract_abw_la_LDFLAGS = $(module_flags)
 libextract_abw_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS)
@@ -198,7 +199,7 @@ libextract_mp3_la_SOURCES = tracker-extract-mp3.c
 libextract_mp3_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS)
 libextract_mp3_la_LDFLAGS = $(module_flags)
 libextract_mp3_la_LIBADD =  \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS)
@@ -208,7 +209,7 @@ libextract_vorbis_la_SOURCES = tracker-extract-vorbis.c $(escape_sources)
 libextract_vorbis_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS)
 libextract_vorbis_la_LDFLAGS = $(module_flags)
 libextract_vorbis_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -219,7 +220,7 @@ libextract_flac_la_SOURCES = tracker-extract-flac.c $(escape_sources)
 libextract_flac_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS)
 libextract_flac_la_LDFLAGS = $(module_flags)
 libextract_flac_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -230,7 +231,7 @@ libextract_mplayer_la_SOURCES = tracker-extract-mplayer.c
 libextract_mplayer_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS)
 libextract_mplayer_la_LDFLAGS = $(module_flags)
 libextract_mplayer_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS)
@@ -242,7 +243,7 @@ libextract_oasis_la_CFLAGS = \
 	$(LIBGSF_CFLAGS)
 libextract_oasis_la_LDFLAGS = $(module_flags)
 libextract_oasis_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -255,7 +256,7 @@ libextract_epub_la_CFLAGS = \
 	$(LIBGSF_CFLAGS)
 libextract_epub_la_LDFLAGS = $(module_flags)
 libextract_epub_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -268,7 +269,7 @@ libextract_png_la_CFLAGS = \
 	$(LIBPNG_CFLAGS)
 libextract_png_la_LDFLAGS = $(module_flags)
 libextract_png_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -280,17 +281,7 @@ libextract_ps_la_SOURCES = tracker-extract-ps.c
 libextract_ps_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS)
 libextract_ps_la_LDFLAGS = $(module_flags)
 libextract_ps_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
-	$(top_builddir)/src/libtracker-common/libtracker-common.la \
-	$(BUILD_LIBS) \
-	$(TRACKER_EXTRACT_MODULES_LIBS)
-
-# Totem
-libextract_totem_la_SOURCES = tracker-extract-totem.c
-libextract_totem_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS)
-libextract_totem_la_LDFLAGS = $(module_flags)
-libextract_totem_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS)
@@ -300,7 +291,7 @@ libextract_xmp_la_SOURCES = tracker-extract-xmp.c
 libextract_xmp_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS)
 libextract_xmp_la_LDFLAGS = $(module_flags)
 libextract_xmp_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS)
 
@@ -311,7 +302,7 @@ libextract_html_la_CFLAGS = \
 	$(LIBXML2_CFLAGS)
 libextract_html_la_LDFLAGS = $(module_flags)
 libextract_html_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
 	$(LIBXML2_LIBS)
@@ -323,7 +314,7 @@ libextract_msoffice_la_CFLAGS = \
 	$(LIBGSF_CFLAGS)
 libextract_msoffice_la_LDFLAGS = $(module_flags)
 libextract_msoffice_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -336,7 +327,7 @@ libextract_msoffice_xml_la_CFLAGS = \
 	$(LIBGSF_CFLAGS)
 libextract_msoffice_xml_la_LDFLAGS = $(module_flags)
 libextract_msoffice_xml_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS)
@@ -348,7 +339,7 @@ libextract_xps_la_CFLAGS = \
 	$(LIBGXPS_CFLAGS)
 libextract_xps_la_LDFLAGS = $(module_flags)
 libextract_xps_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -361,7 +352,7 @@ libextract_pdf_la_CFLAGS = \
 	$(POPPLER_CFLAGS)
 libextract_pdf_la_LDFLAGS = $(module_flags)
 libextract_pdf_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -373,7 +364,7 @@ libextract_dvi_la_CFLAGS = \
 	$(TRACKER_EXTRACT_MODULES_CFLAGS)
 libextract_dvi_la_LDFLAGS = $(module_flags)
 libextract_dvi_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS)
@@ -389,7 +380,7 @@ libextract_gstreamer_la_CFLAGS = \
 	$(LIBCUE_CFLAGS)
 libextract_gstreamer_la_LDFLAGS = $(module_flags)
 libextract_gstreamer_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
 	$(GSTREAMER_LIBS) \
@@ -407,19 +398,6 @@ libextract_gstreamer_la_CFLAGS += $(GSTREAMER_PBUTILS_CFLAGS)
 libextract_gstreamer_la_LIBADD += $(GSTREAMER_PBUTILS_LIBS)
 endif
 
-# Xine
-libextract_xine_la_SOURCES = tracker-extract-libxine.c
-libextract_xine_la_CFLAGS = \
-	$(TRACKER_EXTRACT_MODULES_CFLAGS) \
-	$(XINE_CFLAGS)
-libextract_xine_la_LDFLAGS = $(module_flags)
-libextract_xine_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
-	$(top_builddir)/src/libtracker-common/libtracker-common.la \
-	$(BUILD_LIBS) \
-	$(TRACKER_EXTRACT_MODULES_LIBS) \
-	$(XINE_LIBS)
-
 # GIF
 libextract_gif_la_SOURCES = tracker-extract-gif.c
 libextract_gif_la_CFLAGS = \
@@ -427,7 +405,7 @@ libextract_gif_la_CFLAGS = \
 	$(LIBGIF_CFLAGS)
 libextract_gif_la_LDFLAGS = $(module_flags)
 libextract_gif_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -440,7 +418,7 @@ libextract_jpeg_la_CFLAGS = \
 	$(LIBJPEG_CFLAGS)
 libextract_jpeg_la_LDFLAGS = $(module_flags)
 libextract_jpeg_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -453,7 +431,7 @@ libextract_tiff_la_CFLAGS = \
 	$(LIBTIFF_CFLAGS)
 libextract_tiff_la_LDFLAGS = $(module_flags)
 libextract_tiff_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
 	$(LIBTIFF_LIBS)
@@ -465,7 +443,7 @@ libextract_playlist_la_CFLAGS = \
 	$(TOTEM_PL_PARSER_CFLAGS)
 libextract_playlist_la_LDFLAGS = $(module_flags)
 libextract_playlist_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
 	$(TOTEM_PL_PARSER_LIBS)
@@ -475,7 +453,7 @@ libextract_text_la_SOURCES = tracker-extract-text.c
 libextract_text_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS)
 libextract_text_la_LDFLAGS = $(module_flags)
 libextract_text_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS)
 
@@ -484,7 +462,7 @@ libextract_icon_la_SOURCES = tracker-extract-icon.c
 libextract_icon_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS)
 libextract_icon_la_LDFLAGS = $(module_flags)
 libextract_icon_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS)
 
@@ -496,7 +474,7 @@ libextract_iso_la_CFLAGS = \
 
 libextract_iso_la_LDFLAGS = $(module_flags)
 libextract_iso_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
 	$(LIBOSINFO_LIBS)
@@ -509,7 +487,7 @@ libextract_libav_la_CFLAGS = $(TRACKER_EXTRACT_MODULES_CFLAGS) \
 	$(AVCODEC_CFLAGS)
 libextract_libav_la_LDFLAGS = $(module_flags)
 libextract_libav_la_LIBADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
 	$(TRACKER_EXTRACT_MODULES_LIBS) \
@@ -537,22 +515,23 @@ libexec_PROGRAMS = tracker-extract
 tracker_extract_SOURCES = \
 	tracker-config.c \
 	tracker-config.h \
-	tracker-controller.c \
-	tracker-controller.h \
 	tracker-extract.c \
 	tracker-extract.h \
-	tracker-media-art.c \
-	tracker-media-art.h \
+	tracker-extract-controller.c \
+	tracker-extract-controller.h \
+	tracker-extract-decorator.c \
+	tracker-extract-decorator.h \
+	tracker-extract-priority-dbus.c \
+	tracker-extract-priority-dbus.h \
 	tracker-read.c \
 	tracker-read.h \
 	tracker-main.c \
-	tracker-main.h \
-	tracker-media-art-generic.h
+	tracker-main.h
 
 tracker_extract_LDADD = \
-	$(top_builddir)/src/libtracker-extract/libtracker-extract-@TRACKER_API_VERSION@.la \
 	$(top_builddir)/src/libtracker-sparql-backend/libtracker-sparql-@TRACKER_API_VERSION@.la \
 	$(top_builddir)/src/libtracker-miner/libtracker-miner-@TRACKER_API_VERSION@.la \
+	$(top_builddir)/src/libtracker-extract/libtracker-extract.la \
 	$(top_builddir)/src/libtracker-data/libtracker-data.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS) \
@@ -564,19 +543,27 @@ tracker_extract_CFLAGS = $(LIBGSF_CFLAGS)
 tracker_extract_LDADD += $(LIBGSF_LIBS)
 endif
 
-if HAVE_LIBSTREAMANALYZER
-tracker_extract_SOURCES += tracker-topanalyzer.cpp tracker-topanalyzer.h
-endif
+# do nothing, output as a side-effect
+tracker-extract-priority-dbus.c: tracker-extract-priority-dbus-stamp
+	@:
 
-if HAVE_GDKPIXBUF
-tracker_extract_SOURCES += tracker-media-art-pixbuf.c
-else
-if HAVE_QT
-tracker_extract_SOURCES += tracker-media-art-qt.cpp
-else
-tracker_extract_SOURCES += tracker-media-art-dummy.c
-endif
-endif
+tracker-extract-priority-dbus.h: tracker-extract-priority-dbus-stamp
+	@:
+
+tracker-extract-priority-dbus-stamp: Makefile.am $(top_srcdir)/data/dbus/tracker-extract-priority.xml
+	gdbus-codegen --interface-prefix org.freedesktop.Tracker1.Extract. \
+	              --generate-c-code tracker-extract-priority-dbus \
+	              --c-namespace TrackerExtractDBus \
+	              $(top_srcdir)/data/dbus/tracker-extract-priority.xml
+	touch $@
+
+BUILT_SOURCES = \
+	tracker-extract-priority-dbus.c \
+	tracker-extract-priority-dbus.h \
+	tracker-extract-priority-dbus-stamp \
+	$(NULL)
+
+CLEANFILES = $(BUILT_SOURCES)
 
 EXTRA_DIST = \
 	$(rules_files)
