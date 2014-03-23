@@ -12,6 +12,7 @@ Source0:    http://ftp.gnome.org/pub/GNOME/sources/%{name}/0.14/%{name}-%{versio
 Source1:    tracker-rpmlintrc
 Source2:    tracker-store.service
 Source3:    tracker-miner-fs.service
+Source4:    tracker-extract.service
 Requires:   libmediaart >= 0.3.0
 Requires:   unzip
 Requires:   systemd
@@ -19,7 +20,7 @@ Requires:   systemd-user-session-targets
 Requires:   qt5-plugin-platform-minimal
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-BuildRequires:  pkgconfig(libmediaart) >= 0.3.0
+BuildRequires:  pkgconfig(libmediaart-1.0) >= 0.3.0
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
 BuildRequires:  pkgconfig(enca)
 BuildRequires:  pkgconfig(exempi-2.0)
@@ -162,6 +163,7 @@ cp -a %{SOURCE3} %{buildroot}%{_libdir}/systemd/user/
 mkdir -p %{buildroot}%{_libdir}/systemd/user/user-session.target.wants
 ln -s ../tracker-store.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
 ln -s ../tracker-miner-fs.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
+ln -s ../tracker-extract.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
 
 rm -rf %{buildroot}/%{_datadir}/icons/hicolor/
 rm -rf %{buildroot}/%{_datadir}/gtk-doc
@@ -178,7 +180,7 @@ rm -f %{buildroot}/%{_datadir}/tracker-tests/ttl/*
 glib-compile-schemas   /usr/share/glib-2.0/schemas/
 if [ "$1" -ge 1 ]; then
 systemctl-user daemon-reload || :
-systemctl-user restart tracker-store.service tracker-miner-fs.service || :
+systemctl-user restart tracker-store.service tracker-miner-fs.service tracker-extract.service || :
 fi
 
 
@@ -186,7 +188,7 @@ fi
 /sbin/ldconfig
 glib-compile-schemas   /usr/share/glib-2.0/schemas/
 if [ "$1" -eq 0 ]; then
-systemctl-user stop tracker-miner-fs.service tracker-store.service || :
+systemctl-user stop tracker-miner-fs.service tracker-store.service tracker-extract.service || :
 systemctl-user daemon-reload || :
 fi
 
@@ -216,9 +218,9 @@ cd /usr/share/tracker-tests/
 %{_datadir}/vala/vapi/*
 %{_datadir}/tracker/extract-rules/*
 %{_datadir}/glib-2.0/schemas/*.xml
-%{_libdir}/libtracker-extract-*.so*
 %{_libdir}/libtracker-miner-*.so*
 %{_libdir}/libtracker-sparql-*.so*
+%{_libdir}/libtracker-control-*.so*
 %{_libdir}/tracker-*/*.so*
 %{_libdir}/tracker-*/extract-modules/*.so*
 %{_libdir}/tracker-*/writeback-modules/*.so*
@@ -228,10 +230,13 @@ cd /usr/share/tracker-tests/
 %{_libexecdir}/tracker-writeback
 %config %{_sysconfdir}/xdg/autostart/tracker-miner-fs.desktop
 %config %{_sysconfdir}/xdg/autostart/tracker-store.desktop
+%config %{_sysconfdir}/xdg/autostart/tracker-extract.desktop
 %{_libdir}/systemd/user/tracker-miner-fs.service
 %{_libdir}/systemd/user/tracker-store.service
+%{_libdir}/systemd/user/tracker-extract.service
 %{_libdir}/systemd/user/user-session.target.wants/tracker-miner-fs.service
 %{_libdir}/systemd/user/user-session.target.wants/tracker-store.service
+%{_libdir}/systemd/user/user-session.target.wants/tracker-extract.service
 
 
 %files tests
@@ -253,7 +258,7 @@ cd /usr/share/tracker-tests/
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/tracker-*/libtracker-extract/*.h
 %{_includedir}/tracker-*/libtracker-miner/*.h
 %{_includedir}/tracker-*/libtracker-sparql/*.h
+%{_includedir}/tracker-*/libtracker-control/*.h
 %{_libdir}/pkgconfig/tracker-*.pc
