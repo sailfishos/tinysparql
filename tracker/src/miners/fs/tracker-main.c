@@ -44,7 +44,6 @@
 #include <libtracker-data/tracker-db-manager.h>
 
 #include "tracker-config.h"
-#include "tracker-marshal.h"
 #include "tracker-miner-files.h"
 #include "tracker-miner-files-index.h"
 #include "tracker-writeback.h"

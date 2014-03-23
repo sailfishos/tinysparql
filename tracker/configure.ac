@@ -175,7 +175,7 @@ MEEGOTOUCH_REQUIRED=0.20
 POPPLER_REQUIRED=0.16.0
 CAIRO_REQUIRED=1.0
 GDK_REQUIRED=1.0
-LIBICU_REQUIRED=4.8.1.1
+LIBICU_REQUIRED=4.0
 LIBJPEG_REQUIRED="any version"
 LIBGIF_REQUIRED="any version"
 LIBTIFF_REQUIRED="any version"
@@ -638,6 +638,22 @@ if test "x$enable_maemo" = "xyes" ; then
 fi
 
 ####################################################################
+# Check if we should install nemo specific features
+####################################################################
+
+AC_ARG_ENABLE(nemo,
+              AS_HELP_STRING([--enable-nemo],
+                             [enable nemo specific [[default=no]]]),
+             [enable_nemo="$enableval"],
+             [enable_nemo=no])
+
+AM_CONDITIONAL(HAVE_NEMO, test "x$enable_nemo" = "xyes")
+
+if test "x$enable_nemo" = "xyes" ; then
+   AC_DEFINE(HAVE_NEMO, 1, [Define if we enable Nemo specific features])
+fi
+
+####################################################################
 # Check if we should disable the journal
 ####################################################################
 
@@ -870,7 +886,7 @@ LIBUNISTRING_LIBS="-lunistring"
 
 # Check for libicu...
 PKG_CHECK_MODULES(LIBICU,
-                  [icu-i18n >= $LIBICU_REQUIRED icu-uc >= $LIBICU_REQUIRED],
+                  [icu-i18n icu-uc],
                   [have_libicu=yes],
                   [have_libicu=no])
 
