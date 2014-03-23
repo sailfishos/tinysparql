@@ -3,7 +3,6 @@ include $(top_srcdir)/Makefile.decl
 noinst_PROGRAMS += $(test_programs)
 
 test_programs = \
-	tracker-type-utils                             \
 	tracker-dbus                                   \
 	tracker-file-utils                             \
 	tracker-utils				       \
@@ -23,8 +22,7 @@ LDADD =                                                \
 	$(top_builddir)/tests/common/libtracker-testcommon.la \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS)                                  \
-	$(LIBTRACKER_COMMON_LIBS)                      \
-	-lgthread-2.0
+	$(LIBTRACKER_COMMON_LIBS)                      
 
 tracker_dbus_SOURCES =                                 \
 	tracker-dbus-test.c                            

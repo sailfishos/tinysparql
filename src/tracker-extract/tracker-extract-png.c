@@ -30,8 +30,6 @@
 #include <libtracker-common/tracker-date-time.h>
 #include <libtracker-extract/tracker-extract.h>
 
-#include "tracker-media-art.h"
-
 #define RFC1123_DATE_FORMAT "%d %B %Y %H:%M:%S %z"
 #define CM_TO_INCH          0.393700787
 
@@ -821,9 +819,9 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	}
 
 	f = tracker_file_open (filename);
+	g_free (filename);
 
 	if (!f) {
-		g_free (filename);
 		return FALSE;
 	}
 
@@ -833,7 +831,6 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	                                  NULL);
 	if (!png_ptr) {
 		tracker_file_close (f, FALSE);
-		g_free (filename);
 		return FALSE;
 	}
 
@@ -841,7 +838,6 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	if (!info_ptr) {
 		png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
 		tracker_file_close (f, FALSE);
-		g_free (filename);
 		return FALSE;
 	}
 
@@ -849,14 +845,12 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	if (!end_ptr) {
 		png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
 		tracker_file_close (f, FALSE);
-		g_free (filename);
 		return FALSE;
 	}
 
 	if (setjmp (png_jmpbuf (png_ptr))) {
 		png_destroy_read_struct (&png_ptr, &info_ptr, &end_ptr);
 		tracker_file_close (f, FALSE);
-		g_free (filename);
 		return FALSE;
 	}
 
@@ -874,7 +868,6 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	                   &filter_type)) {
 		png_destroy_read_struct (&png_ptr, &info_ptr, &end_ptr);
 		tracker_file_close (f, FALSE);
-		g_free (filename);
 		return FALSE;
 	}
 
@@ -923,16 +916,8 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 		tracker_sparql_builder_object_string (metadata, dlna_mimetype);
 	}
 
-#if HAVE_NEMO
-	if (tracker_media_art_ismarked (filename)) {
-		tracker_sparql_builder_predicate (metadata, "nemo:isMediaArt");
-		tracker_sparql_builder_object_boolean (metadata, TRUE);
-	}
-#endif
-
 	png_destroy_read_struct (&png_ptr, &info_ptr, &end_ptr);
 	tracker_file_close (f, FALSE);
-	g_free (filename);
 
 	return TRUE;
 }
