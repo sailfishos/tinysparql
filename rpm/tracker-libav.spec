@@ -158,6 +158,7 @@ mkdir -p %{buildroot}%{_libdir}/systemd/user/
 cp -a %{SOURCE2} %{buildroot}%{_libdir}/systemd/user/
 mkdir -p %{buildroot}%{_libdir}/systemd/user/
 cp -a %{SOURCE3} %{buildroot}%{_libdir}/systemd/user/
+cp -a %{SOURCE4} %{buildroot}%{_libdir}/systemd/user/
 
 
 mkdir -p %{buildroot}%{_libdir}/systemd/user/user-session.target.wants
