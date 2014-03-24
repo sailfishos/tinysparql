@@ -26,7 +26,9 @@
 
 #include <libtracker-extract/tracker-extract.h>
 
-#include <tracker-media-art.h>
+#ifdef HAVE_LIBMEDIAART
+#include <libmediaart/mediaart.h>
+#endif
 
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -327,13 +329,15 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			g_free (album_uri);
 		}
 
-		tracker_media_art_process (NULL,
-		                           0,
-		                           NULL,
-		                           TRACKER_MEDIA_ART_ALBUM,
-		                           album_artist,
-		                           album_title,
-		                           uri);
+#ifdef HAVE_LIBMEDIAART
+		media_art_process (NULL,
+		                   0,
+		                   NULL,
+		                   MEDIA_ART_ALBUM,
+		                   album_artist,
+		                   album_title,
+		                   uri);
+#endif
 
 		g_free(performer_uri);
 	}
