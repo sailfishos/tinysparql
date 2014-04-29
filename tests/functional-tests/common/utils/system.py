@@ -4,7 +4,7 @@ import subprocess
 import shutil
 import configuration as cfg
 
-import gobject
+from gi.repository import GObject as gobject
 import glib
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop

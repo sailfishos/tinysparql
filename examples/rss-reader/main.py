@@ -20,7 +20,7 @@
 #
 
 import gtk
-import gobject
+from gi.repository import GObject as gobject
 import pango
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop

@@ -19,7 +19,7 @@
 #
 import dbus
 import glib
-import gobject
+from gi.repository import GObject as gobject
 import commands
 import os
 import signal

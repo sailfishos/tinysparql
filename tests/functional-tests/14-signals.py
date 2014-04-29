@@ -27,7 +27,7 @@ import unittest2 as ut
 from common.utils.storetest import CommonTrackerStoreTest as CommonTrackerStoreTest
 from common.utils import configuration as cfg
 
-import gobject
+from gi.repository import GObject as gobject
 import glib
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop
