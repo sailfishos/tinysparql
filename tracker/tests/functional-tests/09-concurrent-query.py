@@ -26,7 +26,7 @@ import time
 import random
 import commands
 import signal
-import gobject
+from gi.repository import GObject as gobject
 from dbus.mainloop.glib import DBusGMainLoop
 
 from common.utils import configuration as cfg

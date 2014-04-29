@@ -22,7 +22,7 @@ Test the query while running BatchSparqlUpdate at the same time. This was raisin
 some SQLITE_MISUSED errors before.
 """
 import os, dbus
-import gobject
+from gi.repository import GObject as gobject
 from dbus.mainloop.glib import DBusGMainLoop
 
 from common.utils import configuration as cfg

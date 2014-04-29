@@ -18,7 +18,7 @@
 # 02110-1301, USA.
 #
 
-import gobject
+from gi.repository import GObject as gobject
 import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop

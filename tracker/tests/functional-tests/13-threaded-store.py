@@ -22,7 +22,7 @@ Test that the threads in the daemon are working:
  A very long query shouldn't block smaller queries.
 """
 import os, dbus
-import gobject
+from gi.repository import GObject as gobject
 import glib
 import time
 from dbus.mainloop.glib import DBusGMainLoop
