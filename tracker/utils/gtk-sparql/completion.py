@@ -28,7 +28,7 @@ VERSION = '0.1'
 import os
 import re
 
-import gobject
+from gi.repository import GObject as gobject
 import gtk
 
 class CompletionEngine:

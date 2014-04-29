@@ -27,7 +27,7 @@ import random
 import commands
 import configuration
 from dbus.mainloop.glib import DBusGMainLoop
-import gobject
+from gi.repository import GObject as gobject
 import shutil
 from subprocess import Popen,PIPE
 

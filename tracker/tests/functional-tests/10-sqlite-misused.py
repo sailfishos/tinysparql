@@ -22,7 +22,7 @@ Test the query while importing at the same time. This was raising
 some SQLITE_MISUSED errors before.
 """
 import os, dbus
-import gobject
+from gi.repository import GObject as gobject
 from dbus.mainloop.glib import DBusGMainLoop
 
 from common.utils import configuration as cfg
