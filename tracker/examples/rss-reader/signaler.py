@@ -19,7 +19,7 @@
 # 02110-1301, USA.
 #
 
-import gobject
+from gi.repository import GObject as gobject
 import gtk
 import dbus
 import dbus.service

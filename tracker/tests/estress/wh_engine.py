@@ -18,7 +18,7 @@
 # 02110-1301, USA.
 #
 
-import gobject
+from gi.repository import GObject as gobject
 import datetime, random
 import options, sys
 
