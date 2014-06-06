@@ -1,5 +1,3 @@
-include $(top_srcdir)/Makefile.decl
-
 AUTOMAKE_OPTIONS = 1.6
 
 # The name of the module.
@@ -27,7 +25,6 @@ IGNORE_HFILES=                                         \
 	tracker-dbus.h                                 \
 	tracker-file-notifier.h                        \
 	tracker-file-system.h                          \
-	tracker-marshal.h                              \
 	tracker-miner-client.h                         \
 	tracker-miner-dbus.h                           \
 	tracker-miner-glue.h                           \
@@ -70,7 +67,12 @@ expand_content_files =
 HTML_IMAGES =
 
 # Extra options to supply to gtkdoc-fixref
-FIXXREF_OPTIONS=
+FIXXREF_OPTIONS = \
+	--extra-dir=../libtracker-control/html \
+	--extra-dir=../libtracker-sparql/html \
+        --extra-dir=$(GLIB_PREFIX)/share/gtk-doc/html/gobject \
+        --extra-dir=$(GLIB_PREFIX)/share/gtk-doc/html/glib \
+        --extra-dir=$(GLIB_PREFIX)/share/gtk-doc/html/gio
 
 include $(top_srcdir)/gtk-doc.make
 

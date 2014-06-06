@@ -7,11 +7,13 @@ data/gschemas/org.freedesktop.Tracker.FTS.gschema.xml.in
 data/gschemas/org.freedesktop.Tracker.Miner.Files.gschema.xml.in
 data/gschemas/org.freedesktop.Tracker.Store.gschema.xml.in
 data/gschemas/org.freedesktop.Tracker.Writeback.gschema.xml.in
-data/miners/tracker-miner-userguides.desktop.in.in
 data/miners/tracker-miner-applications.desktop.in.in
 data/miners/tracker-miner-evolution.desktop.in.in
+data/miners/tracker-miner-extract.desktop.in.in
 data/miners/tracker-miner-files.desktop.in.in
 data/miners/tracker-miner-rss.desktop.in.in
+data/miners/tracker-miner-userguides.desktop.in.in
+data/tracker-extract.desktop.in.in
 data/tracker-miner-fs.desktop.in.in
 data/tracker-miner-rss.desktop.in.in
 data/tracker-store.desktop.in.in
@@ -20,6 +22,7 @@ src/libtracker-common/tracker-dbus.c
 src/libtracker-common/tracker-utils.c
 src/libtracker-miner/tracker-miner-fs.c
 src/libtracker-miner/tracker-miner-object.c
+src/libtracker-miner/tracker-miner-online.c
 src/miners/fs/tracker-main.c
 src/miners/fs/tracker-miner-files.c
 src/miners/rss/tracker-main.c

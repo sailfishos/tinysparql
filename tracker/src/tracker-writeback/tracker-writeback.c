@@ -465,12 +465,13 @@ sparql_rdf_types_match (const gchar * const *module_types,
 	return FALSE;
 }
 
-static gboolean
-io_writeback_job (GIOSchedulerJob *job,
-                  GCancellable    *cancellable,
-                  gpointer         user_data)
+static void
+io_writeback_job (GTask        *task,
+                  gpointer      source_object,
+                  gpointer      task_data,
+                  GCancellable *cancellable)
 {
-	WritebackData *data = user_data;
+	WritebackData *data = task_data;
 	TrackerControllerPrivate *priv = data->controller->priv;
 	GError *error = NULL;
 	gboolean handled = FALSE;
@@ -506,8 +507,6 @@ io_writeback_job (GIOSchedulerJob *job,
 	}
 
 	g_idle_add (perform_writeback_cb, data);
-
-	return FALSE;
 }
 
 static void
@@ -526,7 +525,6 @@ handle_method_call_perform_writeback (TrackerController     *controller,
 	GStrv rdf_types;
 	gchar *rdf_type = NULL;
 	GList *writeback_handlers = NULL;
-	WritebackData *data;
 
 	priv = controller->priv;
 
@@ -582,6 +580,7 @@ handle_method_call_perform_writeback (TrackerController     *controller,
 
 	if (writeback_handlers != NULL) {
 		WritebackData *data;
+		GTask *task;
 
 		data = writeback_data_new (controller,
 		                           writeback_handlers,
@@ -590,10 +589,12 @@ handle_method_call_perform_writeback (TrackerController     *controller,
 		                           results,
 		                           invocation,
 		                           request);
+		task = g_task_new (controller, data->cancellable, NULL, NULL);
 
-		g_io_scheduler_push_job (io_writeback_job, data, NULL, 0,
-		                         data->cancellable);
-
+		/* No need to free data here, it's done in the callback. */
+		g_task_set_task_data (task, data, NULL);
+		g_task_run_in_thread (task, io_writeback_job);
+		g_object_unref (task);
 	} else {
 		g_dbus_method_invocation_return_error (invocation,
 		                                       TRACKER_DBUS_ERROR,
@@ -727,7 +728,7 @@ tracker_controller_dbus_start (TrackerController   *controller,
 		return FALSE;
 	}
 
-	priv->d_connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &err);
+	priv->d_connection = g_bus_get_sync (TRACKER_IPC_BUS, NULL, &err);
 
 	if (!priv->d_connection) {
 		g_propagate_error (error, err);

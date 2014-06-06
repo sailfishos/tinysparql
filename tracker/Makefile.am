@@ -51,7 +51,6 @@ coverage-report: coverage
 		libstemmer/stem_UTF_8_* \
 		tracker-control/tracker-miner-files-index-client.h \
 		"*.vapi"                               \
-		"tracker-marshal.*"
 	rm -rf $(top_builddir)/coverage
 	$(MKDIR_P) $(top_builddir)/coverage
 	genhtml --title "@PACKAGE_STRING@" --output-directory $(top_builddir)/coverage $(top_builddir)/lcov.info
@@ -72,7 +71,7 @@ gen-ChangeLog:
 functional-test:
 	cd tests/functional-tests/ && $(MAKE) $(AM_MAKEFLAGS) $@
 
-EXTRA_DIST =                                           \
+EXTRA_DIST +=                                          \
 	ChangeLog.pre-0-6-93                           \
 	gitlog-to-changelog                            \
 	intltool-extract.in                            \
@@ -80,7 +79,7 @@ EXTRA_DIST =                                           \
 	intltool-update.in			       \
 	tracker.doap
 
-DISTCLEANFILES =                                       \
+DISTCLEANFILES +=                                      \
 	intltool-extract                               \
 	intltool-merge                                 \
 	intltool-update

@@ -40,11 +40,13 @@
 #include <sys/mman.h>
 #endif /* G_OS_WIN32 */
 
+#ifdef HAVE_LIBMEDIAART
+#include <libmediaart/mediaart.h>
+#endif
+
 #include <libtracker-common/tracker-common.h>
 
 #include <libtracker-extract/tracker-extract.h>
-
-#include "tracker-media-art.h"
 
 #ifdef FRAME_ENABLE_TRACE
 #warning Frame traces enabled
@@ -1294,6 +1296,7 @@ get_id3v24_tags (id3v24frame           frame,
 			g_strstrip (word);
 		} else {
 			/* Can't do anything without word. */
+			g_free (word);
 			break;
 		}
 
@@ -1485,6 +1488,7 @@ get_id3v23_tags (id3v24frame           frame,
 			g_strstrip (word);
 		} else {
 			/* Can't do anything without word. */
+			g_free (word);
 			break;
 		}
 
@@ -2485,13 +2489,15 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	/* Get mp3 stream info */
 	mp3_parse (buffer, buffer_size, audio_offset, uri, metadata, &md);
 
-	tracker_media_art_process (md.media_art_data,
-	                           md.media_art_size,
-	                           md.media_art_mime,
-	                           TRACKER_MEDIA_ART_ALBUM,
-	                           md.performer,
-	                           md.album,
-	                           uri);
+#ifdef HAVE_LIBMEDIAART
+	media_art_process (md.media_art_data,
+	                   md.media_art_size,
+	                   md.media_art_mime,
+	                   MEDIA_ART_ALBUM,
+	                   md.performer,
+	                   md.album,
+	                   uri);
+#endif
 	g_free (md.media_art_data);
 	g_free (md.media_art_mime);
 
