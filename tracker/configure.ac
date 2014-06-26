@@ -11,10 +11,10 @@ AC_PREREQ([2.64])
 # if any functions have been added, set TRACKER_INTERFACE_AGE to 0.
 # if backwards compatibility has been broken,
 # set TRACKER_BINARY_AGE and TRACKER_INTERFACE_AGE to 0.
-m4_define([tracker_major_version], [0])
-m4_define([tracker_minor_version], [17])
-m4_define([tracker_micro_version], [6])
-m4_define([tracker_interface_age], [0])
+m4_define([tracker_major_version], [1])
+m4_define([tracker_minor_version], [0])
+m4_define([tracker_micro_version], [1])
+m4_define([tracker_interface_age], [1])
 m4_define([tracker_binary_age],
           [m4_eval(100 * tracker_minor_version + tracker_micro_version)])
 m4_define([tracker_version],
@@ -38,7 +38,7 @@ m4_define([tracker_lt_current_minus_age],
 # for Tracker.
 #
 # TRACKER_BINARY_VERSION=$TRACKER_MAJOR_VERSION.$TRACKER_MINOR_VERSION.$LT_CURRENT
-m4_define([tracker_binary_version], [0.18.0])
+m4_define([tracker_binary_version], [1.0.0])
 
 AC_INIT([tracker],
         [tracker_version],
@@ -692,12 +692,10 @@ fi
 # Make sure we're not using versions which cause problems.
 #
 # Avoid versions:
-#   3.7.10 - 3.7.13
-#   3.8.1
+#   3.7.10 - 3.7.13: https://mail.gnome.org/archives/tracker-list/2012-October/msg00028.html
+#   3.8.1:           https://mail.gnome.org/archives/tracker-list/2013-November/msg00021.html
+#   3.8.4.1:         https://mail.gnome.org/archives/tracker-list/2014-April/msg00001.html
 #
-# For details see:
-#      https://mail.gnome.org/archives/tracker-list/2012-October/msg00028.html
-#      https://mail.gnome.org/archives/tracker-list/2013-November/msg00021.html
 AC_MSG_CHECKING(whether SQLite3 version is safe)
 
 PKG_CHECK_EXISTS([sqlite3 <= 3.7.9], sqlite_safe=yes, sqlite_safe=no)
@@ -708,6 +706,11 @@ fi
 if test "x$sqlite_safe" = "xyes"; then
    PKG_CHECK_EXISTS([sqlite3 = 3.8.1], sqlite_safe=no, sqlite_safe=yes)
 fi
+
+if test "x$sqlite_safe" = "xyes"; then
+   PKG_CHECK_EXISTS([sqlite3 = 3.8.4.2], sqlite_safe=no, sqlite_safe=yes)
+fi
+
 
 if test "x$sqlite_safe" != "xyes"; then
    AC_MSG_RESULT(no)
@@ -2582,9 +2585,10 @@ sqlite_version=$($PKG_CONFIG --modversion sqlite3)
 echo "
 WARNING:
         SQLite3 version $sqlite_version is not safe. For details see:
-        https://mail.gnome.org/archives/tracker-list/2012-October/msg00028.html
-        https://mail.gnome.org/archives/tracker-list/2013-November/msg00021.html
-        Unsafe versions are 3.7.10 to 3.7.13, and 3.8.1.
+        3.7.10 - 3.7.13: https://mail.gnome.org/archives/tracker-list/2012-October/msg00028.html
+        3.8.1:           https://mail.gnome.org/archives/tracker-list/2013-November/msg00021.html
+        3.8.4.2:         https://mail.gnome.org/archives/tracker-list/2014-April/msg00001.html
+
 
 "
 fi
