@@ -94,15 +94,9 @@ enum {
 	LAST_SIGNAL
 };
 
-typedef enum {
-	TRACKER_DECORATOR_ERROR_EMPTY,
-	TRACKER_DECORATOR_ERROR_PAUSED
-} TrackerDecoratorError;
-
 static guint signals[LAST_SIGNAL] = { 0 };
 static GInitableIface *parent_initable_iface;
 
-static GQuark tracker_decorator_error_quark         (void);
 static void   tracker_decorator_initable_iface_init (GInitableIface   *iface);
 
 G_DEFINE_QUARK (TrackerDecoratorError, tracker_decorator_error)
@@ -334,19 +328,22 @@ decorator_commit_cb (GObject      *object,
 		g_warning ("There was an error pushing metadata: %s\n", error->message);
 	}
 
-	for (i = 0; i < errors->len; i++) {
-		GError *child_error;
+	if (errors) {
+		for (i = 0; i < errors->len; i++) {
+			GError *child_error;
 
-		child_error = g_ptr_array_index (errors, i);
+			child_error = g_ptr_array_index (errors, i);
 
-		if (child_error) {
-			g_warning ("Task %d, error: %s", i, child_error->message);
-			g_warning ("Sparql update was:\n%s\n",
-			           (gchar *) g_ptr_array_index (sparql, i));
+			if (child_error) {
+				g_warning ("Task %d, error: %s", i, child_error->message);
+				g_warning ("Sparql update was:\n%s\n",
+				           (gchar *) g_ptr_array_index (sparql, i));
+			}
 		}
+
+		g_ptr_array_unref (errors);
 	}
 
-	g_ptr_array_unref (errors);
 	g_ptr_array_unref (sparql);
 }
 
