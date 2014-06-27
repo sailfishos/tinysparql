@@ -326,6 +326,8 @@ decorator_commit_cb (GObject      *object,
 
 	if (error) {
 		g_warning ("There was an error pushing metadata: %s\n", error->message);
+		g_ptr_array_unref (sparql);
+		return;
 	}
 
 	if (errors) {
