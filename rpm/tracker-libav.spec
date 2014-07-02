@@ -49,7 +49,8 @@ BuildRequires:  pkgconfig(libavcodec)
 BuildRequires:  pkgconfig(libavformat)
 BuildRequires:  pkgconfig(libavutil)
 BuildRequires:  gettext
-BuildRequires: vala-devel >= 0.16
+BuildRequires:  libtool
+BuildRequires:  vala-devel >= 0.16
 BuildRequires:  giflib-devel
 BuildRequires:  intltool
 BuildRequires:  libjpeg-devel
