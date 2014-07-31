@@ -64,7 +64,7 @@ Boston, MA  02110-1301, USA.
 	disables it entirely.
       </_description>
       <range min="-2" max="365"/>
-      <default>-1</default>
+      <default>0</default>
     </key>
 
     <key name="removable-days-threshold" type="i">
@@ -75,7 +75,7 @@ Boston, MA  02110-1301, USA.
 	maximum is 365.
       </_description>
       <range min="0" max="365"/>
-      <default>3</default>
+      <default>30</default>
     </key>
 
     <key name="enable-monitors" type="b">
@@ -87,13 +87,13 @@ Boston, MA  02110-1301, USA.
     <key name="enable-writeback" type="b">
       <_summary>Enable writeback</_summary>
       <_description>Set to false to completely disable any file writeback</_description>
-      <default>true</default>
+      <default>false</default>
     </key>
 
     <key name="index-removable-devices" type="b">
       <_summary>Index removable devices</_summary>
       <_description>Set to true to enable indexing mounted directories for removable devices.</_description>
-      <default>false</default>
+      <default>true</default>
     </key>
 
     <key name="index-optical-discs" type="b">
@@ -126,7 +126,7 @@ Boston, MA  02110-1301, USA.
 
 	See /etc/xdg/user-dirs.defaults and $HOME/.config/user-dirs.default
       </_description>
-      <default>[ '&amp;DESKTOP', '&amp;DOCUMENTS', '&amp;DOWNLOAD', '&amp;MUSIC', '&amp;PICTURES', '&amp;VIDEOS' ]</default>
+      <default>[ '&amp;DESKTOP', '&amp;DOCUMENTS', '&amp;DOWNLOAD', '&amp;MUSIC', '&amp;PICTURES', '&amp;VIDEOS', '$HOME/android_storage' ]</default>
     </key>
 
     <key name="index-single-directories" type="as">
@@ -156,7 +156,7 @@ Boston, MA  02110-1301, USA.
     <key name="ignored-directories-with-content" type="as">
       <_summary>Ignored directories with content</_summary>
       <_description>Avoid any directory containing a file blacklisted here</_description>
-      <default>[ 'backup.metadata' ]</default>
+      <default>[ 'backup.metadata', '.nomedia' ]</default>
     </key>
   </schema>
 </schemalist>
