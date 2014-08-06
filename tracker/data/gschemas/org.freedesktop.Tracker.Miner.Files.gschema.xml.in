@@ -150,7 +150,7 @@ Boston, MA  02110-1301, USA.
     <key name="ignored-directories" type="as">
       <_summary>Ignored directories</_summary>
       <_description>List of directories to avoid</_description>
-      <default>[ 'po', 'CVS', 'core-dumps', 'lost+found' ]</default>
+      <default>[ 'po', 'CVS', 'core-dumps', 'lost+found', '$HOME/android_storage/Android' ]</default>
     </key>
 
     <key name="ignored-directories-with-content" type="as">
