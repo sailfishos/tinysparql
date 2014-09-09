@@ -3,7 +3,7 @@ Name:       tracker
 %define enable_demo 0
 
 Summary:    An object database, tag/metadata database, search tool and indexer
-Version:    0.17.6
+Version:    1.1.4
 Release:    1
 Group:      Data Management/Content Framework
 License:    GPLv2+
@@ -13,7 +13,7 @@ Source1:    tracker-rpmlintrc
 Source2:    tracker-store.service
 Source3:    tracker-miner-fs.service
 Source4:    tracker-extract.service
-Requires:   libmediaart >= 0.3.0
+Requires:   libmediaart >= 0.5.0
 Requires:   gst-plugins-base >= 0.10
 Requires:   unzip
 Requires:   systemd
@@ -229,9 +229,13 @@ cd /usr/share/tracker-tests/
 %{_libexecdir}/tracker-miner-fs
 %{_libexecdir}/tracker-store
 %{_libexecdir}/tracker-writeback
+%{_libexecdir}/tracker-miner-apps
+%{_libexecdir}/tracker-miner-user-guides
 %config %{_sysconfdir}/xdg/autostart/tracker-miner-fs.desktop
 %config %{_sysconfdir}/xdg/autostart/tracker-store.desktop
 %config %{_sysconfdir}/xdg/autostart/tracker-extract.desktop
+%config %{_sysconfdir}/xdg/autostart/tracker-miner-apps.desktop
+%config %{_sysconfdir}/xdg/autostart/tracker-miner-user-guides.desktop
 %{_libdir}/systemd/user/tracker-miner-fs.service
 %{_libdir}/systemd/user/tracker-store.service
 %{_libdir}/systemd/user/tracker-extract.service
