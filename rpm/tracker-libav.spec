@@ -61,6 +61,7 @@ BuildRequires:  python >= 2.6
 BuildRequires:  dbus-python
 BuildRequires:  fdupes
 BuildRequires:  giflib-devel
+BuildRequires:  gnome-common
 
 %description
 Tracker is a powerful desktop-neutral first class object database,
