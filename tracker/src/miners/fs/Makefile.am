@@ -30,8 +30,11 @@ tracker_miner_fs_SOURCES =                             \
 	tracker-config.c                               \
 	tracker-config.h                               \
 	tracker-main.c                                 \
+<<<<<<< HEAD
 	tracker-miner-locale.c                         \
 	tracker-miner-locale.h                         \
+=======
+>>>>>>> 513c1a54e2abb698330e8bb7a8af0ccd28e41d93
 	tracker-miner-files.c                          \
 	tracker-miner-files.h                          \
 	tracker-miner-files-index.c                    \
@@ -51,9 +54,12 @@ tracker_miner_fs_LDADD =                               \
 	$(top_builddir)/src/libtracker-common/libtracker-common.la \
 	$(BUILD_LIBS)                                  \
 	$(TRACKER_MINER_FS_LIBS)
+<<<<<<< HEAD
 
 if HAVE_MEEGOTOUCH
 tracker_miner_fs_SOURCES += \
 	tracker-miner-meego.cpp \
 	tracker-miner-meego.h
 endif
+=======
+>>>>>>> 513c1a54e2abb698330e8bb7a8af0ccd28e41d93

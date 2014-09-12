@@ -156,7 +156,11 @@ Boston, MA  02110-1301, USA.
     <key name="ignored-directories-with-content" type="as">
       <_summary>Ignored directories with content</_summary>
       <_description>Avoid any directory containing a file blacklisted here</_description>
+<<<<<<< HEAD
       <default>[ 'backup.metadata', '.nomedia' ]</default>
+=======
+      <default>[ '.trackerignore' ]</default>
+>>>>>>> 513c1a54e2abb698330e8bb7a8af0ccd28e41d93
     </key>
   </schema>
 </schemalist>

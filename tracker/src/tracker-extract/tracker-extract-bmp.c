@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+<<<<<<< HEAD
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -40,6 +41,20 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	preupdate = tracker_extract_info_get_preupdate_builder (info);
 	metadata = tracker_extract_info_get_metadata_builder (info);
 	graph = tracker_extract_info_get_graph (info);
+=======
+#include <libtracker-common/tracker-common.h>
+#include <libtracker-extract/tracker-extract.h>
+
+G_MODULE_EXPORT gboolean
+tracker_extract_get_metadata (TrackerExtractInfo *info)
+{
+	TrackerSparqlBuilder *metadata;
+	goffset size;
+	gchar *filename;
+	GFile *file;
+
+	metadata = tracker_extract_info_get_metadata_builder (info);
+>>>>>>> 513c1a54e2abb698330e8bb7a8af0ccd28e41d93
 
 	file = tracker_extract_info_get_file (info);
 	filename = g_file_get_path (file);
@@ -57,5 +72,10 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 
 	/* TODO: Add actual metadata extraction for BMP files */
 
+<<<<<<< HEAD
+=======
+	g_free (filename);
+
+>>>>>>> 513c1a54e2abb698330e8bb7a8af0ccd28e41d93
 	return TRUE;
 }

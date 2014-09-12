@@ -4,8 +4,13 @@ import subprocess
 import shutil
 import configuration as cfg
 
+<<<<<<< HEAD
 from gi.repository import GObject as gobject
 import glib
+=======
+from gi.repository import GObject
+from gi.repository import GLib
+>>>>>>> 513c1a54e2abb698330e8bb7a8af0ccd28e41d93
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop
 import time
@@ -37,14 +42,15 @@ class UnableToBootException (Exception):
 
 class TrackerSystemAbstraction:
 
-    def set_up_environment (self, gsettings, ontodir):
+    def set_up_environment (self, settings, ontodir):
         """
         Sets up the XDG_*_HOME variables and make sure the directories exist
 
-        gsettings is a list of triplets (schema, key, value) that will be set/unset in gsetting
+        Settings should be a dict mapping schema names to dicts that hold the
+        settings that should be changed in those schemas. The contents dicts
+        should map key->value, where key is a key name and value is a suitable
+        GLib.Variant instance.
         """
-
-        assert not gsettings or type(gsettings) is list 
 
         helpers.log ("[Conf] Setting test environment...")
 
@@ -65,13 +71,17 @@ class TrackerSystemAbstraction:
             os.environ [var] = value
 
         # Previous loop should have set DCONF_PROFILE to the test location
-        if gsettings:
-            self.dconf = DConfClient ()
-            self.dconf.reset ()
-            for (schema, key, value) in gsettings:
-                self.dconf.write (schema, key, value)
+        if settings is not None:
+            self._apply_settings(settings)
 
         helpers.log ("[Conf] environment ready")
+
+    def _apply_settings(self, settings):
+        for schema_name, contents in settings.iteritems():
+            dconf = DConfClient(schema_name)
+            dconf.reset()
+            for key, value in contents.iteritems():
+                dconf.write(key, value)
 
     def unset_up_environment (self):
         """
@@ -231,14 +241,14 @@ if __name__ == "__main__":
     def destroy_the_world (a):
         a.tracker_store_testing_stop ()
         print "   stopped"
-        gtk.main_quit()
+        Gtk.main_quit()
 
     print "-- Starting store --"
     a = TrackerSystemAbstraction ()
     a.tracker_store_testing_start ()
     print "   started, waiting 5 sec. to stop it"
-    glib.timeout_add_seconds (5, destroy_the_world, a)
-    gtk.main ()
+    GLib.timeout_add_seconds (5, destroy_the_world, a)
+    Gtk.main ()
 
     print "-- Starting miner-fs --"
     b = TrackerMinerFsLifeCycle ()

@@ -21,8 +21,18 @@ tracker_miners_DATA =
 if HAVE_TRACKER_MINER_FS
 tracker_miners_DATA +=                                 \
 	tracker-miner-extract.desktop                  \
-	tracker-miner-applications.desktop             \
 	tracker-miner-files.desktop
+<<<<<<< HEAD
+=======
+endif
+
+if HAVE_TRACKER_MINER_APPS
+tracker_miners_DATA += tracker-miner-applications.desktop
+endif
+
+if HAVE_TRACKER_MINER_USER_GUIDES
+tracker_miners_DATA += tracker-miner-userguides.desktop
+>>>>>>> 513c1a54e2abb698330e8bb7a8af0ccd28e41d93
 endif
 
 if HAVE_TRACKER_MINER_EVOLUTION

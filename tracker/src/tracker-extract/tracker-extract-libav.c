@@ -27,7 +27,11 @@
 #include <libtracker-extract/tracker-extract.h>
 
 #ifdef HAVE_LIBMEDIAART
+<<<<<<< HEAD
 #include <libmediaart/mediaart.h>
+=======
+#include <tracker-media-art.h>
+>>>>>>> 513c1a54e2abb698330e8bb7a8af0ccd28e41d93
 #endif
 
 #include <libavcodec/avcodec.h>
@@ -330,6 +334,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 		}
 
 #ifdef HAVE_LIBMEDIAART
+<<<<<<< HEAD
 		media_art_process (NULL,
 		                   0,
 		                   NULL,
@@ -337,6 +342,29 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 		                   album_artist,
 		                   album_title,
 		                   uri);
+=======
+		if (album_artist || album_title) {
+			MediaArtProcess *media_art_process;
+			GError *error = NULL;
+			gboolean success;
+
+			media_art_process = tracker_extract_info_get_media_art_process (info);
+			success = media_art_process_file (media_art_process,
+			                                  MEDIA_ART_ALBUM,
+			                                  MEDIA_ART_PROCESS_FLAGS_NONE,
+			                                  file,
+			                                  album_artist,
+			                                  album_title,
+			                                  &error);
+
+			if (!success || error) {
+				g_warning ("Could not process media art for '%s', %s",
+				           uri,
+				           error ? error->message : "No error given");
+				g_clear_error (&error);
+			}
+		}
+>>>>>>> 513c1a54e2abb698330e8bb7a8af0ccd28e41d93
 #endif
 
 		g_free(performer_uri);
