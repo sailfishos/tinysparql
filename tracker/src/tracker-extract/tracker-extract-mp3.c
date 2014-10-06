@@ -1784,7 +1784,7 @@ parse_id3v24 (const gchar           *data,
 		unsigned short flags;
 
 		if (pos + 10 > tsize) {
-			return;
+			break;
 		}
 
 		frame = id3v24_get_frame (&data[pos]);
@@ -1912,7 +1912,7 @@ parse_id3v23 (const gchar          *data,
 		unsigned short flags;
 
 		if (pos + 10 > tsize) {
-			return;
+			break;
 		}
 
 		frame = id3v24_get_frame (&data[pos]);
