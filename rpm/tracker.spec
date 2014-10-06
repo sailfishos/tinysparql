@@ -44,7 +44,7 @@ BuildRequires:  pkgconfig(sqlite3) >= 3.7
 BuildRequires:  pkgconfig(taglib)
 BuildRequires:  pkgconfig(totem-plparser)
 BuildRequires:  pkgconfig(uuid)
-BuildRequires:  pkgconfig(libvala-0.16)
+#BuildRequires:  pkgconfig(libvala-0.16)
 BuildRequires:  pkgconfig(vorbis)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(Qt5Gui)
@@ -59,6 +59,7 @@ BuildRequires:  python >= 2.6
 BuildRequires:  dbus-python
 BuildRequires:  fdupes
 BuildRequires:  libtool
+BuildRequires:  vala-devel >= 0.16
 BuildRequires:  giflib-devel
 BuildRequires:  gnome-common
 
@@ -248,7 +249,7 @@ cd /usr/share/tracker-tests/
 %files tests
 %defattr(-,root,root,-)
 %{_datadir}/tracker-tests/*
-%{_sysconfdir}/dconf/profile/trackertest
+#%{_sysconfdir}/dconf/profile/trackertest
 /opt/tests/tracker/bin/*
 
 
