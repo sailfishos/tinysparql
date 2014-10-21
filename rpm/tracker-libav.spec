@@ -25,7 +25,7 @@ BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
 BuildRequires:  pkgconfig(enca)
 BuildRequires:  pkgconfig(exempi-2.0)
 BuildRequires:  pkgconfig(gconf-2.0)
-BuildRequires:  pkgconfig(gee-1.0)
+BuildRequires:  pkgconfig(gee-0.8)
 BuildRequires:  pkgconfig(glib-2.0) >= 2.38.0
 BuildRequires:  pkgconfig(gmime-2.6)
 BuildRequires:  pkgconfig(icu-uc)
