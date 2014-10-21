@@ -227,6 +227,16 @@ cd /usr/share/tracker-tests/
 %{_libdir}/tracker-*/*.so*
 %{_libdir}/tracker-*/extract-modules/*.so*
 %{_libdir}/tracker-*/writeback-modules/*.so*
+%dir %{_datadir}/tracker
+%dir %{_datadir}/tracker/languages
+%dir %{_datadir}/tracker/miners
+%dir %{_datadir}/tracker/ontologies
+%dir %{_datadir}/tracker/extract-rules
+%dir %{_datadir}/vala
+%dir %{_datadir}/vala/vapi
+%dir %{_libdir}/tracker-*
+%dir %{_libdir}/tracker-*/extract-modules
+%dir %{_libdir}/tracker-*/writeback-modules
 %{_libexecdir}/tracker-extract
 %{_libexecdir}/tracker-miner-fs
 %{_libexecdir}/tracker-store
