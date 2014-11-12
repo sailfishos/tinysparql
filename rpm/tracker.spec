@@ -163,10 +163,10 @@ mkdir -p %{buildroot}%{_libdir}/systemd/user/
 cp -a %{SOURCE3} %{buildroot}%{_libdir}/systemd/user/
 cp -a %{SOURCE4} %{buildroot}%{_libdir}/systemd/user/
 
-mkdir -p %{buildroot}%{_libdir}/systemd/user/user-session.target.wants
-ln -s ../tracker-store.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
-ln -s ../tracker-miner-fs.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
-ln -s ../tracker-extract.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
+mkdir -p %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants
+ln -s ../tracker-store.service %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants/
+ln -s ../tracker-miner-fs.service %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants/
+ln -s ../tracker-extract.service %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants/
 
 rm -rf %{buildroot}/%{_datadir}/icons/hicolor/
 rm -rf %{buildroot}/%{_datadir}/gtk-doc
@@ -241,9 +241,9 @@ cd /usr/share/tracker-tests/
 %{_libdir}/systemd/user/tracker-miner-fs.service
 %{_libdir}/systemd/user/tracker-store.service
 %{_libdir}/systemd/user/tracker-extract.service
-%{_libdir}/systemd/user/user-session.target.wants/tracker-miner-fs.service
-%{_libdir}/systemd/user/user-session.target.wants/tracker-store.service
-%{_libdir}/systemd/user/user-session.target.wants/tracker-extract.service
+%{_libdir}/systemd/user/post-user-session.target.wants/tracker-miner-fs.service
+%{_libdir}/systemd/user/post-user-session.target.wants/tracker-store.service
+%{_libdir}/systemd/user/post-user-session.target.wants/tracker-extract.service
 
 
 %files tests

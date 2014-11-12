@@ -1,11 +1,15 @@
 [Unit]
 Description=Tracker Extractor
-After=pre-user-session.target
-Requires=dbus.socket tracker-miner-fs.service
+After=tracker-store.service
+Requires=dbus.socket tracker-store.service
 
 [Service]
 ExecStart=/usr/libexec/tracker-extract
 OOMScoreAdjust=100
+Type=dbus
+BusName=org.freedesktop.Tracker1.Miner.Extract
+Restart=always
+RestartSec=5
 
 [Install]
-WantedBy=user-session.target
+WantedBy=post-user-session.target
