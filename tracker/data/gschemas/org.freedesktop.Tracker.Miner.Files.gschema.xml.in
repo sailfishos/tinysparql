@@ -29,7 +29,7 @@ Boston, MA  02110-1301, USA.
       <_summary>Initial sleep</_summary>
       <_description>Initial sleep time, in seconds.</_description>
       <range min="0" max="1000"/>
-      <default>15</default>
+      <default>30</default>
     </key>
 
     <key name="sched-idle" enum="org.freedesktop.Tracker.TrackerSchedIdle">
