@@ -5,7 +5,7 @@ Requires=dbus.socket tracker-store.service
 
 [Service]
 ExecStart=/usr/libexec/tracker-extract
-OOMScoreAdjust=100
+OOMScoreAdjust=0
 Type=dbus
 BusName=org.freedesktop.Tracker1.Miner.Extract
 Restart=always
