@@ -13,6 +13,7 @@ Source1:    tracker-rpmlintrc
 Source2:    tracker-store.service
 Source3:    tracker-miner-fs.service
 Source4:    tracker-extract.service
+Source5:    tracker-configs.sh
 Requires:   libmediaart >= 0.5.0
 Requires:   gst-plugins-base >= 0.10
 Requires:   unzip
@@ -20,6 +21,7 @@ Requires:   systemd
 Requires:   systemd-user-session-targets
 Requires:   qt5-plugin-platform-minimal
 Requires(post): /sbin/ldconfig
+Requires(post):  oneshot
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig(libmediaart-1.0) >= 0.3.0
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
@@ -62,6 +64,7 @@ BuildRequires:  libtool
 BuildRequires:  vala-devel >= 0.16
 BuildRequires:  giflib-devel
 BuildRequires:  gnome-common
+BuildRequires:  oneshot
 
 %description
 Tracker is a powerful desktop-neutral first class object database,
@@ -144,7 +147,7 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --with-unicode-support=libicu \
     --disable-tracker-needle \
     --enable-libvorbis \
-    --enable-tracker-fts \
+    --disable-tracker-fts \
     --enable-qt \
     --disable-enca \
     --disable-journal \
@@ -173,6 +176,9 @@ rm -rf %{buildroot}/%{_datadir}/gtk-doc
 # this is 160MB of test data, let's create that during rpm install
 rm -f %{buildroot}/%{_datadir}/tracker-tests/ttl/*
 
+# oneshot run in install
+mkdir -p %{buildroot}%{_oneshotdir}
+cp -a %{SOURCE5} %{buildroot}%{_oneshotdir}
 
 %find_lang %{name}
 
@@ -184,6 +190,7 @@ glib-compile-schemas   /usr/share/glib-2.0/schemas/
 if [ "$1" -ge 1 ]; then
 systemctl-user daemon-reload || :
 systemctl-user restart tracker-store.service tracker-miner-fs.service tracker-extract.service || :
+add-oneshot --user tracker-configs.sh
 fi
 
 
@@ -250,7 +257,7 @@ cd /usr/share/tracker-tests/
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-miner-fs.service
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-store.service
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-extract.service
-
+%{_oneshotdir}/tracker-configs.sh
 
 %files tests
 %defattr(-,root,root,-)
