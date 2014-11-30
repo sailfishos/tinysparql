@@ -146,7 +146,7 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --with-unicode-support=libicu \
     --disable-tracker-needle \
     --enable-libvorbis \
-    --disable-tracker-fts \
+    --enable-tracker-fts \
     --enable-qt \
     --enable-generic-media-extractor=libav \
     --disable-enca \
