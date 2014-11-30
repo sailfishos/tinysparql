@@ -262,12 +262,20 @@ tracker_fts_init_db (sqlite3    *db,
 gboolean
 tracker_fts_shutdown_db (sqlite3 *db)
 {
+	static GMutex mutex;
+
 	g_return_val_if_fail (initialized == TRUE, FALSE);
 
+	/* property_names is a global variable, protect it
+	 * from having this shutdown_db be executed by multiple
+	 * threads. First occurence: GB#740923 */
+
+	g_mutex_lock (&mutex);
 	if (property_names != NULL) {
 		g_strfreev (property_names);
 		property_names = NULL;
 	}
+	g_mutex_unlock (&mutex);
 
 	return TRUE;
 }
