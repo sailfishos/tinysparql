@@ -147,7 +147,7 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --with-unicode-support=libicu \
     --disable-tracker-needle \
     --enable-libvorbis \
-    --enable-tracker-fts \
+    --disable-tracker-fts \
     --enable-qt \
     --disable-enca \
     --disable-journal \
