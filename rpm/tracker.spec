@@ -179,6 +179,7 @@ rm -f %{buildroot}/%{_datadir}/tracker-tests/ttl/*
 # oneshot run in install
 mkdir -p %{buildroot}%{_oneshotdir}
 cp -a %{SOURCE5} %{buildroot}%{_oneshotdir}
+chmod +x %{buildroot}%{_oneshotdir}
 
 %find_lang %{name}
 
@@ -217,7 +218,6 @@ cd /usr/share/tracker-tests/
 
 %files -f %{name}.lang
 %defattr(-,root,root,-)
-%defattr(-, root, root, -)
 %{_bindir}/tracker-control
 %{_datadir}/dbus-1/services/*
 %{_datadir}/man/man1/*
