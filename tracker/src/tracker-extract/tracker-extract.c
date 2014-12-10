@@ -175,6 +175,8 @@ tracker_extract_finalize (GObject *object)
 
 	g_mutex_clear (&priv->task_mutex);
 
+	tracker_extract_module_manager_shutdown ();
+
 	G_OBJECT_CLASS (tracker_extract_parent_class)->finalize (object);
 }
 

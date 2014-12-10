@@ -27,6 +27,8 @@
 #define INIT_FUNCTION      "tracker_extract_module_init"
 #define SHUTDOWN_FUNCTION  "tracker_extract_module_shutdown"
 
+#define UNLOAD_MODULES_INTERVAL	(60 * 30)
+
 typedef struct {
 	const gchar *module_path; /* intern string */
 	GList *patterns;
@@ -40,12 +42,15 @@ typedef struct {
 	TrackerExtractInitFunc init_func;
 	TrackerExtractShutdownFunc shutdown_func;
 	guint initialized : 1;
+	guint loaded : 1;
 } ModuleInfo;
 
 static GHashTable *modules = NULL;
 static GHashTable *mimetype_map = NULL;
 static gboolean initialized = FALSE;
 static GArray *rules = NULL;
+static guint timeout = 0;
+static gboolean needed_last_interval = FALSE;
 
 struct _TrackerMimetypeInfo {
 	const GList *rules;
@@ -53,6 +58,35 @@ struct _TrackerMimetypeInfo {
 
 	ModuleInfo *cur_module_info;
 };
+
+static gboolean
+unload_modules (gpointer user_data)
+{
+	if (!needed_last_interval) {
+		GHashTableIter iter;
+		gpointer key, value;
+
+		g_hash_table_iter_init (&iter, modules);
+		while (g_hash_table_iter_next (&iter, &key, &value)) {
+			ModuleInfo *module_info = (ModuleInfo *) value;
+
+			if (module_info->loaded) {
+				g_module_close (module_info->module);
+				module_info->module = NULL;
+				module_info->loaded = FALSE;
+			}
+		}
+	}
+	needed_last_interval = FALSE;
+
+	return TRUE;
+}
+
+void
+tracker_extract_module_manager_shutdown (void)
+{
+	g_source_remove (timeout);
+}
 
 static gboolean
 load_extractor_rule (GKeyFile  *key_file,
@@ -188,6 +222,8 @@ tracker_extract_module_manager_init (void)
 	                                      g_str_equal,
 	                                      (GDestroyNotify) g_free,
 	                                      NULL);
+
+	timeout = g_timeout_add_seconds (UNLOAD_MODULES_INTERVAL, unload_modules, NULL);
 	initialized = TRUE;
 
 	return TRUE;
@@ -297,11 +333,19 @@ load_module (RuleInfo *info,
 {
 	ModuleInfo *module_info = NULL;
 
+	needed_last_interval = TRUE;
+
 	if (modules) {
 		module_info = g_hash_table_lookup (modules, info->module_path);
 	}
 
 	if (!module_info) {
+		module_info = g_slice_new0 (ModuleInfo);
+		module_info->loaded = FALSE;
+		module_info->initialized = FALSE;
+	}
+
+	if (module_info->loaded == FALSE) {
 		GModule *module;
 
 		/* Load the module */
@@ -314,16 +358,13 @@ load_module (RuleInfo *info,
 			return NULL;
 		}
 
-		g_module_make_resident (module);
-
-		module_info = g_slice_new0 (ModuleInfo);
-		module_info->module = module;
+		/* g_module_make_resident (module); */
 
 		if (!g_module_symbol (module, EXTRACTOR_FUNCTION, (gpointer *) &module_info->extract_func)) {
-			g_warning ("Could not load module '%s': Function %s() was not found, is it exported?",
-			           g_module_name (module), EXTRACTOR_FUNCTION);
-			g_slice_free (ModuleInfo, module_info);
-			return NULL;
+				g_warning ("Could not load module '%s': Function %s() was not found, is it exported?",
+				           g_module_name (module), EXTRACTOR_FUNCTION);
+				g_slice_free (ModuleInfo, module_info);
+				return NULL;
 		}
 
 		g_module_symbol (module, INIT_FUNCTION, (gpointer *) &module_info->init_func);
@@ -337,7 +378,10 @@ load_module (RuleInfo *info,
 			modules = g_hash_table_new (NULL, NULL);
 		}
 
+		module_info->loaded = TRUE;
+
 		g_hash_table_insert (modules, (gpointer) info->module_path, module_info);
+		module_info->module = module;
 	}
 
 	if (module_info && initialize &&

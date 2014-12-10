@@ -69,6 +69,7 @@ typedef gboolean (* TrackerExtractMetadataFunc) (TrackerExtractInfo *info);
 
 
 gboolean  tracker_extract_module_manager_init                (void) G_GNUC_CONST;
+void      tracker_extract_module_manager_shutdown            (void);
 GModule * tracker_extract_module_manager_get_for_mimetype    (const gchar                  *mimetype,
                                                               TrackerExtractInitFunc       *init_func,
                                                               TrackerExtractShutdownFunc   *shutdown_func,
