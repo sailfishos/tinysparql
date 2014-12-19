@@ -271,7 +271,7 @@ decorator_next_item_cb (TrackerDecorator *decorator,
 		    error->domain == tracker_decorator_error_quark ()) {
 			switch (error->code) {
 			case TRACKER_DECORATOR_ERROR_EMPTY:
-				g_message ("Next item does not require 2nd stage metadata extraction (e.g. resource may not be a file)");
+				g_message ("There are no further items to extract");
 				break;
 			case TRACKER_DECORATOR_ERROR_PAUSED:
 				g_message ("Next item is on hold because miner is paused");
@@ -619,9 +619,6 @@ tracker_extract_decorator_init (TrackerExtractDecorator *decorator)
 	TrackerExtractDecoratorPrivate *priv;
 
 	decorator->priv = priv = TRACKER_EXTRACT_DECORATOR_GET_PRIVATE (decorator);
-	priv->persistence = tracker_extract_persistence_initialize (decorator_retry_file,
-	                                                            decorator_ignore_file,
-	                                                            decorator);
 	priv->recovery_files = g_hash_table_new_full (g_str_hash, g_str_equal,
 	                                              (GDestroyNotify) g_free,
 	                                              (GDestroyNotify) g_object_unref);
@@ -677,6 +674,9 @@ tracker_extract_decorator_initable_init (GInitable     *initable,
 		ret = FALSE;
 	}
 
+	priv->persistence = tracker_extract_persistence_initialize (decorator_retry_file,
+	                                                            decorator_ignore_file,
+	                                                            decorator);
 out:
 	g_clear_object (&conn);
 
