@@ -9,7 +9,7 @@ Group:      Data Management/Content Framework
 License:    GPLv2+
 URL:        http://ftp.gnome.org/pub/GNOME/sources/tracker/0.10/
 Source0:    http://ftp.gnome.org/pub/GNOME/sources/%{name}/0.14/%{name}-%{version}.tar.xz
-Source1:    tracker-rpmlintrc
+Source1:    tracker-libav-rpmlintrc
 Source2:    tracker-store.service
 Source3:    tracker-miner-fs.service
 Source4:    tracker-extract.service
