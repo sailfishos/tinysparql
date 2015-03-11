@@ -1511,7 +1511,7 @@ item_add_or_update (TrackerMinerFS *fs,
 	 * created, its meta data might already be in the store
 	 * (possibly inserted by other application) - in such a case
 	 * we have to UPDATE, not INSERT. */
-	urn = lookup_file_urn (fs, file, FALSE);
+	urn = lookup_file_urn (fs, file, TRUE);
 
 	if (!tracker_indexing_tree_file_is_root (fs->priv->indexing_tree, file)) {
 		parent = g_file_get_parent (file);
