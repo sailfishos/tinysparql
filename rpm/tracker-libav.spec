@@ -189,7 +189,7 @@ cp -a %{SOURCE5} %{buildroot}%{_oneshotdir}
 glib-compile-schemas   /usr/share/glib-2.0/schemas/
 if [ "$1" -ge 1 ]; then
 systemctl-user daemon-reload || :
-systemctl-user restart tracker-store.service tracker-miner-fs.service tracker-extract.service || :
+systemctl-user try-restart tracker-store.service tracker-miner-fs.service tracker-extract.service || :
 add-oneshot --user tracker-configs.sh
 fi
 
