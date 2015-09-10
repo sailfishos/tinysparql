@@ -128,6 +128,16 @@ create_artist (TrackerSparqlBuilder *preupdate,
 	return uri;
 }
 
+static AVDictionaryEntry *find_tag (AVFormatContext *format, AVStream *stream, const gchar *name)
+{
+        AVDictionaryEntry *tag = av_dict_get(format->metadata, name, NULL, 0);
+        if (!tag) {
+                tag = av_dict_get(stream->metadata, name, NULL, 0);
+        }
+
+        return tag;
+}
+
 G_MODULE_EXPORT gboolean
 tracker_extract_get_metadata (TrackerExtractInfo *info)
 {
@@ -248,30 +258,30 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			set_value_int64 (metadata, "nfo:duration", duration);
 		}
 
-		if ((tag = av_dict_get (audio_stream->metadata, "track", NULL, 0))) {
+		if ((tag = find_tag (format, audio_stream, "track"))) {
 			int track = atoi(tag->value);
 			if (track > 0) {
 				set_value_int64 (metadata, "nmm:trackNumber", track);
 			}
 		}
 
-		if ((tag = av_dict_get (audio_stream->metadata, "album", NULL, 0))) {
+		if ((tag = find_tag (format, audio_stream, "album"))) {
 			album_title = tag->value;
 		}
 
-		if (album_title && (tag = av_dict_get (audio_stream->metadata, "album_artist", NULL, 0))) {
+		if (album_title && (tag = find_tag (format, audio_stream, "album_artist"))) {
 			album_artist_uri = create_artist (preupdate, graph, tag->value);
 			album_artist = tag->value;
 		}
 
-		if ((tag = av_dict_get (audio_stream->metadata, "artist", tag, 0))) {
+		if ((tag = find_tag (format, audio_stream, "artist"))) {
 			performer_uri = create_artist (preupdate, graph, tag->value);
 			if (!album_artist) {
 				album_artist = tag->value;
 			}
 		}
 
-		if (!performer_uri && (tag = av_dict_get (audio_stream->metadata, "performer", tag, 0))) {
+		if (!performer_uri && (tag = find_tag (format, audio_stream, "performer"))) {
 			performer_uri = create_artist (preupdate, graph, tag->value);
 			if (!album_artist) {
 				album_artist = tag->value;
@@ -284,7 +294,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			set_value_iri (metadata, "nmm:performer", album_artist_uri);
 		}
 
-		if ((tag = av_dict_get (audio_stream->metadata, "composer", tag, 0))) {
+		if ((tag = find_tag (format, audio_stream, "composer"))) {
 			gchar *composer_uri = create_artist (preupdate, graph, tag->value);
 			set_value_iri (metadata, "nmm:composer", composer_uri);
 			g_free(composer_uri);
@@ -306,7 +316,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			close_insert (preupdate, graph);
 
 
-			if ((tag = av_dict_get (audio_stream->metadata, "disc", NULL, 0))) {
+			if ((tag = find_tag (format, audio_stream, "disc"))) {
 				disc = atoi (tag->value);
 			}
 
