@@ -248,30 +248,30 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			set_value_int64 (metadata, "nfo:duration", duration);
 		}
 
-		if ((tag = av_dict_get (format->metadata, "track", NULL, 0))) {
+		if ((tag = av_dict_get (audio_stream->metadata, "track", NULL, 0))) {
 			int track = atoi(tag->value);
 			if (track > 0) {
 				set_value_int64 (metadata, "nmm:trackNumber", track);
 			}
 		}
 
-		if ((tag = av_dict_get (format->metadata, "album", NULL, 0))) {
+		if ((tag = av_dict_get (audio_stream->metadata, "album", NULL, 0))) {
 			album_title = tag->value;
 		}
 
-		if (album_title && (tag = av_dict_get (format->metadata, "album_artist", NULL, 0))) {
+		if (album_title && (tag = av_dict_get (audio_stream->metadata, "album_artist", NULL, 0))) {
 			album_artist_uri = create_artist (preupdate, graph, tag->value);
 			album_artist = tag->value;
 		}
 
-		if ((tag = av_dict_get (format->metadata, "artist", tag, 0))) {
+		if ((tag = av_dict_get (audio_stream->metadata, "artist", tag, 0))) {
 			performer_uri = create_artist (preupdate, graph, tag->value);
 			if (!album_artist) {
 				album_artist = tag->value;
 			}
 		}
 
-		if (!performer_uri && (tag = av_dict_get (format->metadata, "performer", tag, 0))) {
+		if (!performer_uri && (tag = av_dict_get (audio_stream->metadata, "performer", tag, 0))) {
 			performer_uri = create_artist (preupdate, graph, tag->value);
 			if (!album_artist) {
 				album_artist = tag->value;
@@ -284,7 +284,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			set_value_iri (metadata, "nmm:performer", album_artist_uri);
 		}
 
-		if ((tag = av_dict_get (format->metadata, "composer", tag, 0))) {
+		if ((tag = av_dict_get (audio_stream->metadata, "composer", tag, 0))) {
 			gchar *composer_uri = create_artist (preupdate, graph, tag->value);
 			set_value_iri (metadata, "nmm:composer", composer_uri);
 			g_free(composer_uri);
@@ -306,7 +306,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			close_insert (preupdate, graph);
 
 
-			if ((tag = av_dict_get (format->metadata, "disc", NULL, 0))) {
+			if ((tag = av_dict_get (audio_stream->metadata, "disc", NULL, 0))) {
 				disc = atoi (tag->value);
 			}
 
