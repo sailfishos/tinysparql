@@ -3,7 +3,7 @@ Name:       tracker
 %define enable_demo 0
 
 Summary:    An object database, tag/metadata database, search tool and indexer
-Version:    1.1.4
+Version:    1.3.2
 Release:    1
 Group:      Data Management/Content Framework
 License:    GPLv2+
@@ -102,14 +102,6 @@ Requires:   %{name} = %{version}-%{release}
 
 %description utils
 Tracker command line applications to lookup data
-Included utilities for Tracker are as follows
- tracker-import      Import TTL files.
- tracker-info        Display all information known about an entity.
- tracker-search      Search for entites (files, folders, videos, etc)
- tracker-sparql      Run a SPARQL query against the databases.
- tracker-stats       Get statistics on how many entities are indexed.
- tracker-tag         Add, remove, list tags for entities.
-
 
 %package devel
 Summary:    Development files for %{name}
@@ -151,7 +143,8 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --enable-generic-media-extractor=libav \
     --disable-enca \
     --disable-journal \
-    --enable-libgif
+    --enable-libgif \
+    --disable-cfg-man-pages
 
 make %{?jobs:-j%jobs}
 
@@ -220,6 +213,7 @@ cd /usr/share/tracker-tests/
 %defattr(-, root, root, -)
 %{_bindir}/tracker-control
 %{_datadir}/dbus-1/services/*
+%{_datadir}/tracker/miners/*
 %{_datadir}/man/man1/*
 %{_datadir}/tracker/*.xml
 %{_datadir}/tracker/stop-words/*
@@ -266,13 +260,14 @@ cd /usr/share/tracker-tests/
 
 %files utils
 %defattr(-,root,root,-)
+%{_bindir}/tracker
 %{_bindir}/tracker-import
 %{_bindir}/tracker-info
 %{_bindir}/tracker-search
 %{_bindir}/tracker-sparql
 %{_bindir}/tracker-stats
 %{_bindir}/tracker-tag
-
+/etc/bash_completion.d/tracker-prompt.sh
 
 %files devel
 %defattr(-,root,root,-)
