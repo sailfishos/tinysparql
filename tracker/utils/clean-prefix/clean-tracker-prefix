@@ -36,8 +36,8 @@ if [ -n "$1" ]; then
 	prefix=$1
 fi
 
-if [ -e $prefix/bin/tracker-control ]; then
-	$prefix/bin/tracker-control -r
+if [ -e $prefix/bin/tracker ]; then
+	$prefix/bin/tracker reset --hard
 fi
 
 
@@ -45,11 +45,11 @@ sudo rm -rfv \
 $prefix/bin/tracker-* \
 $prefix/libexec/tracker-* \
 $prefix/include/tracker-* \
-$prefix/lib/libtracker-* \
-$prefix/lib/girepository-1.0/Tracker* \
-$prefix/lib/pkgconfig/tracker-* \
-$prefix/lib/tracker \
-$prefix/lib/tracker-* \
+$prefix/{lib,lib64}/libtracker-* \
+$prefix/{lib,lib64}/girepository-1.0/Tracker* \
+$prefix/{lib,lib64}/pkgconfig/tracker-* \
+$prefix/{lib,lib64}/tracker \
+$prefix/{lib,lib64}/tracker-* \
 $prefix/share/applications/tracker-* \
 $prefix/share/dbus-1/services/org.freedesktop.Tracker1.* \
 $prefix/share/doc/libtracker* \
