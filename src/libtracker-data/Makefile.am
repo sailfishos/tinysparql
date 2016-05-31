@@ -74,8 +74,24 @@ noinst_HEADERS =                                       \
 	tracker-property.h                             \
 	tracker-sparql-query.h
 
-BUILT_SOURCES =                                        \
+# Configuration / GSettings
+gsettings_ENUM_NAMESPACE = org.freedesktop.Tracker
+gsettings_ENUM_FILES = $(top_srcdir)/src/libtracker-common/tracker-enums.h
+
+gsettings_SCHEMAS = org.freedesktop.Tracker.DB.gschema.xml
+
+@INTLTOOL_XML_NOMERGE_RULE@
+
+@GSETTINGS_RULES@
+
+# Dist / Clean rules for all data
+BUILT_SOURCES = \
 	libtracker_data_la_vala.stamp
 
-EXTRA_DIST =                                           \
-	libtracker-data.vapi
+CLEANFILES = \
+	libtracker_data_la_vala.stamp \
+	$(gsettings_SCHEMAS)
+
+EXTRA_DIST = \
+	libtracker-data.vapi \
+	$(gsettings_SCHEMAS:.xml=.xml.in)

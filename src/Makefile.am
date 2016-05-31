@@ -3,8 +3,8 @@ libtrackerfts_dir = libtracker-fts
 endif
 
 SUBDIRS =                                              \
+	ontologies				       \
 	gvdb                                           \
-	$(libstemmer_dir)                              \
 	libtracker-common                              \
 	libtracker-sparql                              \
 	$(libtrackerfts_dir)                           \
