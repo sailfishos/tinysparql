@@ -811,6 +811,35 @@ else
 fi
 
 ##################################################################
+# Check for libtracker-common, make sure libstemmer exists
+##################################################################
+
+AC_ARG_ENABLE([libstemmer],
+              AS_HELP_STRING([--enable-libstemmer],
+                             [enable the stemming while indexing [[default=auto]]]),
+              [enable_libstemmer=$enableval],
+              [enable_libstemmer=auto])
+
+if test "x$enable_libstemmer" != "xno" ; then
+   AC_CHECK_LIB([stemmer], [sb_stemmer_new], [have_libstemmer=yes], [have_libstemmer=no])
+
+   if test "x$have_libstemmer" = "xyes"; then
+      AC_DEFINE(HAVE_LIBSTEMMER, [], [Define if we have libstemmer])
+      LIBTRACKER_COMMON_LIBS="$LIBTRACKER_COMMON_LIBS -lstemmer"
+   fi
+else
+   have_libstemmer="no  (disabled)"
+fi
+
+if test "x$enable_libstemmer" = "xyes"; then
+   if test "x$have_libstemmer" != "xyes"; then
+      AC_MSG_ERROR([Couldn't find libstemmer.])
+   fi
+fi
+
+AM_CONDITIONAL(HAVE_LIBSTEMMER, test "x$have_libstemmer" = "xyes")
+
+##################################################################
 # Check for tracker-fts, allow disabling FTS support
 ##################################################################
 
@@ -820,10 +849,10 @@ AC_ARG_ENABLE([tracker-fts],
               [enable_tracker_fts=$enableval],
               [enable_tracker_fts=auto])
 
-if test "x$enable_tracker_fts" != "xno" ; then
-   have_tracker_fts="yes"
-else
+if test "x$enable_tracker_fts" = "xno" ; then
    have_tracker_fts="no  (disabled)"
+else
+   have_tracker_fts="yes"
 fi
 
 if test "x$have_tracker_fts" = "xyes"; then
@@ -2580,7 +2609,6 @@ AC_CONFIG_FILES([
 	Makefile
 	po/Makefile.in
 	src/gvdb/Makefile
-	src/libstemmer/Makefile
 	src/libtracker-common/Makefile
 	src/libtracker-sparql/Makefile
 	src/libtracker-bus/Makefile
@@ -2729,6 +2757,7 @@ Feature Support:
 
 	Build with Journal support:             $have_tracker_journal
 	Build with SQLite FTS support:          $have_tracker_fts (built-in FTS: $have_builtin_fts4)
+	Build with Stemming support:            $have_libstemmer
 
 	Cache media art                         $have_libmediaart (libmediaart)
 	Install artwork                         $have_artwork
