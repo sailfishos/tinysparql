@@ -40,6 +40,7 @@ TestInfo title_tests [] = {
 	{ "dot-separators", "file:///a/b/a.video.with.no.metadata.avi", NULL, "a.video.with.no.metadata" },
 	{ "no-extension", "file:///a/b/a video without extension", NULL, "a video without extension" },
 	{ "hidden-files", "file:///a/b/.hidden_file", NULL, "hidden file" },
+
 	{ NULL, NULL, NULL }
 };
 
@@ -54,13 +55,16 @@ static void
 test_title (TestInfo      *info,
             gconstpointer  context)
 {
+#ifdef GUARANTEE_METADATA
 	gchar *sparql;
 	gchar *title_guaranteed;
+	gboolean title_retrieved;
 
 	tracker_sparql_builder_insert_open (info->builder, "test");
 	tracker_sparql_builder_subject_iri (info->builder, "test://resource");
+	title_retrieved = tracker_guarantee_title_from_file (info->builder, "nie:title", info->extracted, info->uri, &title_guaranteed);
+	g_assert_true (title_retrieved);
 
-	g_assert_true (tracker_guarantee_title_from_file (info->builder, "nie:title", info->extracted, info->uri, &title_guaranteed));
 	tracker_sparql_builder_insert_close (info->builder);
 
 	sparql = g_strdup_printf ("INSERT INTO <test> {\n<test://resource> nie:title \"%s\" .\n}\n", info->expected);
@@ -69,20 +73,31 @@ test_title (TestInfo      *info,
 
 	g_free (title_guaranteed);
 	g_free (sparql);
+#else  /* GUARANTEE_METADATA */
+	g_test_skip ("Not built with --enable-guarantee-metadata");
+#endif /* GUARANTEE_METADATA */
 }
 
 static void
 test_date (TestInfo      *info,
            gconstpointer  context)
 {
+#ifdef GUARANTEE_METADATA
+	gboolean date_retrieved;
+
 	tracker_sparql_builder_insert_open (info->builder, "test");
 	tracker_sparql_builder_subject_iri (info->builder, "test://resource");
 
-	g_assert_true (tracker_guarantee_date_from_file_mtime (info->builder, "test:mtime", info->extracted, info->uri));
+	date_retrieved = tracker_guarantee_date_from_file_mtime (info->builder, "test:mtime", info->extracted, info->uri);
+	g_assert_true (date_retrieved);
+
 	tracker_sparql_builder_insert_close (info->builder);
 
 	/* mtime can change in the file so we just check that the property is in the output */
 	g_assert_nonnull (g_strstr_len (tracker_sparql_builder_get_result (info->builder), -1, "test:mtime"));
+#else  /* GUARANTEE_METADATA */
+	g_test_skip ("Not built with --enable-guarantee-metadata");
+#endif /* GUARANTEE_METADATA */
 }
 
 static void

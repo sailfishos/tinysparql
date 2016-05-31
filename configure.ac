@@ -13,7 +13,7 @@ AC_PREREQ([2.64])
 # set TRACKER_BINARY_AGE and TRACKER_INTERFACE_AGE to 0.
 m4_define([tracker_major_version], [1])
 m4_define([tracker_minor_version], [3])
-m4_define([tracker_micro_version], [0])
+m4_define([tracker_micro_version], [2])
 m4_define([tracker_interface_age], [0])
 m4_define([tracker_binary_age],
           [m4_eval(100 * tracker_minor_version + tracker_micro_version)])
@@ -323,12 +323,13 @@ LIBTRACKER_SPARQL_REQUIRED="glib-2.0     >= $GLIB_REQUIRED
 PKG_CHECK_MODULES(LIBTRACKER_SPARQL, [$LIBTRACKER_SPARQL_REQUIRED])
 
 # Check requirements for tracker-control
-TRACKER_CONTROL_REQUIRED="glib-2.0     >= $GLIB_REQUIRED
-                          gio-unix-2.0 >= $GLIB_REQUIRED
-                          uuid"
+TRACKER_REQUIRED="glib-2.0     >= $GLIB_REQUIRED
+                  gio-unix-2.0 >= $GLIB_REQUIRED
+                  uuid"
 
-PKG_CHECK_MODULES(TRACKER_CONTROL, [$TRACKER_CONTROL_REQUIRED])
+PKG_CHECK_MODULES(TRACKER, [$TRACKER_REQUIRED])
 
+# Check requirements for tracker-resdump
 TRACKER_RESDUMP_REQUIRED="glib-2.0     >= $GLIB_REQUIRED
                           gee-0.8      >= $GEE_REQUIRED"
 
@@ -503,12 +504,6 @@ TRACKER_MINER_RSS_REQUIRED="glib-2.0     >= $GLIB_REQUIRED
 PKG_CHECK_MODULES(TRACKER_MINER_RSS, [$TRACKER_MINER_RSS_REQUIRED],
                   [have_tracker_miner_rss=yes],
                   [have_tracker_miner_rss=no])
-
-# Check requirements for tracker-utils
-TRACKER_UTILS_REQUIRED="glib-2.0     >= $GLIB_REQUIRED
-                        gio-unix-2.0 >= $GLIB_REQUIRED"
-
-PKG_CHECK_MODULES(TRACKER_UTILS, [$TRACKER_UTILS_REQUIRED])
 
 # Check requirements for tracker-needle
 TRACKER_NEEDLE_REQUIRED="glib-2.0     >= $GLIB_REQUIRED
@@ -1048,6 +1043,10 @@ case "x$with_unicode_support" in
 esac
 
 AM_CONDITIONAL(HAVE_LIBICU, test "x$have_libicu" = "xyes")
+
+# Add to libtracker-common
+LIBTRACKER_COMMON_CFLAGS="$LIBTRACKER_COMMON_CFLAGS $UNICODE_SUPPORT_CFLAGS"
+LIBTRACKER_COMMON_LIBS="$LIBTRACKER_COMMON_LIBS $UNICODE_SUPPORT_LIBS"
 
 # Add to libtracker-fts
 LIBTRACKER_FTS_CFLAGS="$LIBTRACKER_FTS_CFLAGS $UNICODE_SUPPORT_CFLAGS"
@@ -2541,6 +2540,24 @@ fi
 
 AM_CONDITIONAL(HAVE_TOTEM_PL_PARSER, test "x$have_playlist" = "xyes")
 
+#####################################################################
+# Check for tracker-extract: Guarantee existence of certain metadata
+#####################################################################
+
+# Currently guarantees (for extraction):
+# - nie:title for music and video files
+# - nie:contentCreated for music, video and image files
+
+AC_ARG_ENABLE(guarantee-metadata,
+              AS_HELP_STRING([--enable-guarantee-metadata],
+                             [enable guaranteed existence of some metadata, e.g. nie:title from files [[default=no]]]),
+              [enable_guarantee_metadata=$enableval],
+              [enable_guarantee_metadata=no])
+
+if test "x$enable_guarantee_metadata" != "xno"; then
+  AC_DEFINE(GUARANTEE_METADATA, 1, [Guarantee existence of some metadata])
+fi
+
 ####################################################################
 # Check if we should use initctl or sysvinit
 ####################################################################
@@ -2613,12 +2630,11 @@ AC_CONFIG_FILES([
 	src/miners/user-guides/Makefile
 	src/ontologies/Makefile
 	src/tracker-store/Makefile
-	src/tracker-control/Makefile
+	src/tracker/Makefile
 	src/tracker-extract/Makefile
 	src/tracker-preferences/Makefile
 	src/tracker-preferences/tracker-preferences.desktop.in
 	src/tracker-needle/Makefile
-	src/tracker-needle/tracker-needle.desktop.in
 	src/tracker-needle/icons/Makefile
 	src/tracker-needle/icons/16x16/Makefile
 	src/tracker-needle/icons/22x22/Makefile
@@ -2626,7 +2642,7 @@ AC_CONFIG_FILES([
 	src/tracker-needle/icons/32x32/Makefile
 	src/tracker-needle/icons/48x48/Makefile
 	src/tracker-needle/icons/scalable/Makefile
-	src/tracker-utils/Makefile
+	src/tracker-needle/tracker-needle.desktop.in
 	src/tracker-writeback/Makefile
 	src/plugins/Makefile
 	src/plugins/evolution/Makefile
@@ -2715,7 +2731,6 @@ AC_CONFIG_FILES([
 	utils/data-generators/cc/Makefile
 	utils/mtp/Makefile
 	utils/sandbox/Makefile
-	utils/tracker-sql/Makefile
 	utils/tracker-resdump/Makefile
 	examples/Makefile
 	examples/libtracker-miner/Makefile
@@ -2819,6 +2834,7 @@ Frameworks / Options:
         Support GNOME's Nautilus                $have_tracker_nautilus_extension ($tracker_nautilus_extension_install_dir)
 	Support Maemo                           $enable_maemo
 	Support libmeegotouch                   $have_meegotouch
+	Support Guaranteed Metadata             $enable_guarantee_metadata (e.g. guess nie:title from files)
 
 "
 
