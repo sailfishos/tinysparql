@@ -222,14 +222,12 @@ cd /usr/share/tracker-tests/
 %{_datadir}/dbus-1/services/*
 %{_datadir}/man/man1/*
 %{_datadir}/tracker/*.xml
-%{_datadir}/tracker/languages/*
-%{_datadir}/tracker/miners/*
+%{_datadir}/tracker/stop-words/*
 %{_datadir}/tracker/ontologies/*
 %{_datadir}/vala/vapi/*
 %{_datadir}/tracker/extract-rules/*
 %dir %{_datadir}/tracker
-%dir %{_datadir}/tracker/languages
-%dir %{_datadir}/tracker/miners
+%dir %{_datadir}/tracker/stop-words
 %dir %{_datadir}/tracker/ontologies
 %dir %{_datadir}/tracker/extract-rules
 %dir %{_datadir}/vala
