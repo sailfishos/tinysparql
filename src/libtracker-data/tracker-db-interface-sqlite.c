@@ -937,6 +937,7 @@ open_database (TrackerDBInterface  *db_interface,
                GError             **error)
 {
 	int mode;
+	int result;
 
 	g_assert (db_interface->filename != NULL);
 
@@ -946,11 +947,15 @@ open_database (TrackerDBInterface  *db_interface,
 		mode = SQLITE_OPEN_READONLY;
 	}
 
-	if (sqlite3_open_v2 (db_interface->filename, &db_interface->db, mode | SQLITE_OPEN_NOMUTEX, NULL) != SQLITE_OK) {
+	result = sqlite3_open_v2 (db_interface->filename, &db_interface->db, mode | SQLITE_OPEN_NOMUTEX, NULL);
+	if (result != SQLITE_OK) {
+		const gchar *str;
+
+		str = sqlite3_errstr (result);
 		g_set_error (error,
 		             TRACKER_DB_INTERFACE_ERROR,
 		             TRACKER_DB_OPEN_ERROR,
-		             "Could not open sqlite3 database:'%s'", db_interface->filename);
+		             "Could not open sqlite3 database:'%s': %s", db_interface->filename, str);
 		return;
 	} else {
 		g_message ("Opened sqlite3 database:'%s'", db_interface->filename);
@@ -1212,8 +1217,17 @@ tracker_db_interface_sqlite_fts_update_text (TrackerDBInterface  *db_interface,
 							      TRACKER_DB_STATEMENT_CACHE_TYPE_UPDATE,
 							      &error,
 							      "DELETE FROM fts WHERE docid=?");
-		tracker_db_statement_bind_int (stmt, 0, id);
 
+		if (!stmt || error) {
+			if (error) {
+				g_warning ("Could not create FTS update statement: %s",
+				           error->message);
+				g_error_free (error);
+			}
+			return FALSE;
+		}
+
+		tracker_db_statement_bind_int (stmt, 0, id);
 		tracker_db_statement_execute (stmt, &error);
 		g_object_unref (stmt);
 
@@ -2334,6 +2348,7 @@ void
 tracker_db_statement_execute (TrackerDBStatement  *stmt,
                               GError             **error)
 {
+	g_return_if_fail (TRACKER_IS_DB_STATEMENT (stmt));
 	g_return_if_fail (!stmt->stmt_is_sunk);
 
 	execute_stmt (stmt->db_interface, stmt->stmt, NULL, error);
@@ -2343,6 +2358,7 @@ TrackerDBCursor *
 tracker_db_statement_start_cursor (TrackerDBStatement  *stmt,
                                    GError             **error)
 {
+	g_return_val_if_fail (TRACKER_IS_DB_STATEMENT (stmt), NULL);
 	g_return_val_if_fail (!stmt->stmt_is_sunk, NULL);
 
 	return tracker_db_cursor_sqlite_new (stmt->stmt, stmt, NULL, 0, NULL, 0, FALSE);
@@ -2357,6 +2373,7 @@ tracker_db_statement_start_sparql_cursor (TrackerDBStatement   *stmt,
                                           gboolean              threadsafe,
                                           GError              **error)
 {
+	g_return_val_if_fail (TRACKER_IS_DB_STATEMENT (stmt), NULL);
 	g_return_val_if_fail (!stmt->stmt_is_sunk, NULL);
 
 	return tracker_db_cursor_sqlite_new (stmt->stmt, stmt, types, n_types, variable_names, n_variable_names, threadsafe);
