@@ -3,7 +3,7 @@ Name:       tracker
 %define enable_demo 0
 
 Summary:    An object database, tag/metadata database, search tool and indexer
-Version:    1.3.2
+Version:    1.4.3
 Release:    1
 Group:      Data Management/Content Framework
 License:    GPLv2+
@@ -14,7 +14,7 @@ Source2:    tracker-store.service
 Source3:    tracker-miner-fs.service
 Source4:    tracker-extract.service
 Source5:    tracker-configs.sh
-Requires:   libmediaart >= 0.5.0
+Requires:   libmediaart
 Requires:   unzip
 Requires:   systemd
 Requires:   systemd-user-session-targets
@@ -22,7 +22,7 @@ Requires:   qt5-plugin-platform-minimal
 Requires(post): /sbin/ldconfig
 Requires(post):  oneshot
 Requires(postun): /sbin/ldconfig
-BuildRequires:  pkgconfig(libmediaart-1.0) >= 0.3.0
+BuildRequires:  pkgconfig(libmediaart-2.0)
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
 BuildRequires:  pkgconfig(enca)
 BuildRequires:  pkgconfig(exempi-2.0)
@@ -267,7 +267,7 @@ cd /usr/share/tracker-tests/
 %{_bindir}/tracker-sparql
 %{_bindir}/tracker-stats
 %{_bindir}/tracker-tag
-/etc/bash_completion.d/tracker-prompt.sh
+%{_datadir}/bash-completion/completions/tracker
 
 %files devel
 %defattr(-,root,root,-)
