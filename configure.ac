@@ -12,9 +12,9 @@ AC_PREREQ([2.64])
 # if backwards compatibility has been broken,
 # set TRACKER_BINARY_AGE and TRACKER_INTERFACE_AGE to 0.
 m4_define([tracker_major_version], [1])
-m4_define([tracker_minor_version], [3])
-m4_define([tracker_micro_version], [2])
-m4_define([tracker_interface_age], [0])
+m4_define([tracker_minor_version], [4])
+m4_define([tracker_micro_version], [3])
+m4_define([tracker_interface_age], [1])
 m4_define([tracker_binary_age],
           [m4_eval(100 * tracker_minor_version + tracker_micro_version)])
 m4_define([tracker_version],
@@ -55,7 +55,7 @@ AC_CONFIG_HEADERS([config.h])
 # See: https://www.gnu.org/software/autoconf/manual/autoconf-2.64/html_node/Posix-Variants.html
 AC_USE_SYSTEM_EXTENSIONS
 
-AM_INIT_AUTOMAKE([1.11 no-define tar-ustar -Wno-portability])
+AM_INIT_AUTOMAKE([1.11 no-define tar-ustar -Wno-portability no-dist-gzip dist-xz])
 
 AC_PROG_LIBTOOL
 
@@ -231,14 +231,7 @@ NETWORK_MANAGER_REQUIRED=0.8
 GSTREAMER_REQUIRED=0.10.31
 GUPNP_DLNA_REQUIRED=0.9.4
 LIBPNG_REQUIRED=0.89
-LIBMEDIAART_REQUIRED=0.5.0
-
-# 3.6.11 for sqlite_backup API
-# 3.6.16 to fix test failures
-# 3.6.17 for shared cache mode with virtual tables
-# 3.7.0 for WAL
-# 3.7.9 for FTS4 content= support
-SQLITE_REQUIRED=3.7.9
+LIBMEDIAART_REQUIRED=1.9.0
 
 # Needed to generate .gir files,
 # see http://live.gnome.org/GnomeGoals/AddGObjectIntrospectionSupport
@@ -277,7 +270,6 @@ esac
 # Check requirements for libtracker-data
 LIBTRACKER_DATA_REQUIRED="glib-2.0     >= $GLIB_REQUIRED
                           gio-unix-2.0 >= $GLIB_REQUIRED
-                          sqlite3      >= $SQLITE_REQUIRED
                           uuid"
 PKG_CHECK_MODULES(LIBTRACKER_DATA, [$LIBTRACKER_DATA_REQUIRED])
 
@@ -298,8 +290,7 @@ PKG_CHECK_MODULES(LIBTRACKER_EXTRACT, [$LIBTRACKER_EXTRACT_REQUIRED])
 
 # Check requirements for libtracker-fts
 LIBTRACKER_FTS_REQUIRED="glib-2.0     >= $GLIB_REQUIRED
-                         gio-unix-2.0 >= $GLIB_REQUIRED
-                         sqlite3      >= $SQLITE_REQUIRED"
+                         gio-unix-2.0 >= $GLIB_REQUIRED"
 
 PKG_CHECK_MODULES(LIBTRACKER_FTS, [$LIBTRACKER_FTS_REQUIRED])
 
@@ -340,8 +331,7 @@ PKG_CHECK_MODULES(TRACKER_RESDUMP, [$TRACKER_RESDUMP_REQUIRED],
 # Check requirements for tracker-store
 TRACKER_STORE_REQUIRED="glib-2.0     >= $GLIB_REQUIRED
                         gio-unix-2.0 >= $GLIB_REQUIRED
-                        gmodule-2.0  >= $GLIB_REQUIRED
-                        sqlite3      >= $SQLITE_REQUIRED"
+                        gmodule-2.0  >= $GLIB_REQUIRED"
 
 PKG_CHECK_MODULES(TRACKER_STORE, [$TRACKER_STORE_REQUIRED])
 
@@ -741,49 +731,6 @@ if test "x$enable_journal" = "xno" ; then
    AC_DEFINE(DISABLE_JOURNAL, 1, [Define if we disable the journal])
 fi
 
-####################################################################
-# Check for SQLite
-####################################################################
-
-PKG_CHECK_MODULES(SQLITE3, [sqlite3 >= $SQLITE_REQUIRED])
-AC_SUBST(SQLITE3_CFLAGS)
-AC_SUBST(SQLITE3_LIBS)
-
-# Make sure SQLite is compiled thread-safe
-AX_SQLITE_THREADSAFE
-if test "x$ax_cv_sqlite_threadsafe" != "xyes"; then
-  AC_MSG_ERROR([sqlite3 is not compiled thread-safe])
-fi
-
-# Make sure we're not using versions which cause problems.
-#
-# Avoid versions:
-#   3.7.10 - 3.7.13: https://mail.gnome.org/archives/tracker-list/2012-October/msg00028.html
-#   3.8.1:           https://mail.gnome.org/archives/tracker-list/2013-November/msg00021.html
-#   3.8.4.1:         https://mail.gnome.org/archives/tracker-list/2014-April/msg00001.html
-#
-AC_MSG_CHECKING(whether SQLite3 version is safe)
-
-PKG_CHECK_EXISTS([sqlite3 <= 3.7.9], sqlite_safe=yes, sqlite_safe=no)
-if test "x$sqlite_safe" != "xyes"; then
-   PKG_CHECK_EXISTS([sqlite3 >= 3.7.14], sqlite_safe=yes, sqlite_safe=no)
-fi
-
-if test "x$sqlite_safe" = "xyes"; then
-   PKG_CHECK_EXISTS([sqlite3 = 3.8.1], sqlite_safe=no, sqlite_safe=yes)
-fi
-
-if test "x$sqlite_safe" = "xyes"; then
-   PKG_CHECK_EXISTS([sqlite3 = 3.8.4.2], sqlite_safe=no, sqlite_safe=yes)
-fi
-
-
-if test "x$sqlite_safe" != "xyes"; then
-   AC_MSG_RESULT(no)
-else
-   AC_MSG_RESULT(yes)
-fi
-
 ##################################################################
 # Check for libtracker-common, make sure libstemmer exists
 ##################################################################
@@ -817,35 +764,33 @@ AM_CONDITIONAL(HAVE_LIBSTEMMER, test "x$have_libstemmer" = "xyes")
 # Check for tracker-fts, allow disabling FTS support
 ##################################################################
 
-AC_ARG_ENABLE([tracker-fts],
-              AS_HELP_STRING([--enable-tracker-fts],
-                             [enable the tracker FTS [[default=auto]]]),
-              [enable_tracker_fts=$enableval],
-              [enable_tracker_fts=auto])
+AC_DEFINE(HAVE_TRACKER_FTS, [1], [Define to 1 if tracker FTS is compiled])
+AC_DEFINE(HAVE_BUILTIN_FTS, [1], [Defined if Sqlite has FTS4 compiled in])
+AM_CONDITIONAL(HAVE_BUILTIN_FTS, test -n "yes")
+AM_CONDITIONAL(HAVE_TRACKER_FTS, test -n "of course")
 
-if test "x$enable_tracker_fts" = "xno" ; then
-   have_tracker_fts="no  (disabled)"
-else
-   have_tracker_fts="yes"
+####################################################################
+# bash-completion
+####################################################################
+
+AC_ARG_WITH([bash-completion-dir],
+    AS_HELP_STRING([--with-bash-completion-dir[=PATH]],
+        [Install the bash auto-completion script in this directory. @<:@default=yes@:>@]),
+    [],
+    [with_bash_completion_dir=yes])
+
+if test "x$with_bash_completion_dir" = "xyes"; then
+   PKG_CHECK_MODULES([BASH_COMPLETION], [bash-completion >= 2.0],
+       [BASH_COMPLETION_DIR=$($PKG_CONFIG --variable=completionsdir bash-completion)],
+       [BASH_COMPLETION_DIR="${datadir}/bash-completion/completions"])
+elif test "x$with_bash_completion_dir" != "xno"; then
+   # Set with_bash_completions_dir to avoid printing path twice below
+   BASH_COMPLETION_DIR="$with_bash_completion_dir"
+   with_bash_completion_dir="yes"
 fi
 
-if test "x$have_tracker_fts" = "xyes"; then
-   AC_DEFINE(HAVE_TRACKER_FTS, [1], [Define to 1 if tracker FTS is compiled])
-
-   AX_SQLITE_BUILTIN_FTS4
-   if test "x$ax_cv_sqlite_builtin_fts4" = "xyes" ; then
-      have_builtin_fts4="yes"
-      AC_DEFINE(HAVE_BUILTIN_FTS, [], [Defined if Sqlite has FTS4 compiled in])
-   else
-      have_builtin_fts4="no"
-   fi
-else
-   AC_DEFINE(HAVE_TRACKER_FTS, [0], [Define to 0 if tracker FTS is not compiled])
-   have_builtin_fts4="disabled"
-fi
-
-AM_CONDITIONAL(HAVE_BUILTIN_FTS, test "$have_builtin_fts4" = "yes")
-AM_CONDITIONAL(HAVE_TRACKER_FTS, test "$have_tracker_fts" = "yes")
+AC_SUBST([BASH_COMPLETION_DIR])
+AM_CONDITIONAL([WITH_BASH_COMPLETION],[test "x$with_bash_completion_dir" != "xno"])
 
 ####################################################################
 # Check for D-Bus requirements
@@ -1107,7 +1052,7 @@ AC_ARG_ENABLE(libmediaart,
 
 if test "x$enable_libmediaart" != "xno" ; then
    PKG_CHECK_MODULES(LIBMEDIAART,
-                     [libmediaart-1.0 >= $LIBMEDIAART_REQUIRED],
+                     [libmediaart-2.0 >= $LIBMEDIAART_REQUIRED],
                      [have_libmediaart=yes],
                      [have_libmediaart=no])
 
@@ -1124,7 +1069,7 @@ if test "x$enable_libmediaart" != "xno" ; then
    TRACKER_MINER_FS_LIBS="$TRACKER_MINER_FS_LIBS $LIBMEDIAART_LIBS"
 
    # Used for .pc file...
-   LIBTRACKER_MINER_PC_REQUIRES="libmediaart-1.0"
+   LIBTRACKER_MINER_PC_REQUIRES="libmediaart-2.0"
    AC_SUBST(LIBTRACKER_MINER_PC_REQUIRES)
 
    if test "x$have_libmediaart" = "xyes"; then
@@ -2629,11 +2574,11 @@ AC_CONFIG_FILES([
 	src/miners/rss/Makefile
 	src/miners/user-guides/Makefile
 	src/ontologies/Makefile
+	src/sqlite/Makefile
 	src/tracker-store/Makefile
 	src/tracker/Makefile
 	src/tracker-extract/Makefile
 	src/tracker-preferences/Makefile
-	src/tracker-preferences/tracker-preferences.desktop.in
 	src/tracker-needle/Makefile
 	src/tracker-needle/icons/Makefile
 	src/tracker-needle/icons/16x16/Makefile
@@ -2642,7 +2587,6 @@ AC_CONFIG_FILES([
 	src/tracker-needle/icons/32x32/Makefile
 	src/tracker-needle/icons/48x48/Makefile
 	src/tracker-needle/icons/scalable/Makefile
-	src/tracker-needle/tracker-needle.desktop.in
 	src/tracker-writeback/Makefile
 	src/plugins/Makefile
 	src/plugins/evolution/Makefile
@@ -2766,11 +2710,12 @@ Feature Support:
 	Unicode support library:                $with_unicode_support
 
 	Build with Journal support:             $have_tracker_journal
-	Build with SQLite FTS support:          $have_tracker_fts (built-in FTS: $have_builtin_fts4)
 	Build with Stemming support:            $have_libstemmer
 
 	Cache media art                         $have_libmediaart (libmediaart)
 	Install artwork                         $have_artwork
+
+	Bash completion support:                $with_bash_completion_dir ($BASH_COMPLETION_DIR)
 
 Data Miners / Writebacks:
 
@@ -2837,17 +2782,3 @@ Frameworks / Options:
 	Support Guaranteed Metadata             $enable_guarantee_metadata (e.g. guess nie:title from files)
 
 "
-
-# Any warnings we need to issue...
-if test "x$sqlite_safe" = "xno"; then
-sqlite_version=$($PKG_CONFIG --modversion sqlite3)
-echo "
-WARNING:
-        SQLite3 version $sqlite_version is not safe. For details see:
-        3.7.10 - 3.7.13: https://mail.gnome.org/archives/tracker-list/2012-October/msg00028.html
-        3.8.1:           https://mail.gnome.org/archives/tracker-list/2013-November/msg00021.html
-        3.8.4.2:         https://mail.gnome.org/archives/tracker-list/2014-April/msg00001.html
-
-
-"
-fi

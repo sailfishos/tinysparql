@@ -504,7 +504,8 @@ get_embedded_media_art (MetadataExtractor *extractor)
 
 	} while (have_sample);
 
-	have_sample = gst_tag_list_get_sample_index (extractor->tagcache, GST_TAG_IMAGE, lindex, &extractor->sample);
+	/* Fallback to the preview image */
+	have_sample = gst_tag_list_get_sample_index (extractor->tagcache, GST_TAG_PREVIEW_IMAGE, 0, &extractor->sample);
 
 	if (have_sample) {
 		GstBuffer *buffer;
@@ -1154,6 +1155,20 @@ extract_metadata (MetadataExtractor      *extractor,
 
 	if (extractor->mime == EXTRACT_MIME_GUESS && !gst_tag_list_is_empty (extractor->tagcache)) {
 		extractor_guess_content_type (extractor);
+	} else {
+		/* Rely on the information from the discoverer rather than the
+		 * mimetype, this is a safety net for those formats that fool
+		 * mimetype sniffing (eg. .ogg suffixed OGG videos being detected
+		 * as audio/ogg.
+		 */
+		if (extractor->mime == EXTRACT_MIME_AUDIO && extractor->has_video) {
+			g_debug ("mimetype says its audio, but has video frames. Falling back to video extraction.");
+			extractor->mime = EXTRACT_MIME_VIDEO;
+		} else if (extractor->mime == EXTRACT_MIME_VIDEO &&
+			   !extractor->has_video && extractor->has_audio) {
+			g_debug ("mimetype says its video, but has only audio. Falling back to audio extraction.");
+			extractor->mime = EXTRACT_MIME_AUDIO;
+		}
 	}
 
 	if (extractor->mime == EXTRACT_MIME_GUESS) {
@@ -1418,6 +1433,28 @@ discoverer_shutdown (MetadataExtractor *extractor)
 		g_object_unref (extractor->discoverer);
 }
 
+static gchar *
+get_discoverer_required_plugins_message (GstDiscovererInfo *info)
+{
+	GString *str;
+	gchar **plugins;
+	gchar *plugins_str;
+
+	plugins = (gchar **)
+	        gst_discoverer_info_get_missing_elements_installer_details (info);
+
+	if (g_strv_length((gchar **)plugins) == 0) {
+		str = g_string_new ("No information available on which plugin is required.");
+	} else {
+		str = g_string_new("Required plugins: ");
+		plugins_str = g_strjoinv (", ", (gchar **)plugins);
+		g_string_append (str, plugins_str);
+		g_free (plugins_str);
+	}
+
+	return g_string_free (str, FALSE);
+}
+
 static gboolean
 discoverer_init_and_run (MetadataExtractor *extractor,
                          const gchar       *uri)
@@ -1426,6 +1463,7 @@ discoverer_init_and_run (MetadataExtractor *extractor,
 	const GstTagList *discoverer_tags;
 	GError *error = NULL;
 	GList *l;
+	gchar *required_plugins_message;
 
 	extractor->duration = -1;
 	extractor->audio_channels = -1;
@@ -1467,8 +1505,15 @@ discoverer_init_and_run (MetadataExtractor *extractor,
 	}
 
 	if (error) {
-		g_warning ("Call to gst_discoverer_discover_uri() failed: %s",
-		           error->message);
+		if (gst_discoverer_info_get_result(info) == GST_DISCOVERER_MISSING_PLUGINS) {
+			required_plugins_message = get_discoverer_required_plugins_message (info);
+			g_message ("Missing a GStreamer plugin for %s. %s", uri,
+			           required_plugins_message);
+			g_free (required_plugins_message);
+		} else {
+			g_warning ("Call to gst_discoverer_discover_uri(%s) failed: %s",
+			           uri, error->message);
+		}
 		gst_discoverer_info_unref (info);
 		g_error_free (error);
 		return FALSE;
@@ -1631,6 +1676,7 @@ tracker_extract_gstreamer (const gchar          *uri,
 				                                    extractor->media_art_buffer_mime,
 				                                    extractor->media_art_artist,
 				                                    extractor->media_art_title,
+				                                    NULL,
 				                                    &error);
 			} else {
 				success = media_art_process_file (media_art_process,
@@ -1639,6 +1685,7 @@ tracker_extract_gstreamer (const gchar          *uri,
 				                                  tracker_extract_info_get_file (info),
 				                                  extractor->media_art_artist,
 				                                  extractor->media_art_title,
+				                                  NULL,
 				                                  &error);
 			}
 

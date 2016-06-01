@@ -2658,7 +2658,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	mp3_parse (buffer, buffer_size, audio_offset, uri, metadata, &md);
 
 #ifdef HAVE_LIBMEDIAART
-	if (md.performer || md.title) {
+	if (md.performer || md.album) {
 		MediaArtProcess *media_art_process;
 		GError *error = NULL;
 		gboolean success = TRUE;
@@ -2674,7 +2674,8 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			                                    md.media_art_size,
 			                                    md.media_art_mime,
 			                                    md.performer,
-			                                    md.title,
+			                                    md.album,
+			                                    NULL,
 			                                    &error);
 		} else {
 			success = media_art_process_file (media_art_process,
@@ -2682,7 +2683,8 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			                                  MEDIA_ART_PROCESS_FLAGS_NONE,
 			                                  file,
 			                                  md.performer,
-			                                  md.title,
+			                                  md.album,
+			                                  NULL,
 			                                  &error);
 		}
 

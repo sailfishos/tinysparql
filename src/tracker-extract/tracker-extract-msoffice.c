@@ -759,7 +759,7 @@ open_file (const gchar *filename, FILE *file)
 	infile = gsf_infile_msole_new (input, &error);
 
 	if (error) {
-		g_warning ("Failed to open file: %s", error->message);
+		g_warning ("Failed to open file '%s': %s", filename, error->message);
 		g_error_free (error);
 	}
 
@@ -1372,6 +1372,7 @@ xls_get_extended_record_string (GsfInput  *stream,
 		/* Go to next chunk */
 		i++;
 	}
+	g_free(buffer);
 }
 
 /**
