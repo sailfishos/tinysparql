@@ -2675,6 +2675,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			                                    md.media_art_mime,
 			                                    md.performer,
 			                                    md.album,
+			                                    NULL,
 			                                    &error);
 		} else {
 			success = media_art_process_file (media_art_process,
@@ -2683,6 +2684,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			                                  file,
 			                                  md.performer,
 			                                  md.album,
+			                                  NULL,
 			                                  &error);
 		}
 

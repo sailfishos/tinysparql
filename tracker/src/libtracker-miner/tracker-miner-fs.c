@@ -19,11 +19,7 @@
 
 #include "config.h"
 
-#include <libtracker-common/tracker-date-time.h>
-#include <libtracker-common/tracker-dbus.h>
-#include <libtracker-common/tracker-file-utils.h>
-#include <libtracker-common/tracker-log.h>
-#include <libtracker-common/tracker-utils.h>
+#include <libtracker-common/tracker-common.h>
 
 #include "tracker-crawler.h"
 #include "tracker-miner-fs.h"
@@ -360,6 +356,16 @@ static GQuark quark_file_iri = 0;
 static GInitableIface* miner_fs_initable_parent_iface;
 static guint signals[LAST_SIGNAL] = { 0, };
 
+/**
+ * tracker_miner_fs_error_quark:
+ *
+ * Gives the caller the #GQuark used to identify #TrackerMinerFS errors
+ * in #GError structures. The #GQuark is used as the domain for the error.
+ *
+ * Returns: the #GQuark used for the domain of a #GError.
+ *
+ * Since: 1.2.
+ **/
 G_DEFINE_QUARK (TrackerMinerFSError, tracker_miner_fs_error)
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (TrackerMinerFS, tracker_miner_fs, TRACKER_TYPE_MINER,
@@ -1276,6 +1282,8 @@ sparql_buffer_task_finished_cb (GObject      *object,
 	task = g_simple_async_result_get_op_res_gpointer (G_SIMPLE_ASYNC_RESULT (result));
 	task_file = tracker_task_get_file (task);
 
+	tracker_file_notifier_invalidate_file_iri (priv->file_notifier, task_file);
+
 	if (item_queue_is_blocked_by_file (fs, task_file)) {
 		g_object_unref (priv->item_queue_blocker);
 		priv->item_queue_blocker = NULL;
@@ -1486,8 +1494,7 @@ lookup_file_urn (TrackerMinerFS *fs,
 static gboolean
 item_add_or_update (TrackerMinerFS *fs,
                     GFile          *file,
-                    gint            priority,
-                    gboolean        is_new)
+                    gint            priority)
 {
 	TrackerMinerFSPrivate *priv;
 	TrackerSparqlBuilder *sparql;
@@ -1872,7 +1879,7 @@ item_move (TrackerMinerFS *fs,
 	                               NULL, NULL);
 
 	/* Get 'source' ID */
-	source_iri = lookup_file_urn (fs, source_file, FALSE);
+	source_iri = lookup_file_urn (fs, source_file, TRUE);
 	source_exists = (source_iri != NULL);
 
 	if (!file_info) {
@@ -2587,8 +2594,7 @@ item_queue_handlers_cb (gpointer user_data)
 		if (!parent ||
 		    tracker_indexing_tree_file_is_root (fs->priv->indexing_tree, file) ||
 		    lookup_file_urn (fs, parent, TRUE)) {
-			keep_processing = item_add_or_update (fs, file, priority,
-			                                      (queue == QUEUE_CREATED));
+			keep_processing = item_add_or_update (fs, file, priority);
 		} else {
 			TrackerPriorityQueue *item_queue;
 			gchar *uri;
@@ -2655,7 +2661,7 @@ _tracker_idle_add (TrackerMinerFS *fs,
 {
 	guint interval;
 
-	interval = TRACKER_MAX_TIMEOUT_INTERVAL * fs->priv->throttle;
+	interval = TRACKER_CRAWLER_MAX_TIMEOUT_INTERVAL * fs->priv->throttle;
 
 	if (interval == 0) {
 		return g_idle_add_full (TRACKER_TASK_PRIORITY, func, user_data, NULL);
@@ -3763,12 +3769,13 @@ tracker_miner_fs_file_notify (TrackerMinerFS *fs,
 /**
  * tracker_miner_fs_set_throttle:
  * @fs: a #TrackerMinerFS
- * @throttle: throttle value, between 0 and 1
+ * @throttle: a double between 0.0 and 1.0
  *
- * Tells the filesystem miner to throttle its operations.
- * a value of 0 means no throttling at all, so the miner
- * will perform operations at full speed, 1 is the slowest
- * value.
+ * Tells the filesystem miner to throttle its operations. A value of
+ * 0.0 means no throttling at all, so the miner will perform
+ * operations at full speed, 1.0 is the slowest value. With a value of
+ * 1.0, the @fs is typically waiting one full second before handling
+ * the next batch of queued items to be processed.
  *
  * Since: 0.8
  **/
@@ -3801,9 +3808,10 @@ tracker_miner_fs_set_throttle (TrackerMinerFS *fs,
  * tracker_miner_fs_get_throttle:
  * @fs: a #TrackerMinerFS
  *
- * Gets the current throttle value. see tracker_miner_fs_set_throttle().
+ * Gets the current throttle value, see
+ * tracker_miner_fs_set_throttle() for more details.
  *
- * Returns: current throttle value.
+ * Returns: a double representing a value between 0.0 and 1.0.
  *
  * Since: 0.8
  **/
@@ -4002,7 +4010,7 @@ tracker_miner_fs_force_recheck (TrackerMinerFS *fs)
  * could be changed outside between startup and shutdown of the
  * process using this API.
  *
- * The default if not set directly is that @mtime_checking is #TRUE.
+ * The default if not set directly is that @mtime_checking is %TRUE.
  *
  * Since: 0.10
  **/
@@ -4019,8 +4027,13 @@ tracker_miner_fs_set_mtime_checking (TrackerMinerFS *fs,
  * tracker_miner_fs_get_mtime_checking:
  * @fs: a #TrackerMinerFS
  *
- * Returns: #TRUE if mtime checks for directories against the database
- * are done when @fs crawls the file system, otherwise #FALSE.
+ * Returns a boolean used to identify if file modification time checks
+ * are performed when processing content. This may be set to %FALSE if
+ * working prodominently with cloud data where you can't perform these
+ * checks. By default and for local file systems, this is enabled.
+ *
+ * Returns: %TRUE if mtime checks for directories against the database
+ * are done when @fs crawls the file system, otherwise %FALSE.
  *
  * Since: 0.10
  **/
@@ -4063,6 +4076,30 @@ tracker_miner_fs_force_mtime_checking (TrackerMinerFS *fs,
 	                           flags);
 }
 
+/**
+ * tracker_miner_fs_set_initial_crawling:
+ * @fs: a #TrackerMinerFS
+ * @do_initial_crawling: a #gboolean
+ *
+ * Tells the @fs that crawling the #TrackerIndexingTree should happen
+ * initially. This is actually required to set up file system monitor
+ * using technologies like inotify, etc.
+ *
+ * Setting this to #FALSE can dramatically improve the start up the
+ * crawling of the @fs.
+ *
+ * The down side is that using this consistently means that some files
+ * on the disk may be out of date with files in the database.
+ *
+ * The main purpose of this function is for systems where a @fs is
+ * running the entire time and where it is very unlikely that a file
+ * could be changed outside between startup and shutdown of the
+ * process using this API.
+ *
+ * The default if not set directly is that @do_initial_crawling is %TRUE.
+ *
+ * Since: 0.10
+ **/
 void
 tracker_miner_fs_set_initial_crawling (TrackerMinerFS *fs,
                                        gboolean        do_initial_crawling)
@@ -4072,6 +4109,20 @@ tracker_miner_fs_set_initial_crawling (TrackerMinerFS *fs,
 	fs->priv->initial_crawling = do_initial_crawling;
 }
 
+/**
+ * tracker_miner_fs_get_initial_crawling:
+ * @fs: a #TrackerMinerFS
+ *
+ * Returns a boolean which indicates if the indexing tree is crawled
+ * upon start up or not. This may be set to %FALSE if working
+ * prodominently with cloud data where you can't perform these checks.
+ * By default and for local file systems, this is enabled.
+ *
+ * Returns: %TRUE if a file system structure is crawled for new
+ * updates on start up, otherwise %FALSE.
+ *
+ * Since: 0.10
+ **/
 gboolean
 tracker_miner_fs_get_initial_crawling (TrackerMinerFS *fs)
 {
@@ -4084,8 +4135,13 @@ tracker_miner_fs_get_initial_crawling (TrackerMinerFS *fs)
  * tracker_miner_fs_has_items_to_process:
  * @fs: a #TrackerMinerFS
  *
- * Returns: #TRUE if there are items to process in the internal
- * queues, otherwise #FALSE.
+ * The @fs keeps many priority queus for content it is processing.
+ * This function returns %TRUE if the sum of all (or any) priority
+ * queues is more than 0. This includes items deleted, created,
+ * updated, moved or being written back.
+ *
+ * Returns: %TRUE if there are items to process in the internal
+ * queues, otherwise %FALSE.
  *
  * Since: 0.10
  **/

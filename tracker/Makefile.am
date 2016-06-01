@@ -98,6 +98,7 @@ DISTCLEANFILES +=                                      \
 
 DISTCHECK_CONFIGURE_FLAGS =                            \
 	--with-session-bus-services-dir="\$(datadir)"/dbus-1/services \
+	--with-bash-completion-dir="\$(datadir)"/bash-completion/ \
 	--disable-nautilus-extension                   \
 	--enable-unit-tests                            \
 	--enable-functional-tests                      \
@@ -117,6 +118,6 @@ DISTCHECK_CONFIGURE_FLAGS =                            \
 	--enable-libgsf                                \
 	--enable-playlist                              \
 	--enable-tracker-preferences                   \
-	--with-enca
+	--enable-enca
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
