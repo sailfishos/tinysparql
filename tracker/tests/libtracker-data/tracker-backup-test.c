@@ -22,7 +22,7 @@
 #include <string.h>
 #include <locale.h>
 
-#include <glib.h>
+#include <glib/gstdio.h>
 #include <gio/gio.h>
 
 #include <libtracker-common/tracker-common.h>
@@ -246,7 +246,7 @@ setup (TestInfo      *info,
 
 		g_assert_true (g_setenv ("XDG_DATA_HOME", xdg_location, TRUE));
 		g_assert_true (g_setenv ("XDG_CACHE_HOME", xdg_location, TRUE));
-		g_assert_true (g_setenv ("TRACKER_DB_ONTOLOGIES_DIR", TOP_SRCDIR "/data/ontologies/", TRUE));
+		g_assert_true (g_setenv ("TRACKER_DB_ONTOLOGIES_DIR", TOP_SRCDIR "/src/ontologies/", TRUE));
 	}
 }
 

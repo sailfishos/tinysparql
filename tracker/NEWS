@@ -1,3 +1,272 @@
+New in 1.4.3 - 2016-03-01
+=========================
+
+  * Include embedded copy of sqlite
+
+Translations: pt_BR
+
+New in 1.4.2 - 2015-12-27
+=========================
+
+  * tracker CLI: fixed search with -f argument
+  * libtracker-miner: Cancel pending async operations during destruction
+  * libtracker-miner: Handle failure to get a TrackerSparqlConnection
+  * libtracker-common: Fix buffer overrun on libunistring unaccenting
+  * libtracker-control: Fix return value in function call
+  * libtracker-control: Improve docs
+  * libtracker-data: Silence criticals on REGEX() with null strings
+
+Translations: cs, de, hu, id, lt, pl, pt, sv
+
+NEW in 1.4.1 - 2014-07-31
+=========================
+
+  * build: Move bash-completion to new location
+  * libtracker-miner: Set inotify limits for 'GInotifyFileBackend' too (changes in GLib)
+  * tracker-extract: Remove ModulePath from comic/ebook rules
+  * tracker-extract-gstreamer: Rely better on the GstDiscoverer than mimetype sniffing
+  * tracker-extract-gstreamer: Fallback to preview image for album art
+  * tracker-miner-fs: Reset retry counter when we need to prepend parents
+  * tracker-preferences: Use the new command line tool
+  * tracker: Improve bash completion script (complete on real files for some arguments)
+  * tracker: Mark missing strings for translation
+  * Fixes: GB#735610, Remove requirement on ModulePath for extractor .rule files
+  * Fixes: GB#732236, use embedded album art if available
+  * Fixes: GB#750394, libtracker-miner: Keep a monitor on root index tree files on deletion
+  * Fixes: GB#751723, [PATCH] tracker-sparql.1: Man page syntax fix
+  * Fixes: GB#751724, [PATCH] docs: Spelling fixes
+  * Fixes: GB#751992, gnome-shell search on fresh new tracker db triggers tracker-miner-fs warnings
+  * Fixes: GB#748677, tracker-preferences still calls tracker-control
+  * Fixes: GB#746401, epub: handle multiple dc:identifier tags
+
+Translations:
+
+  * Updated bg: Alexander Shopov
+  * Updated pl: Piotr Drąg
+  * Updated pt: Pedro Albuquerque
+  * Updated pt_BR: Gustavo Marques, Felipe Braga
+  * Updated sl: Martin Srebotnjak, Matej Urbančič
+
+
+NEW in 1.4.0 - 2014-03-24
+=========================
+
+  * Fix ambiguous GListModel vs GtkListModel references in vala (#746194)
+  * Fix compiler warnings (#746381)
+  * Ignore "." recursing through compressed content (#746437)
+
+Translations: id, it, sv, tr
+
+NEW in 1.3.6 - 2015-03-17
+=========================
+
+  * Fix spurious folder deletes/reindexes (#741852)
+  * Fix nie:url UNIQUE constraint asserts on downloaded files (RH#1192224)
+  * Clear tracker-store watchdog timeout (#745565)
+  * Support fn:replace (#745917)
+  * Spam stderr less for not-so-uncommon error conditions (#746256)
+
+Translations: ko, bs, sr, sl, da
+
+
+NEW in 1.3.5 - 2015-03-06
+=========================
+
+  * Fix major database migration bug, skip Tracker 1.3.4. (#745737)
+  * Build only libiptc test if libjpeg is enabled (#745583)
+  * Put absolute path in shell script (#743738)
+
+Translations: ru
+
+
+NEW in 1.3.4 - 2015-03-03
+=========================
+
+  * Fixed playlists being processed by tracker-extract
+  * Fixes: #743727, Account for cardinality=0 on DB migration
+  * Fixes: #745219, mp3 passes album instead of song title to libmediaart
+
+Translations: zh_TW, sk, eo, nb, lt, eu, po
+
+
+NEW in 1.3.3 - 2015-02-05
+=========================
+
+  * Fixes: GB#681698, Disc number may be incorrect for multi-disc vorbis / flac albums
+  * Fixes: GB#741109, BMP extractor doesn't retrieve image height and width
+  * Fixes: GB#743250, libmediart-2.0 support
+  * Fixes: GB#735406, Tracker spams my log with "Unable to insert multiple values for subject ..."
+  * Fixes: GB#742391, applications, userguides: Don't detect locale changes if we failed to create the miner
+  * Fixes: GB#742035, 1.2.5 unit test failures
+  * Fixes: GB#739234, Tracker sometimes ignores SIGINT/SIGTERM
+  * Fixes: GB#663687, Missing accessible label names on tracker-needle widgets
+  * Fixes: GB#741777, libtracker-sparql: Document requirement to escape constructed queries
+  * Fixes: GB#678986, item_move() creates invalid SPARQL if source file does not exist
+  * Reverted: GB#733536, Remove --enable-guarantee metadata, always guarantee nie:title and nie:contentCreated
+
+Translations:
+
+  * Updated cs: Marek Černocký
+  * Updated de: Christian Kirbach, Bernd Homuth
+  * Updated el: Dimitris Spingos, Dimitris Spingos (Δημήτρης Σπίγγος)
+  * Updated es: Daniel Mustieles
+  * Updated eu: Inaki Larranaga Murgoitio, Iñaki Larrañaga Murgoitio
+  * Updated gl: Fran Dieguez
+  * Updated hu: Balázs Úr
+  * Updated pt_BR: Rafael Ferreira
+
+
+NEW in 1.3.2 - 2014-12-11
+=========================
+
+  * New Feature: 'tracker' binary: All pre-existing tracker-* command line tools have been merged into this new binary. Man pages are shown for 'help' sub-commands. This brings more of a "git" feel to the tracker's command line tools. There is a backwards compatible 'tracker-command' script and compatibility layer provided to ensure existing commands still work for a limited time. The old 'tracker-control' actions are now part of 'tracker daemon', 'tracker reset' and 'tracker index'. Additionally, the 'tracker-sql' utility has been integrated to allow SQL operations directly on the DB.
+  * Fixes: GB#741317, miner-fs: use GFile to check for homedir
+  * Fixes: GB#741141, Tracker crashes every 5-10 minutes
+  * Fixes: RH#1133042, [abrt] tracker: persistence_store_file(): tracker-extract killed by SIGSEGV
+  * all: Move all code from tracker_info() to g_info() new in GLib 2.40.
+  * gvdb: Fixed LDFLAGS and CFLAGS, was using unused variables
+  * gvdb: Move away from g_file_delete() to unlink() to avoid GIO dep for one line in unit tests
+  * libtracker-fts: Make property list per-thread data to fix uninitialisation issues
+  * libtracker-fts: Fixed compilation errors when --disable-tracker-fts is used
+  * tracker-extract: Fixed potential use of uninitialised hash table in persistence_invalidate()
+  * tracker-extract: Fixed possible invalid memory read/write in tracker_keywords_parse()
+  * tracker-extract: Fixed memory leak of MediaArt object for TrackerExtractInfo
+  * clean-tracker-prefix: Should consider lib64 as well as lib directories
+
+Translations:
+
+  * Updated pl: Piotr Drąg
+
+
+NEW in 1.3.1 - 2014-12-03
+=========================
+
+  * Fixes: GB#733536, Remove --enable-guarantee metadata, always guarantee nie:title and nie:contentCreated
+  * Fixes: GB#739260, srcdir != builddir issue with latest git
+  * Fixes: GB#741012, should not override "all" target
+  * Fixes: GB#740268, System tab - very ambiguous about what is being removed
+  * Fixes: GB#740864, Symlink target for D-Bus service files includes DESTDIR
+
+Translations:
+
+  * Updated cs: Marek Černocký
+  * Updated es: Daniel Mustieles
+  * Updated hu: Balázs Úr
+  * Updated nb: Kjartan Maraas
+  * Updated pt: Duarte Loreto, Pedro Albuquerque
+
+
+NEW in 1.3.0 - 2014-11-06
+=========================
+
+The main changes since 1.2.x are:
+
+  * build: Require GLib >= 2.4.0, for g_str_match_string() and g_info()
+  * all: Migrate to GKeyfileSettingsBackend, including:
+   * Now when using TRACKER_USE_CONFIG_FILES env var, we use this backend
+   * MAN pages which previously didn't exist for configurations are generated from xml gschemas
+  * libstemmer: Removed imported code and depend on external version
+  * libtracker-miner: Major update to Vala bindings
+  * libtracker-common: Major clean up and removal of unused internal APIs, including:
+    * Removed os-dependent APIs (mainly process spawning GLib does now anyway)
+    * Removed tracker_file_(un)lock() API which was unused
+    * Removed all run-time locale management, GNOME handles this between logins, so do we
+    * Removed TrackerConfigFile and TrackerKeyfileObject classes, use GSettings instead
+    * Removed unused type utils functions (e.g. tracker_*_to_string() and more)
+    * Moved tracker-ontologies.h (with prefix, etc definitions) into libtracker-sparql
+    * Moved CRC32 API into libtracker-data (the only place it's used)
+    * Moved TrackerStorage class to tracker-miner-fs (only place it's used)
+  * data: Now moved into their respective binary dirs, including:
+    * .desktop: Desktop files (moved from data/ into src/tracker-store, etc)
+    * .pc: Pkgconfig files (moved from data/ into src/libtracker-miner, etc)
+    * .service: DBus files (moved from data/dbus/* to src/tracker-store, etc)
+    * .png, .svg: Moved artwork into src/tracker-needle)
+    * .gschema.xml: GSettings files (moved from data/gschemas into src, tracker-store, etc)
+    * .ontology: Ontologies are now in src/ontologies
+    * stopwords.*: Stop words per language (moved from data/stopwords into src/libtracker-common for TrackerLanguage)
+  * data: Merged all data miner .desktop files with existing DBus .service files
+  * functional-tests: Many updates to fix broken functional tests, including:
+    * Writeback and miner base class clean ups
+    * Removing IgnoreNextUpdate wrapper and 'wait for miner to be idle' calls
+    * Waiting properly for resource addition / removal
+  * Fixes GB#737663, Avoid the use of setrlimit() causing SIGABRT in tracker-extract
+
+Translations:
+
+  * Updated fi: Timo Jyrinki, Jiri Grönroos
+  * Updated hu: Gábor Kelemen, Gabor Kelemen
+  * Updated it: Milo Casagrande
+
+
+NEW in 1.2.0 - 2014-09-22
+=========================
+
+The main changes since 1.0.x are:
+
+  * New Feature: Extractor now supports eBook and Comic book formats
+  * New Feature: Extractor now supports BMP files
+  * New Feature: Data Provider: Now there are TrackerDataProvider and TrackerEnumerator interfaces to allow 3rd parties to supply their own data to Tracker to be indexed, for example for an online or proprietary service
+  * New Feature: Extractor is now 'crash-aware' that being, we have a separate data source for content that can't be extracted to avoid repeated failures from tracker-extract. This also survives through crashes that may occur due to attempted extractions
+  * build: Updated doap file (added programming language and category is now "core")
+  * build: Improve firefox and thunderbird detection to avoid warnings in console
+  * build: Removed all GNU_SOURCE additions in sources, use AC_USE_SYSTEM_EXTENSIONS instead
+  * build: Fixed many unit tests that were not properly isolated
+  * build: configure now has an --enable-minimal option to ONLY build tracker-store
+  * build: Reduce vala generated source warnings from GCC
+  * build: Use major version only PkgConfig files. Previously, we had $library-$major-$minor (e.g. tracker-sparql-1.2, when it should be tracker-sparql-1.0) to avoid creating unnecessary work for developers using Tracker. This release corrects this and it was planned originally.
+  * build: Include COPYING*GPL files in tarball
+  * build: Generate Vala bindings from GIR for libtracker-miner, libtracker-control
+  * build: Improved many GIR annotations for nullable cases in libtracker-miner, libtracker-control
+  * build: Avoid using rpath where possible
+  * build: Make check fails to generate test reports
+  * build: Remove --enable-guarantee metadata, always guarantee nie:title and nie:contentCreated
+  * build: Added CC_CHECK_FLAGS_APPEND m4 macros from xinelib/systemd projects to check GCC compiler flags we can use
+  * ontology: nfo:hasMediaStream no longer has a max cardinality of 1, this may mean a reindex is needed
+  * libtracker-bus: Fixed a crash in query_async() where splice async operation is cancelled
+  * libtracker-bus: Fixed a bug where tracker-stats showed no information with Vala 0.24+
+  * libtracker-sparql: All TrackerSparqlConnection APIs throw GLib.Error due to GUnixFDList _append() API
+  * libtracker-sparql: Move TRACKER_ const definitions to Tracker namespace, i.e. Tracker.DBUS_*
+  * libtracker-miner: Fixed reference leak with TrackerTaskPool when using external data miners
+  * libtracker-miner: Add new API tracker_decorator_fs_prepend_file() as part of 'crash-aware' feature.
+  * libtracker-miner: PkgConfig file now requires libmediaart (when dependent) privately
+  * libtracker-extract: Fixed broken EXIF GPS coordinate extraction
+  * libtracker-extract: There is no longer an example in the examples/ directory as this library is now private
+  * tracker-extract: Fixed missing TRACKER_EXTRACTORS_DIR env var that was removed at some stage
+  * tracker-extract: Cleaned up signal handling, SIGALRM and SIGABRT no longer used
+  * tracker-extract: [DOC] Catch more MS Office MIME types supported
+  * tracker-extract: [MP3] Fixed mp3 parsing for ID3v24 or ID3v23 tags
+  * tracker-extract: [ISO] Extract language, copyright and author information about ISO images using new ontology
+  * tracker-extract: [ODT] Improved extraction of content so we don't stop on embedded tabs and line breaks
+  * tracker-extract: [GIF] Support giflib 5.1.0 as well as earlier versions
+  * tracker-stats: Now EXPRESSIONS can be used to filter stats shown
+  * tracker-stats: Now only common and fallback RDF types are shown by default, --all can be used to old behaviour
+  * tracker-info: Add --resource-is-iri or -i to avoid filename to URN lookups
+  * tracker-info: Don't show "(null)" for nie:InformationElements with no nie:url
+  * tracker-control: Added a lot of strings previsouly untranslated
+  * tracker-control: Removed shorthand command line switches for less common arguments (--list-*, --pause-details)
+  * tracker-control: Added --watch command line option to watch changes to the database.
+  * tracker-miner-fs: By default, ignore directories with '.trackerignore' file inside
+  * tracker-miner-apps: New process to mine data about applications, previously part of tracker-miner-fs. Can be disabled with --disable-miner-apps
+  * tracker-miner-user-guides: New process to mine data about user guides and help content, previously part of tracker-miner-fs. Can be disabled with --disable-user-guides
+  * tracker-writeback: Support GIFs
+  * tracker-preferences: Removed fixed column for indexed locations, column header text was cut off
+  * tracker-preferences: Don't use Stock.* deprecated since Gtk+ 3.10
+  * tracker-preferences: Added suggestion to reindex OR restart depending on configuration changes applied
+  * tracker-preferences: General UI clean up and modernization fixing many deprecations where old GTK+ widgets were used
+  * tracker-preferences: Added 'control' tab to allow users to enable finer control of what's indexed (e.g. numbers - which are normally disabled)
+  * tracker-preferences: Add AppData with screenshots for app stores
+  * tracker-needle: Add AppData with screenshots for app stores
+  * tracker-sandbox: Setup xdg-user-dirs too
+
+Bugs Fixed (31):
+
+  https://bugzilla.gnome.org/buglist.cgi?quicksearch=737023,736328,735180,735645,735636,735460,735610,735567,735317,735339,733573,733317,734464,733857,734089,734144,733316,733948,733863,733536,733439,732839,730627,728370,730111,729253,729968,729708,728252,728546,725717
+
+Translations:
+
+  Many, thank you to everyone involved.
+
+
 NEW in 1.1.4 - 2014-09-05
 =========================
 

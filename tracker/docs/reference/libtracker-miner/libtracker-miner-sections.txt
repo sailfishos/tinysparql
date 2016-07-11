@@ -2,8 +2,6 @@
 <FILE>tracker-data-provider</FILE>
 <TITLE>TrackerDataProvider</TITLE>
 TrackerDataProviderIface
-tracker_data_provider_get_crawl_flags
-tracker_data_provider_set_crawl_flags
 tracker_data_provider_begin
 tracker_data_provider_begin_async
 tracker_data_provider_begin_finish
@@ -124,6 +122,7 @@ tracker_file_enumerator_get_type
 TrackerIndexingTree
 TrackerIndexingTreeClass
 tracker_indexing_tree_new
+tracker_indexing_tree_new_with_root
 tracker_indexing_tree_add
 tracker_indexing_tree_remove
 tracker_indexing_tree_add_filter
@@ -156,19 +155,12 @@ tracker_media_art_queue_empty
 </SECTION>
 
 <SECTION>
-<FILE>tracker-miner-common</FILE>
-TRACKER_MINER_FS_GRAPH_URN
-</SECTION>
-
-<SECTION>
 <FILE>tracker-miner-enum-types</FILE>
 <SUBSECTION Standard>
-TRACKER_TYPE_CRAWL_FLAGS
 TRACKER_TYPE_DIRECTORY_FLAGS
 TRACKER_TYPE_FILTER_POLICY
 TRACKER_TYPE_FILTER_TYPE
 TRACKER_TYPE_NETWORK_TYPE
-tracker_crawl_flags_get_type
 tracker_directory_flags_get_type
 tracker_filter_policy_get_type
 tracker_filter_type_get_type
@@ -181,7 +173,6 @@ TrackerDirectoryFlags
 TrackerFilterType
 TrackerFilterPolicy
 TrackerNetworkType
-TrackerCrawlFlags
 </SECTION>
 
 <SECTION>
@@ -265,6 +256,7 @@ tracker_miner_get_type
 <SECTION>
 <FILE>tracker-miner-online</FILE>
 <TITLE>TrackerMinerOnline</TITLE>
+TrackerMinerOnline
 TrackerMinerOnlineClass
 tracker_miner_online_get_network_type
 <SUBSECTION Standard>
@@ -274,7 +266,6 @@ TRACKER_MINER_ONLINE
 TRACKER_MINER_ONLINE_CLASS
 TRACKER_MINER_ONLINE_GET_CLASS
 TRACKER_TYPE_MINER_ONLINE
-TrackerMinerOnline
 tracker_miner_online_get_type
 </SECTION>
 
@@ -297,3 +288,4 @@ TRACKER_THUMBNAILER_GET_CLASS
 TRACKER_TYPE_THUMBNAILER
 tracker_thumbnailer_get_type
 </SECTION>
+

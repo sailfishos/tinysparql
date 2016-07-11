@@ -1,14 +1,11 @@
 if HAVE_TRACKER_FTS
-libstemmer_dir = libstemmer
-endif
-
-if HAVE_TRACKER_FTS
 libtrackerfts_dir = libtracker-fts
 endif
 
 SUBDIRS =                                              \
+	sqlite                                         \
+	ontologies				       \
 	gvdb                                           \
-	$(libstemmer_dir)                              \
 	libtracker-common                              \
 	libtracker-sparql                              \
 	$(libtrackerfts_dir)                           \
@@ -19,11 +16,10 @@ SUBDIRS =                                              \
 	libtracker-extract                             \
 	libtracker-miner                               \
 	libtracker-control                             \
+	tracker                                        \
 	miners                                         \
 	plugins                                        \
-	tracker-store                                  \
-	tracker-control                                \
-	tracker-utils
+	tracker-store
 
 if HAVE_TRACKER_EXTRACT
 SUBDIRS += tracker-extract

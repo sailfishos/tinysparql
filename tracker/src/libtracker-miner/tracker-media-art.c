@@ -96,16 +96,16 @@ on_query_finished (GObject      *source_object,
 		/* The get_path API does stripping itself */
 		media_art_get_path (artist,
 		                    album,
-		                    "album", NULL,
-		                    &target, NULL);
+		                    "album",
+		                    &target);
 
 		g_hash_table_replace (table, target, target);
 
 		/* Also add the file to which the symlinks are made */
 		media_art_get_path (NULL,
 		                    album,
-		                    "album", NULL,
-		                    &album_path, NULL);
+		                    "album",
+		                    &album_path);
 
 
 		g_hash_table_replace (table, album_path, album_path);
@@ -159,6 +159,7 @@ on_error:
 	}
 #endif /* HAVE_LIBMEDIAART */
 }
+
 /**
  * tracker_media_art_queue_remove:
  * @uri: URI of the file
@@ -214,9 +215,15 @@ on_timer_destroy (gpointer data)
 }
 
 /**
- * tracker_media_art_queue_execute:
+ * tracker_media_art_queue_empty:
+ * @connection: a #TrackerSparqlConnection
  *
- * Process all stored media art requests.
+ * Using @connection, find all media art associated with content in
+ * Tracker (so as not to remove media art for other processes) and
+ * remove caches for that media art.
+ *
+ * Note, this highly depends on built in support for libmediaart. If
+ * there is no support, this API does nothing.
  *
  * Since: 0.10.4
  */
@@ -224,7 +231,6 @@ void
 tracker_media_art_queue_empty (TrackerSparqlConnection *connection)
 {
 	if (had_any && timer_id == 0) {
-
 		timer_id = g_timeout_add_seconds_full (G_PRIORITY_LOW,
 		                                       1800 /* Half an hour worth of seconds*/,
 		                                       on_timer_callback,

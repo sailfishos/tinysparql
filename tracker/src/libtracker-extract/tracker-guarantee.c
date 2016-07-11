@@ -28,6 +28,8 @@
 
 #include "tracker-guarantee.h"
 
+#ifdef GUARANTEE_METADATA
+
 static gchar *
 get_title_from_file (const gchar *uri)
 {
@@ -66,6 +68,8 @@ get_date_from_file_mtime (const gchar *uri)
 	return date;
 }
 
+#endif /* GUARANTEE_METADATA */
+
 /**
  * tracker_guarantee_title_from_file:
  * @metadata: the metadata object to insert the data into
@@ -83,7 +87,7 @@ get_date_from_file_mtime (const gchar *uri)
  * (before the "." and extension of the file) as the title. If the
  * title has any "_" characters, they are also converted into spaces.
  *
- * Returns: %TRUE on success, otherwise %FALSE.
+ * Returns: %TRUE on success and content was added to @metadata, otherwise %FALSE.
  *
  * Since: 0.10
  **/
@@ -94,6 +98,9 @@ tracker_guarantee_title_from_file (TrackerSparqlBuilder  *metadata,
                                    const gchar           *uri,
                                    gchar                **p_new_value)
 {
+	gboolean success = TRUE;
+
+#ifdef GUARANTEE_METADATA
 	g_return_val_if_fail (metadata != NULL, FALSE);
 	g_return_val_if_fail (key != NULL, FALSE);
 	g_return_val_if_fail (uri != NULL, FALSE);
@@ -110,7 +117,12 @@ tracker_guarantee_title_from_file (TrackerSparqlBuilder  *metadata,
 		gchar *value;
 
 		value = get_title_from_file (uri);
-		tracker_sparql_builder_object_unvalidated (metadata, value);
+
+		if (value && value[0] != '\0') {
+			tracker_sparql_builder_object_unvalidated (metadata, value);
+		} else {
+			success = FALSE;
+		}
 
 		if (p_new_value != NULL) {
 			*p_new_value = value;
@@ -118,8 +130,20 @@ tracker_guarantee_title_from_file (TrackerSparqlBuilder  *metadata,
 			g_free (value);
 		}
 	}
+#else  /* GUARANTEE_METADATA */
+	if (current_value && *current_value != '\0') {
+		tracker_sparql_builder_predicate (metadata, key);
+		tracker_sparql_builder_object_unvalidated (metadata, current_value);
 
-	return TRUE;
+		if (p_new_value != NULL) {
+			*p_new_value = g_strdup (current_value);
+		}
+	} else {
+		success = FALSE;
+	}
+#endif /* GUARANTEE_METADATA */
+
+	return success;
 }
 
 /**
@@ -136,7 +160,7 @@ tracker_guarantee_title_from_file (TrackerSparqlBuilder  *metadata,
  * When parsing @uri, stat() is called on the file to create a
  * date based on the file's mtime.
  *
- * Returns: %TRUE on success, otherwise %FALSE.
+ * Returns: %TRUE on success and content was added to @metadata, otherwise %FALSE.
  *
  * Since: 0.10
  **/
@@ -146,6 +170,9 @@ tracker_guarantee_date_from_file_mtime (TrackerSparqlBuilder *metadata,
                                         const gchar          *current_value,
                                         const gchar          *uri)
 {
+	gboolean success = TRUE;
+
+#ifdef GUARANTEE_METADATA
 	g_return_val_if_fail (metadata != NULL, FALSE);
 	g_return_val_if_fail (key != NULL, FALSE);
 	g_return_val_if_fail (uri != NULL, FALSE);
@@ -158,9 +185,23 @@ tracker_guarantee_date_from_file_mtime (TrackerSparqlBuilder *metadata,
 		gchar *value;
 
 		value = get_date_from_file_mtime (uri);
-		tracker_sparql_builder_object_unvalidated (metadata, value);
+
+		if (value && *value != '\0') {
+			tracker_sparql_builder_object_unvalidated (metadata, value);
+		} else {
+			success = FALSE;
+		}
+
 		g_free (value);
 	}
+#else  /* GUARANTEE_METADATA */
+	if (current_value && *current_value != '\0') {
+		tracker_sparql_builder_predicate (metadata, key);
+		tracker_sparql_builder_object_unvalidated (metadata, current_value);
+	} else {
+		success = FALSE;
+	}
+#endif /* GUARANTEE_METADATA */
 
-	return TRUE;
+	return success;
 }

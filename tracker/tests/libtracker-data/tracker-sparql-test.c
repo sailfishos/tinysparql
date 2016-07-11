@@ -22,7 +22,7 @@
 #include <string.h>
 #include <locale.h>
 
-#include <glib.h>
+#include <glib/gstdio.h>
 #include <gio/gio.h>
 
 #include <libtracker-common/tracker-common.h>
@@ -105,7 +105,7 @@ const TestInfo tests[] = {
 	{ "graph/graph-2", "graph/data-2", FALSE },
 	{ "graph/graph-3", "graph/data-3", FALSE },
 	{ "graph/graph-4", "graph/data-3", FALSE },
-	{ "graph/graph-4", "graph/data-4", FALSE },
+	{ "graph/graph-5", "graph/data-4", FALSE },
 	{ "optional/q-opt-complex-1", "optional/complex-data-1", FALSE },
 	{ "optional/simple-optional-triple", "optional/simple-optional-triple", FALSE },
 	{ "regex/regex-query-001", "regex/regex-data-01", FALSE },
@@ -340,7 +340,7 @@ setup (TestInfo      *info,
 
 		g_assert_true (g_setenv ("XDG_DATA_HOME", xdg_location, TRUE));
 		g_assert_true (g_setenv ("XDG_CACHE_HOME", xdg_location, TRUE));
-		g_assert_true (g_setenv ("TRACKER_DB_ONTOLOGIES_DIR", TOP_SRCDIR "/data/ontologies/", TRUE));
+		g_assert_true (g_setenv ("TRACKER_DB_ONTOLOGIES_DIR", TOP_SRCDIR "/src/ontologies/", TRUE));
 	}
 }
 

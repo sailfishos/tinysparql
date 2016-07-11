@@ -3,7 +3,7 @@ Name:       tracker
 %define enable_demo 0
 
 Summary:    An object database, tag/metadata database, search tool and indexer
-Version:    1.1.4
+Version:    1.4.3
 Release:    1
 Group:      Data Management/Content Framework
 License:    GPLv2+
@@ -14,7 +14,7 @@ Source2:    tracker-store.service
 Source3:    tracker-miner-fs.service
 Source4:    tracker-extract.service
 Source5:    tracker-configs.sh
-Requires:   libmediaart >= 0.5.0
+Requires:   libmediaart
 Requires:   unzip
 Requires:   systemd
 Requires:   systemd-user-session-targets
@@ -22,7 +22,7 @@ Requires:   qt5-plugin-platform-minimal
 Requires(post): /sbin/ldconfig
 Requires(post):  oneshot
 Requires(postun): /sbin/ldconfig
-BuildRequires:  pkgconfig(libmediaart-1.0) >= 0.3.0
+BuildRequires:  pkgconfig(libmediaart-2.0)
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
 BuildRequires:  pkgconfig(enca)
 BuildRequires:  pkgconfig(exempi-2.0)
@@ -102,14 +102,6 @@ Requires:   %{name} = %{version}-%{release}
 
 %description utils
 Tracker command line applications to lookup data
-Included utilities for Tracker are as follows
- tracker-import      Import TTL files.
- tracker-info        Display all information known about an entity.
- tracker-search      Search for entites (files, folders, videos, etc)
- tracker-sparql      Run a SPARQL query against the databases.
- tracker-stats       Get statistics on how many entities are indexed.
- tracker-tag         Add, remove, list tags for entities.
-
 
 %package devel
 Summary:    Development files for %{name}
@@ -151,7 +143,8 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --enable-generic-media-extractor=libav \
     --disable-enca \
     --disable-journal \
-    --enable-libgif
+    --enable-libgif \
+    --disable-cfg-man-pages
 
 make %{?jobs:-j%jobs}
 
@@ -220,16 +213,15 @@ cd /usr/share/tracker-tests/
 %defattr(-, root, root, -)
 %{_bindir}/tracker-control
 %{_datadir}/dbus-1/services/*
+%{_datadir}/tracker/miners/*
 %{_datadir}/man/man1/*
 %{_datadir}/tracker/*.xml
-%{_datadir}/tracker/languages/*
-%{_datadir}/tracker/miners/*
+%{_datadir}/tracker/stop-words/*
 %{_datadir}/tracker/ontologies/*
 %{_datadir}/vala/vapi/*
 %{_datadir}/tracker/extract-rules/*
 %dir %{_datadir}/tracker
-%dir %{_datadir}/tracker/languages
-%dir %{_datadir}/tracker/miners
+%dir %{_datadir}/tracker/stop-words
 %dir %{_datadir}/tracker/ontologies
 %dir %{_datadir}/tracker/extract-rules
 %dir %{_datadir}/vala
@@ -268,13 +260,14 @@ cd /usr/share/tracker-tests/
 
 %files utils
 %defattr(-,root,root,-)
+%{_bindir}/tracker
 %{_bindir}/tracker-import
 %{_bindir}/tracker-info
 %{_bindir}/tracker-search
 %{_bindir}/tracker-sparql
 %{_bindir}/tracker-stats
 %{_bindir}/tracker-tag
-
+%{_datadir}/bash-completion/completions/tracker
 
 %files devel
 %defattr(-,root,root,-)

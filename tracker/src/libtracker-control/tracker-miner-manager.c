@@ -40,10 +40,10 @@
 
 #define TRACKER_MINER_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TRACKER_TYPE_MINER_MANAGER, TrackerMinerManagerPrivate))
 
-#define DESKTOP_ENTRY_GROUP "Desktop Entry"
-#define DBUS_NAME_KEY "DBusName"
-#define DBUS_PATH_KEY "DBusPath"
-#define DISPLAY_NAME_KEY "Name"
+#define DESKTOP_ENTRY_GROUP "D-BUS Service"
+#define DBUS_NAME_KEY "Name"
+#define DBUS_PATH_KEY "Path"
+#define DISPLAY_NAME_KEY "DisplayName"
 #define DESCRIPTION_KEY "Comment"
 
 typedef struct TrackerMinerManagerPrivate TrackerMinerManagerPrivate;
@@ -759,9 +759,9 @@ check_file (GFile    *file,
 
 	data = g_slice_new0 (MinerData);
 	data->dbus_path = dbus_path;
-	data->dbus_name = dbus_name;
+	data->dbus_name = dbus_name;        /* In .service file as Name */
 	data->display_name = display_name;
-	data->description = description;
+	data->description = description;    /* In .desktop file as _comment */
 
 	priv->miners = g_list_prepend (priv->miners, data);
 
@@ -829,7 +829,7 @@ initialize_miners_data (TrackerMinerManager *manager)
 	}
 
 	file = g_file_new_for_path (miners_dir);
-	directory_foreach (file, ".desktop", (GFunc) check_file, manager);
+	directory_foreach (file, ".service", (GFunc) check_file, manager);
 	g_object_unref (file);
 }
 
@@ -1578,7 +1578,7 @@ miner_manager_index_file_sync (TrackerMinerManager *manager,
 
 	g_variant_unref (v);
 
-	return FALSE;
+	return TRUE;
 }
 
 static void
@@ -1605,7 +1605,7 @@ miner_manager_index_file_thread (GTask *task,
  * @file: a URL valid in GIO of a file to give to the miner for processing
  * @error: (out callee-allocates) (transfer full) (allow-none): return location for errors
  *
- * Tells the filesystem miner to index the @file.
+ * Tells the filesystem miner to start indexing the @file.
  *
  * On failure @error will be set.
  *
@@ -1632,9 +1632,9 @@ tracker_miner_manager_index_file (TrackerMinerManager  *manager,
  * @callback: (scope async): a #GAsyncReadyCallback to call when the request is satisfied
  * @user_data: the data to pass to the callback function
  *
- * Tells the filesystem miner to index the @file. When the operation is called,
+ * Tells the filesystem miner to start indexing the @file. Once the message has been sent,
  * @callback will be called. You can then call tracker_miner_manager_index_file_finish()
- * to get the result of the operation.
+ * to get the result.
  *
  * Since: 0.16
  **/

@@ -22,23 +22,17 @@
 #include <string.h>
 #include <stdlib.h>
 #include <locale.h>
-#include <signal.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 #include <glib.h>
+#include <glib-unix.h>
 #include <glib-object.h>
 #include <glib/gi18n.h>
 
-#include <libtracker-common/tracker-dbus.h>
-#include <libtracker-common/tracker-ioprio.h>
-#include <libtracker-common/tracker-log.h>
-#include <libtracker-common/tracker-ontologies.h>
-#include <libtracker-common/tracker-file-utils.h>
-#include <libtracker-common/tracker-sched.h>
-#include <libtracker-common/tracker-enums.h>
-
+#include <libtracker-common/tracker-common.h>
+#include <libtracker-sparql/tracker-sparql.h>
 #include <libtracker-miner/tracker-miner.h>
 
 #include <libtracker-data/tracker-db-manager.h>
@@ -195,9 +189,11 @@ sanity_check_option_values (TrackerConfig *config)
 	}
 }
 
-static void
-signal_handler (int signo)
+static gboolean
+signal_handler (gpointer user_data)
 {
+	int signo = GPOINTER_TO_INT (user_data);
+
 	static gboolean in_loop = FALSE;
 
 	/* Die if we get re-entrant signals handler calls */
@@ -209,11 +205,8 @@ signal_handler (int signo)
 	case SIGTERM:
 	case SIGINT:
 		in_loop = TRUE;
-		if (main_loop != NULL) {
-			g_main_loop_quit (main_loop);
-		} else {
-			exit (0);
-		}
+		g_main_loop_quit (main_loop);
+
 		/* Fall through */
 	default:
 		if (g_strsignal (signo)) {
@@ -224,23 +217,16 @@ signal_handler (int signo)
 		}
 		break;
 	}
+
+	return G_SOURCE_CONTINUE;
 }
 
 static void
 initialize_signal_handler (void)
 {
 #ifndef G_OS_WIN32
-	struct sigaction act;
-	sigset_t         empty_mask;
-
-	sigemptyset (&empty_mask);
-	act.sa_handler = signal_handler;
-	act.sa_mask    = empty_mask;
-	act.sa_flags   = 0;
-
-	sigaction (SIGTERM, &act, NULL);
-	sigaction (SIGINT,  &act, NULL);
-	sigaction (SIGHUP,  &act, NULL);
+	g_unix_signal_add (SIGTERM, signal_handler, GINT_TO_POINTER (SIGTERM));
+	g_unix_signal_add (SIGINT, signal_handler, GINT_TO_POINTER (SIGINT));
 #endif /* G_OS_WIN32 */
 }
 
@@ -452,10 +438,10 @@ miner_finished_cb (TrackerMinerFS *fs,
                    guint           total_files_ignored,
                    gpointer        user_data)
 {
-	tracker_info ("Finished mining in seconds:%f, total directories:%d, total files:%d",
-	              seconds_elapsed,
-	              total_directories_found,
-	              total_files_found);
+	g_info ("Finished mining in seconds:%f, total directories:%d, total files:%d",
+	        seconds_elapsed,
+	        total_directories_found,
+	        total_files_found);
 
 	if (TRACKER_IS_MINER_FILES (fs) &&
 	    tracker_miner_fs_get_initial_crawling (fs)) {

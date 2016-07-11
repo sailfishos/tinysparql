@@ -24,14 +24,14 @@
 #include <time.h>
 #include <stdlib.h>
 #include <locale.h>
-#include <signal.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <glib.h>
 #include <glib-object.h>
+#include <glib-unix.h>
 #include <glib/gi18n.h>
+#include <glib/gprintf.h>
 #include <gio/gio.h>
 
 #ifndef G_OS_WIN32
@@ -42,12 +42,7 @@
 #include <libmediaart/mediaart.h>
 #endif
 
-#include <libtracker-common/tracker-log.h>
-#include <libtracker-common/tracker-dbus.h>
-#include <libtracker-common/tracker-os-dependant.h>
-#include <libtracker-common/tracker-ioprio.h>
-#include <libtracker-common/tracker-locale.h>
-#include <libtracker-common/tracker-sched.h>
+#include <libtracker-common/tracker-common.h>
 
 #include <libtracker-data/tracker-db-manager.h>
 
@@ -155,9 +150,11 @@ initialize_directories (void)
 	g_free (user_data_dir);
 }
 
-static void
-signal_handler (int signo)
+static gboolean
+signal_handler (gpointer user_data)
 {
+	int signo = GPOINTER_TO_INT (user_data);
+
 	static gboolean in_loop = FALSE;
 
 	/* Die if we get re-entrant signals handler calls */
@@ -181,23 +178,16 @@ signal_handler (int signo)
 		}
 		break;
 	}
+
+	return G_SOURCE_CONTINUE;
 }
 
 static void
 initialize_signal_handler (void)
 {
 #ifndef G_OS_WIN32
-	struct sigaction act;
-	sigset_t         empty_mask;
-
-	sigemptyset (&empty_mask);
-	act.sa_handler = signal_handler;
-	act.sa_mask    = empty_mask;
-	act.sa_flags   = 0;
-
-	sigaction (SIGTERM, &act, NULL);
-	sigaction (SIGINT,  &act, NULL);
-	sigaction (SIGHUP,  &act, NULL);
+	g_unix_signal_add (SIGTERM, signal_handler, GINT_TO_POINTER (SIGTERM));
+	g_unix_signal_add (SIGINT, signal_handler, GINT_TO_POINTER (SIGINT));
 #endif /* G_OS_WIN32 */
 }
 
@@ -277,8 +267,6 @@ run_standalone (TrackerConfig *config)
 		tracker_locale_shutdown ();
 		return EXIT_FAILURE;
 	}
-
-	tracker_memory_setrlimits ();
 
 	tracker_extract_get_metadata_by_cmdline (object, uri, mime_type);
 
@@ -364,7 +352,6 @@ main (int argc, char *argv[])
 	/* This makes sure we don't steal all the system's resources */
 	initialize_priority_and_scheduling (tracker_config_get_sched_idle (config),
 	                                    tracker_db_manager_get_first_index_done () == FALSE);
-	tracker_memory_setrlimits ();
 
 	extract = tracker_extract_new (TRUE, force_module);
 
@@ -393,10 +380,11 @@ main (int argc, char *argv[])
 	controller = tracker_extract_controller_new (decorator);
 	tracker_miner_start (TRACKER_MINER (decorator));
 
-	initialize_signal_handler ();
-
 	/* Main loop */
 	main_loop = g_main_loop_new (NULL, FALSE);
+
+	initialize_signal_handler ();
+
 	g_main_loop_run (main_loop);
 
 	my_main_loop = main_loop;

@@ -19,8 +19,9 @@
 
 #include "config.h"
 
+#include <libtracker-sparql/tracker-sparql.h>
 #include <libtracker-extract/tracker-extract.h>
-#include <libtracker-common/tracker-ontologies.h>
+
 #include "tracker-extract-decorator.h"
 #include "tracker-extract-persistence.h"
 #include "tracker-extract-priority-dbus.h"
@@ -29,8 +30,8 @@ enum {
 	PROP_EXTRACTOR = 1
 };
 
-#define TRACKER_EXTRACT_DATA_SOURCE TRACKER_TRACKER_PREFIX "extractor-data-source"
-#define TRACKER_EXTRACT_FAILURE_DATA_SOURCE TRACKER_TRACKER_PREFIX "extractor-failure-data-source"
+#define TRACKER_EXTRACT_DATA_SOURCE TRACKER_PREFIX_TRACKER "extractor-data-source"
+#define TRACKER_EXTRACT_FAILURE_DATA_SOURCE TRACKER_PREFIX_TRACKER "extractor-failure-data-source"
 #define MAX_EXTRACTING_FILES 1
 
 #define TRACKER_EXTRACT_DECORATOR_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TRACKER_TYPE_EXTRACT_DECORATOR, TrackerExtractDecoratorPrivate))
@@ -72,6 +73,7 @@ static const gchar *supported_classes[] = {
 	"nfo:Image",
 	"nfo:Video",
 	"nfo:FilesystemImage",
+	"nmm:Playlist",
 	NULL
 };
 
@@ -151,7 +153,7 @@ decorator_save_info (TrackerSparqlBuilder    *sparql,
 	urn = tracker_decorator_info_get_urn (decorator_info);
 
 	tracker_sparql_builder_insert_open (sparql, NULL);
-	tracker_sparql_builder_graph_open (sparql, TRACKER_MINER_FS_GRAPH_URN);
+	tracker_sparql_builder_graph_open (sparql, TRACKER_OWN_GRAPH_URN);
 
 	/* Set tracker-extract data source */
 	tracker_sparql_builder_subject_iri (sparql, urn);
@@ -214,7 +216,13 @@ get_metadata_cb (TrackerExtract *extract,
 		GError *error = NULL;
 
 		g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result), &error);
-		g_task_return_error (task, error);
+
+		if (!error || error->domain == TRACKER_EXTRACT_ERROR) {
+			g_message ("Extraction failed: %s\n", error->message);
+			g_task_return_boolean (task, FALSE);
+		} else {
+			g_task_return_error (task, error);
+		}
 	} else {
 		decorator_save_info (g_task_get_task_data (task),
 		                     TRACKER_EXTRACT_DECORATOR (data->decorator),
@@ -297,7 +305,7 @@ decorator_next_item_cb (TrackerDecorator *decorator,
 	tracker_extract_file (priv->extractor,
 	                      tracker_decorator_info_get_url (info),
 	                      tracker_decorator_info_get_mimetype (info),
-	                      TRACKER_MINER_FS_GRAPH_URN,
+	                      TRACKER_OWN_GRAPH_URN,
 	                      g_task_get_cancellable (task),
 	                      (GAsyncReadyCallback) get_metadata_cb, data);
 }
@@ -594,7 +602,7 @@ decorator_ignore_file (GFile    *file,
 	g_message ("Extraction on file '%s' has been attempted too many times, ignoring", uri);
 
 	conn = tracker_miner_get_connection (TRACKER_MINER (decorator));
-	query = g_strdup_printf ("INSERT { GRAPH <" TRACKER_MINER_FS_GRAPH_URN "> {"
+	query = g_strdup_printf ("INSERT { GRAPH <" TRACKER_OWN_GRAPH_URN "> {"
 	                         "  ?urn nie:dataSource <" TRACKER_EXTRACT_DATA_SOURCE ">;"
 	                         "       nie:dataSource <" TRACKER_EXTRACT_FAILURE_DATA_SOURCE ">."
 	                         "} WHERE {"
@@ -619,9 +627,6 @@ tracker_extract_decorator_init (TrackerExtractDecorator *decorator)
 	TrackerExtractDecoratorPrivate *priv;
 
 	decorator->priv = priv = TRACKER_EXTRACT_DECORATOR_GET_PRIVATE (decorator);
-	priv->persistence = tracker_extract_persistence_initialize (decorator_retry_file,
-	                                                            decorator_ignore_file,
-	                                                            decorator);
 	priv->recovery_files = g_hash_table_new_full (g_str_hash, g_str_equal,
 	                                              (GDestroyNotify) g_free,
 	                                              (GDestroyNotify) g_object_unref);
@@ -677,6 +682,9 @@ tracker_extract_decorator_initable_init (GInitable     *initable,
 		ret = FALSE;
 	}
 
+	priv->persistence = tracker_extract_persistence_initialize (decorator_retry_file,
+	                                                            decorator_ignore_file,
+	                                                            decorator);
 out:
 	g_clear_object (&conn);
 

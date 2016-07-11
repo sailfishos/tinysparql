@@ -435,6 +435,17 @@ static gint spf_table[6] = {
 	48, 144, 144, 48, 144,  72
 };
 
+#ifndef HAVE_STRNLEN
+
+size_t
+strnlen (const char *str, size_t max)
+{
+	const char *end = memchr (str, 0, max);
+	return end ? (size_t)(end - str) : max;
+}
+
+#endif /* HAVE_STRNLEN */
+
 static void
 id3tag_free (id3tag *tags)
 {
@@ -2664,6 +2675,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			                                    md.media_art_mime,
 			                                    md.performer,
 			                                    md.album,
+			                                    NULL,
 			                                    &error);
 		} else {
 			success = media_art_process_file (media_art_process,
@@ -2672,6 +2684,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			                                  file,
 			                                  md.performer,
 			                                  md.album,
+			                                  NULL,
 			                                  &error);
 		}
 

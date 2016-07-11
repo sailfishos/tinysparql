@@ -143,6 +143,11 @@ tracker_extract_info_unref (TrackerExtractInfo *info)
 		g_object_unref (info->metadata);
 		g_free (info->where_clause);
 
+#ifdef HAVE_LIBMEDIAART
+		if (info->media_art_process)
+			g_object_unref (info->media_art_process);
+#endif
+
 		g_slice_free (TrackerExtractInfo, info);
 	}
 }

@@ -28,13 +28,14 @@
 
 #include <libtracker-common/tracker-date-time.h>
 #include <libtracker-common/tracker-locale.h>
+#include <libtracker-common/tracker-parser.h>
 
 #include <libtracker-sparql/tracker-sparql.h>
 
 #if HAVE_TRACKER_FTS
 #include <libtracker-fts/tracker-fts.h>
-#include <libtracker-fts/tracker-parser.h>
 #endif
+
 
 #ifdef HAVE_LIBUNISTRING
 /* libunistring versions prior to 9.1.2 need this hack */
@@ -559,7 +560,11 @@ function_sparql_regex (sqlite3_context *context,
 		sqlite3_set_auxdata (context, 1, regex, (void (*) (void*)) g_regex_unref);
 	}
 
-	ret = g_regex_match (regex, text, 0, NULL);
+	if (text != NULL) {
+		ret = g_regex_match (regex, text, 0, NULL);
+	} else {
+		ret = FALSE;
+	}
 
 	sqlite3_result_int (context, ret);
 }
@@ -926,21 +931,11 @@ check_interrupt (void *user_data)
 }
 
 static void
-tracker_locale_notify_cb (TrackerLocaleID id,
-                          gpointer        user_data)
-{
-	TrackerDBInterface *db_interface = user_data;
-
-	/* Request a collator reset. Use thread-safe methods as this function will get
-	 * called from the main thread */
-	g_atomic_int_compare_and_exchange (&(db_interface->collator_reset_requested), FALSE, TRUE);
-}
-
-static void
 open_database (TrackerDBInterface  *db_interface,
                GError             **error)
 {
 	int mode;
+	int result;
 
 	g_assert (db_interface->filename != NULL);
 
@@ -950,11 +945,15 @@ open_database (TrackerDBInterface  *db_interface,
 		mode = SQLITE_OPEN_READONLY;
 	}
 
-	if (sqlite3_open_v2 (db_interface->filename, &db_interface->db, mode | SQLITE_OPEN_NOMUTEX, NULL) != SQLITE_OK) {
+	result = sqlite3_open_v2 (db_interface->filename, &db_interface->db, mode | SQLITE_OPEN_NOMUTEX, NULL);
+	if (result != SQLITE_OK) {
+		const gchar *str;
+
+		str = sqlite3_errstr (result);
 		g_set_error (error,
 		             TRACKER_DB_INTERFACE_ERROR,
 		             TRACKER_DB_OPEN_ERROR,
-		             "Could not open sqlite3 database:'%s'", db_interface->filename);
+		             "Could not open sqlite3 database:'%s': %s", db_interface->filename, str);
 		return;
 	} else {
 		g_message ("Opened sqlite3 database:'%s'", db_interface->filename);
@@ -962,11 +961,6 @@ open_database (TrackerDBInterface  *db_interface,
 
 	/* Set our unicode collation function */
 	tracker_db_interface_sqlite_reset_collator (db_interface);
-	/* And register for updates on locale changes */
-	db_interface->locale_notification_id = tracker_locale_notify_add (TRACKER_LOCALE_COLLATE,
-	                                                                  tracker_locale_notify_cb,
-	                                                                  db_interface,
-	                                                                  NULL);
 
 	sqlite3_progress_handler (db_interface->db, 100,
 	                          check_interrupt, db_interface);
@@ -1216,8 +1210,17 @@ tracker_db_interface_sqlite_fts_update_text (TrackerDBInterface  *db_interface,
 							      TRACKER_DB_STATEMENT_CACHE_TYPE_UPDATE,
 							      &error,
 							      "DELETE FROM fts WHERE docid=?");
-		tracker_db_statement_bind_int (stmt, 0, id);
 
+		if (!stmt || error) {
+			if (error) {
+				g_warning ("Could not create FTS update statement: %s",
+				           error->message);
+				g_error_free (error);
+			}
+			return FALSE;
+		}
+
+		tracker_db_statement_bind_int (stmt, 0, id);
 		tracker_db_statement_execute (stmt, &error);
 		g_object_unref (stmt);
 
@@ -1338,10 +1341,6 @@ tracker_db_interface_sqlite_finalize (GObject *object)
 
 	db_interface = TRACKER_DB_INTERFACE (object);
 
-#if HAVE_TRACKER_FTS
-	tracker_fts_shutdown_db (db_interface->db);
-#endif
-
 	close_database (db_interface);
 	g_free (db_interface->fts_insert_str);
 
@@ -1349,10 +1348,6 @@ tracker_db_interface_sqlite_finalize (GObject *object)
 
 	g_free (db_interface->filename);
 	g_free (db_interface->busy_status);
-
-	if (db_interface->locale_notification_id) {
-		tracker_locale_notify_remove (db_interface->locale_notification_id);
-	}
 
 	G_OBJECT_CLASS (tracker_db_interface_parent_class)->finalize (object);
 }
@@ -2338,6 +2333,7 @@ void
 tracker_db_statement_execute (TrackerDBStatement  *stmt,
                               GError             **error)
 {
+	g_return_if_fail (TRACKER_IS_DB_STATEMENT (stmt));
 	g_return_if_fail (!stmt->stmt_is_sunk);
 
 	execute_stmt (stmt->db_interface, stmt->stmt, NULL, error);
@@ -2347,6 +2343,7 @@ TrackerDBCursor *
 tracker_db_statement_start_cursor (TrackerDBStatement  *stmt,
                                    GError             **error)
 {
+	g_return_val_if_fail (TRACKER_IS_DB_STATEMENT (stmt), NULL);
 	g_return_val_if_fail (!stmt->stmt_is_sunk, NULL);
 
 	return tracker_db_cursor_sqlite_new (stmt->stmt, stmt, NULL, 0, NULL, 0, FALSE);
@@ -2361,6 +2358,7 @@ tracker_db_statement_start_sparql_cursor (TrackerDBStatement   *stmt,
                                           gboolean              threadsafe,
                                           GError              **error)
 {
+	g_return_val_if_fail (TRACKER_IS_DB_STATEMENT (stmt), NULL);
 	g_return_val_if_fail (!stmt->stmt_is_sunk, NULL);
 
 	return tracker_db_cursor_sqlite_new (stmt->stmt, stmt, types, n_types, variable_names, n_variable_names, threadsafe);
