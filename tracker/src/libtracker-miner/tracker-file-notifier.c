@@ -280,35 +280,18 @@ file_notifier_traverse_tree_foreach (GFile    *file,
 	priv = notifier->priv;
 	current_root = priv->current_index_root->current_dir;
 
-	store_mtime = tracker_file_system_get_property (priv->file_system, file,
-	                                                quark_property_store_mtime);
-	disk_mtime = tracker_file_system_get_property (priv->file_system, file,
-	                                               quark_property_filesystem_mtime);
-	file_type = tracker_file_system_get_file_type (priv->file_system, file);
-
-	if (file_type == G_FILE_TYPE_DIRECTORY &&
-	    store_mtime && disk_mtime && *disk_mtime != *store_mtime) {
-		/* A directory has updated its mtime, this means something
-		 * was either added or removed in the mean time. Crawling
-		 * will always find all newly added files. But still, we
-		 * must check the contents in the store to handle contents
-		 * having been deleted in the directory.
-		 * Do not do this if the directory is pending, because in
-		 * that case its contents are not in the crawler results.
-		 * The directory will get its turn when it is the current root.
-		 */
-		if (file == current_root ||
-		    g_queue_find(priv->current_index_root->pending_dirs, file) == NULL)
-			g_ptr_array_add (priv->current_index_root->updated_dirs, file);
-	}
-
 	/* If we're crawling over a subdirectory of a root index, it's been
 	 * already notified in the crawling op that made it processed, so avoid
-	 * notifying again.
+	 * it here again.
 	 */
 	if (current_root == file &&
 	    current_root != priv->current_index_root->root)
 		return FALSE;
+
+	store_mtime = tracker_file_system_get_property (priv->file_system, file,
+	                                                quark_property_store_mtime);
+	disk_mtime = tracker_file_system_get_property (priv->file_system, file,
+	                                               quark_property_filesystem_mtime);
 
 	if (store_mtime && !disk_mtime) {
 		/* In store but not in disk, delete */

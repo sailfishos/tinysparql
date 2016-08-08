@@ -3,7 +3,7 @@ Name:       tracker
 %define enable_demo 0
 
 Summary:    An object database, tag/metadata database, search tool and indexer
-Version:    1.4.3
+Version:    1.8.0
 Release:    1
 Group:      Data Management/Content Framework
 License:    GPLv2+
@@ -26,7 +26,7 @@ BuildRequires:  pkgconfig(libmediaart-2.0)
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
 BuildRequires:  pkgconfig(enca)
 BuildRequires:  pkgconfig(exempi-2.0)
-BuildRequires:  pkgconfig(gconf-2.0)
+BuildRequires:  pkgconfig(dconf)
 BuildRequires:  pkgconfig(gee-0.8)
 BuildRequires:  pkgconfig(glib-2.0) >= 2.38.0
 BuildRequires:  pkgconfig(gmime-2.6)
@@ -39,7 +39,7 @@ BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(ossp-uuid)
 BuildRequires:  pkgconfig(poppler-glib)
-BuildRequires:  pkgconfig(sqlite3) >= 3.7
+BuildRequires:  pkgconfig(sqlite3) >= 3.11
 BuildRequires:  pkgconfig(taglib)
 BuildRequires:  pkgconfig(totem-plparser)
 BuildRequires:  pkgconfig(uuid)
@@ -124,21 +124,20 @@ chmod +x tests/functional-tests/create-tests-xml.py
 
 %configure --disable-static \
     --with-compile-warnings=no \
-    --disable-gtk-doc \
     --disable-tracker-preferences \
-    --disable-tracker-search-bar \
-    --disable-tracker-explorer \
+	--disable-tracker-needle \
     --enable-unit-tests \
     --enable-functional-tests \
     --disable-miner-evolution \
-    --disable-miner-flickr \
+    --disable-miner-firefox \
+    --disable-miner-thunderbird \
     --disable-miner-rss \
+    --disable-miner-user-guides \
+    --disable-miner-apps \
     --enable-maemo --enable-nemo \
     --enable-guarantee-metadata \
     --with-unicode-support=libicu \
-    --disable-tracker-needle \
     --enable-libvorbis \
-    --disable-tracker-fts \
     --enable-qt \
     --enable-generic-media-extractor=libav \
     --disable-enca \
@@ -211,7 +210,6 @@ cd /usr/share/tracker-tests/
 %files -f %{name}.lang
 %defattr(-,root,root,-)
 %defattr(-, root, root, -)
-%{_bindir}/tracker-control
 %{_datadir}/dbus-1/services/*
 %{_datadir}/tracker/miners/*
 %{_datadir}/man/man1/*
@@ -240,8 +238,6 @@ cd /usr/share/tracker-tests/
 %{_libexecdir}/tracker-miner-fs
 %{_libexecdir}/tracker-store
 %{_libexecdir}/tracker-writeback
-%{_libexecdir}/tracker-miner-apps
-%{_libexecdir}/tracker-miner-user-guides
 %exclude %{_sysconfdir}/xdg/autostart/*.desktop
 %{_libdir}/systemd/user/tracker-miner-fs.service
 %{_libdir}/systemd/user/tracker-store.service
@@ -261,12 +257,6 @@ cd /usr/share/tracker-tests/
 %files utils
 %defattr(-,root,root,-)
 %{_bindir}/tracker
-%{_bindir}/tracker-import
-%{_bindir}/tracker-info
-%{_bindir}/tracker-search
-%{_bindir}/tracker-sparql
-%{_bindir}/tracker-stats
-%{_bindir}/tracker-tag
 %{_datadir}/bash-completion/completions/tracker
 
 %files devel

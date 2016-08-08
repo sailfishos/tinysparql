@@ -2691,7 +2691,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	parsed = mp3_parse (buffer, buffer_size, audio_offset, uri, metadata, &md);
 
 #ifdef HAVE_LIBMEDIAART
-	if (parsed && (md.performer || md.album)) {
+	if (parsed && (md.performer && md.album)) {
 		MediaArtProcess *media_art_process;
 		GError *error = NULL;
 		gboolean success = TRUE;

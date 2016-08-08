@@ -12,3 +12,4 @@ gsettings set org.freedesktop.Tracker.Miner.Files index-single-directories "['$H
 gsettings set org.freedesktop.Tracker.Miner.Files index-recursive-directories "['&DESKTOP', '&DOCUMENTS', '&DOWNLOAD', '&MUSIC', '&PICTURES', '&VIDEOS', '$HOME/android_storage/DCIM', '$HOME/android_storage/Download', '$HOME/android_storage/Pictures', '$HOME/android_storage/Podcasts', '$HOME/android_storage/Music']"
 gsettings set org.freedesktop.Tracker.Miner.Files ignored-directories-with-content "[ 'backup.metadata', '.nomedia' ]"
 gsettings set org.freedesktop.Tracker.Miner.Files ignored-directories "[ 'po', 'CVS', 'core-dumps', 'lost+found', '$HOME/android_storage/Android' ]"
+tracker reset --soft

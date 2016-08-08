@@ -3,7 +3,7 @@ Name:       tracker
 %define enable_demo 0
 
 Summary:    An object database, tag/metadata database, search tool and indexer
-Version:    1.1.4
+Version:    1.8.0
 Release:    1
 Group:      Data Management/Content Framework
 License:    GPLv2+
@@ -14,8 +14,8 @@ Source2:    tracker-store.service
 Source3:    tracker-miner-fs.service
 Source4:    tracker-extract.service
 Source5:    tracker-configs.sh
-Requires:   libmediaart >= 0.5.0
-Requires:   gst-plugins-base >= 0.10
+Requires:   libmediaart
+Requires:   gstreamer1.0-plugins-base >= 1.0
 Requires:   unzip
 Requires:   systemd
 Requires:   systemd-user-session-targets
@@ -23,16 +23,16 @@ Requires:   qt5-plugin-platform-minimal
 Requires(post): /sbin/ldconfig
 Requires(post):  oneshot
 Requires(postun): /sbin/ldconfig
-BuildRequires:  pkgconfig(libmediaart-1.0) >= 0.3.0
+BuildRequires:  pkgconfig(libmediaart-2.0)
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
 BuildRequires:  pkgconfig(enca)
 BuildRequires:  pkgconfig(exempi-2.0)
-BuildRequires:  pkgconfig(gconf-2.0)
+BuildRequires:  pkgconfig(dconf)
 BuildRequires:  pkgconfig(gee-0.8)
 BuildRequires:  pkgconfig(glib-2.0) >= 2.38.0
 BuildRequires:  pkgconfig(gmime-2.6)
-BuildRequires:  pkgconfig(gstreamer-0.10)
-BuildRequires:  pkgconfig(gstreamer-plugins-base-0.10)
+BuildRequires:  pkgconfig(gstreamer-1.0)
+BuildRequires:  pkgconfig(gstreamer-plugins-base-1.0)
 BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  pkgconfig(id3tag)
 BuildRequires:  pkgconfig(libexif)
@@ -42,15 +42,18 @@ BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(ossp-uuid)
 BuildRequires:  pkgconfig(poppler-glib)
-BuildRequires:  pkgconfig(sqlite3) >= 3.7
+BuildRequires:  pkgconfig(sqlite3) >= 3.11
 BuildRequires:  pkgconfig(taglib)
 BuildRequires:  pkgconfig(totem-plparser)
 BuildRequires:  pkgconfig(uuid)
 #BuildRequires:  pkgconfig(libvala-0.16)
 BuildRequires:  pkgconfig(vorbis)
+BuildRequires:  pkgconfig(flac)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  gettext
+BuildRequires:  libtool
+BuildRequires:  vala-devel >= 0.16
 BuildRequires:  giflib-devel
 BuildRequires:  intltool
 BuildRequires:  libjpeg-devel
@@ -60,8 +63,6 @@ BuildRequires:  pygobject2
 BuildRequires:  python >= 2.6
 BuildRequires:  dbus-python
 BuildRequires:  fdupes
-BuildRequires:  libtool
-BuildRequires:  vala-devel >= 0.16
 BuildRequires:  giflib-devel
 BuildRequires:  gnome-common
 BuildRequires:  oneshot
@@ -102,14 +103,6 @@ Requires:   %{name} = %{version}-%{release}
 
 %description utils
 Tracker command line applications to lookup data
-Included utilities for Tracker are as follows
- tracker-import      Import TTL files.
- tracker-info        Display all information known about an entity.
- tracker-search      Search for entites (files, folders, videos, etc)
- tracker-sparql      Run a SPARQL query against the databases.
- tracker-stats       Get statistics on how many entities are indexed.
- tracker-tag         Add, remove, list tags for entities.
-
 
 %package devel
 Summary:    Development files for %{name}
@@ -142,19 +135,21 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --disable-miner-evolution \
     --disable-miner-flickr \
     --disable-miner-rss \
+    --disable-miner-user-guides \
+    --disable-miner-apps \
     --enable-maemo --enable-nemo \
     --enable-guarantee-metadata \
     --with-unicode-support=libicu \
     --disable-tracker-needle \
     --enable-libvorbis \
-    --disable-tracker-fts \
-    --enable-qt \
+    --enable-libflac \
+    --enable-generic-media-extractor=gstreamer \
     --disable-enca \
     --disable-journal \
-    --enable-libgif
+    --enable-libgif \
+    --disable-cfg-man-pages
 
 make %{?jobs:-j%jobs}
-
 
 %install
 rm -rf %{buildroot}
@@ -165,6 +160,7 @@ cp -a %{SOURCE2} %{buildroot}%{_libdir}/systemd/user/
 mkdir -p %{buildroot}%{_libdir}/systemd/user/
 cp -a %{SOURCE3} %{buildroot}%{_libdir}/systemd/user/
 cp -a %{SOURCE4} %{buildroot}%{_libdir}/systemd/user/
+
 
 mkdir -p %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants
 ln -s ../tracker-store.service %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants/
@@ -179,7 +175,6 @@ rm -f %{buildroot}/%{_datadir}/tracker-tests/ttl/*
 # oneshot run in install
 mkdir -p %{buildroot}%{_oneshotdir}
 cp -a %{SOURCE5} %{buildroot}%{_oneshotdir}
-chmod +x %{buildroot}%{_oneshotdir}
 
 %find_lang %{name}
 
@@ -218,25 +213,17 @@ cd /usr/share/tracker-tests/
 
 %files -f %{name}.lang
 %defattr(-,root,root,-)
-%{_bindir}/tracker-control
+%defattr(-, root, root, -)
 %{_datadir}/dbus-1/services/*
+%{_datadir}/tracker/miners/*
 %{_datadir}/man/man1/*
 %{_datadir}/tracker/*.xml
-%{_datadir}/tracker/languages/*
-%{_datadir}/tracker/miners/*
+%{_datadir}/tracker/stop-words/*
 %{_datadir}/tracker/ontologies/*
 %{_datadir}/vala/vapi/*
 %{_datadir}/tracker/extract-rules/*
-%{_datadir}/glib-2.0/schemas/*.xml
-%{_libdir}/libtracker-miner-*.so*
-%{_libdir}/libtracker-sparql-*.so*
-%{_libdir}/libtracker-control-*.so*
-%{_libdir}/tracker-*/*.so*
-%{_libdir}/tracker-*/extract-modules/*.so*
-%{_libdir}/tracker-*/writeback-modules/*.so*
 %dir %{_datadir}/tracker
-%dir %{_datadir}/tracker/languages
-%dir %{_datadir}/tracker/miners
+%dir %{_datadir}/tracker/stop-words
 %dir %{_datadir}/tracker/ontologies
 %dir %{_datadir}/tracker/extract-rules
 %dir %{_datadir}/vala
@@ -244,12 +231,17 @@ cd /usr/share/tracker-tests/
 %dir %{_libdir}/tracker-*
 %dir %{_libdir}/tracker-*/extract-modules
 %dir %{_libdir}/tracker-*/writeback-modules
+%{_datadir}/glib-2.0/schemas/*.xml
+%{_libdir}/libtracker-miner-*.so*
+%{_libdir}/libtracker-sparql-*.so*
+%{_libdir}/libtracker-control-*.so*
+%{_libdir}/tracker-*/*.so*
+%{_libdir}/tracker-*/extract-modules/*.so*
+%{_libdir}/tracker-*/writeback-modules/*.so*
 %{_libexecdir}/tracker-extract
 %{_libexecdir}/tracker-miner-fs
 %{_libexecdir}/tracker-store
 %{_libexecdir}/tracker-writeback
-%{_libexecdir}/tracker-miner-apps
-%{_libexecdir}/tracker-miner-user-guides
 %exclude %{_sysconfdir}/xdg/autostart/*.desktop
 %{_libdir}/systemd/user/tracker-miner-fs.service
 %{_libdir}/systemd/user/tracker-store.service
@@ -268,13 +260,8 @@ cd /usr/share/tracker-tests/
 
 %files utils
 %defattr(-,root,root,-)
-%{_bindir}/tracker-import
-%{_bindir}/tracker-info
-%{_bindir}/tracker-search
-%{_bindir}/tracker-sparql
-%{_bindir}/tracker-stats
-%{_bindir}/tracker-tag
-
+%{_bindir}/tracker
+%{_datadir}/bash-completion/completions/tracker
 
 %files devel
 %defattr(-,root,root,-)

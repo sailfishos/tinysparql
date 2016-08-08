@@ -41,3 +41,5 @@ tmpl
 tracker-*-client.h
 tracker-*-glue.h
 tracker-preferences.[ch]
+/documentation.list
+/tracker.lang

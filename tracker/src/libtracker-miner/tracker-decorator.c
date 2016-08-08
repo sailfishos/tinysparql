@@ -645,7 +645,6 @@ query_add_id_filter (GString  *query,
 
 		g_string_append_printf (query, "%d",
 		                        g_array_index (ids, gint, i));
->>>>>>> 6026614f181963aed661e887e6cb74fd5b9ae2e4
 	}
 
 	g_string_append (query, ")");

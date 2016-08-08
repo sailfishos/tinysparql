@@ -51,5 +51,5 @@ EXTRA_DIST +=                                          \
 	version.xml.in                                 \
 	$(ONTOLOGY_EXPLANATIONS)
 
-CLEANFILES +=                                          \
+CLEANFILES =                                          \
 	gen-doc.stamp

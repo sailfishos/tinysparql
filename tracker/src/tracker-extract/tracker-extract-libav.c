@@ -340,7 +340,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 		}
 
 #ifdef HAVE_LIBMEDIAART
-		if (album_artist || album_title) {
+		if (album_artist && album_title) {
 			MediaArtProcess *media_art_process;
 			GError *error = NULL;
 			gboolean success;
@@ -393,10 +393,6 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 
 	if ((tag = av_dict_get (format->metadata, "genre", NULL, 0))) {
 		set_value_string (metadata, "nfo:genre", tag->value);
-	}
-
-	if ((tag = av_dict_get (format->metadata, "language", NULL, 0))) {
-		set_value_string (metadata, "nfo:language", tag->value);
 	}
 
 	if ((tag = av_dict_get (format->metadata, "title", NULL, 0))) {
