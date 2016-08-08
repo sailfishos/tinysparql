@@ -4,10 +4,10 @@
 # Alexander Shopov <ash@kambanaria.org>, 2015.
 msgid ""
 msgstr ""
-"Project-Id-Version: tracker tracker-1.4\n"
+"Project-Id-Version: tracker master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-09 10:51+0300\n"
-"PO-Revision-Date: 2015-05-09 10:51+0300\n"
+"POT-Creation-Date: 2015-05-09 10:52+0300\n"
+"PO-Revision-Date: 2015-05-09 10:52+0300\n"
 "Last-Translator: Alexander Shopov <ash@kambanaria.org>\n"
 "Language-Team: Bulgarian <dict@fsa-bg.org>\n"
 "Language: bg\n"
@@ -190,8 +190,8 @@ msgstr "Грешка при стартирането на програмата �
 #: ../src/tracker/tracker-index.c:123 ../src/tracker/tracker-index.c:155
 #: ../src/tracker/tracker-index.c:196 ../src/tracker/tracker-index.c:272
 #: ../src/tracker/tracker-index.c:329 ../src/tracker/tracker-info.c:264
-#: ../src/tracker/tracker-process.c:66 ../src/tracker/tracker-process.c:186
-#: ../src/tracker/tracker-process.c:271 ../src/tracker/tracker-process.c:292
+#: ../src/tracker/tracker-process.c:75 ../src/tracker/tracker-process.c:196
+#: ../src/tracker/tracker-process.c:325 ../src/tracker/tracker-process.c:346
 #: ../src/tracker/tracker-search.c:1579 ../src/tracker/tracker-sparql.c:168
 #: ../src/tracker/tracker-sparql.c:1078 ../src/tracker/tracker-status.c:176
 #: ../src/tracker/tracker-status.c:422 ../src/tracker/tracker-status.c:432
@@ -838,6 +838,17 @@ msgstr "Модул за извличане на метаданни"
 msgid "Extracts metadata from local files"
 msgstr "Извличане на метаданни за локалните файлове"
 
+#: ../src/tracker-needle/org.freedesktop.Tracker.Needle.gschema.xml.in.h:1
+msgid "Default View"
+msgstr "Стандартен изглед"
+
+#: ../src/tracker-needle/org.freedesktop.Tracker.Needle.gschema.xml.in.h:2
+msgid ""
+"When 0, default view of tracker-needle will be Icons view. When 1, default "
+"view of tracker-needle will be Categories view. When 2, default view of "
+"tracker-needle will be Files view."
+msgstr ""
+
 #: ../src/tracker-needle/tracker-needle.desktop.in.in.h:1
 #: ../src/tracker-needle/tracker-needle.ui.h:1
 msgid "Desktop Search"
@@ -874,51 +885,55 @@ msgid "Find search criteria in file titles"
 msgstr "Критерии за търсенето в името на файловете"
 
 #: ../src/tracker-needle/tracker-needle.ui.h:7
+msgid "Find search criteria in file tags only (separated by comma)"
+msgstr "Критерии за търсенето в името на файловете (разделени с „,“)"
+
+#: ../src/tracker-needle/tracker-needle.ui.h:8
 msgid "_Search:"
 msgstr "_Търсене:"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:8
+#: ../src/tracker-needle/tracker-needle.ui.h:9
 msgid "Show tagging panel which allows editing tags of selected results"
 msgstr ""
 "Показване на панела за етикети, с който могат за се редактират етикетите на "
 "избраните резултати"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:9
+#: ../src/tracker-needle/tracker-needle.ui.h:10
 msgid "Show statistics about the data stored"
 msgstr "Извеждане на статистика за съхранените данни"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:11
+#: ../src/tracker-needle/tracker-needle.ui.h:12
 #, no-c-format
 msgid "_Set the tags you want to associate with the %d selected items:"
 msgstr "_Задаване на етикетите за %d избрани обекта:"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:12
+#: ../src/tracker-needle/tracker-needle.ui.h:13
 msgid "Add tag"
 msgstr "Добавяне на етикет"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:13
+#: ../src/tracker-needle/tracker-needle.ui.h:14
 msgid "Remove selected tag"
 msgstr "Премахване на избрания етикет"
 
-#: ../src/tracker-needle/tracker-needle.vala:71
+#: ../src/tracker-needle/tracker-needle.vala:75
 msgid "Search criteria was too generic"
 msgstr "Прекалено общи критерии за търсене"
 
-#: ../src/tracker-needle/tracker-needle.vala:72
+#: ../src/tracker-needle/tracker-needle.vala:76
 msgid "Only the first 500 items will be displayed"
 msgstr "Само първите 500 резултата ще бъдат показани"
 
-#: ../src/tracker-needle/tracker-needle.vala:731
+#: ../src/tracker-needle/tracker-needle.vala:811
 #: ../src/tracker-preferences/tracker-preferences.vala:1051
 msgid "Print version"
 msgstr "Извеждане на версията"
 
-#: ../src/tracker-needle/tracker-needle.vala:738
-#: ../src/tracker-needle/tracker-needle.vala:739
+#: ../src/tracker-needle/tracker-needle.vala:818
+#: ../src/tracker-needle/tracker-needle.vala:819
 msgid "[SEARCH-CRITERIA]"
 msgstr "[КРИТЕРИИ_ЗА_ТЪРСЕНЕ]"
 
-#: ../src/tracker-needle/tracker-needle.vala:744
+#: ../src/tracker-needle/tracker-needle.vala:824
 msgid "Desktop Search user interface using Tracker"
 msgstr "Търсене с помощта на Tracker"
 
@@ -2266,35 +2281,35 @@ msgstr "„%s“ не е команда на tracker. Вижте „tracker --he
 msgid "Available tracker commands are:"
 msgstr "Съществуващите команди на tracker са:"
 
-#: ../src/tracker/tracker-process.c:65
+#: ../src/tracker/tracker-process.c:74
 msgid "Could not open /proc"
 msgstr "Не може да се отвори папката „/proc“"
 
-#: ../src/tracker/tracker-process.c:115
+#: ../src/tracker/tracker-process.c:124
 msgid "Could not stat() file"
 msgstr "Файлът не може да се открие от функцията „stat()“"
 
-#: ../src/tracker/tracker-process.c:183
+#: ../src/tracker/tracker-process.c:193
 #, c-format
 msgid "Could not open '%s'"
 msgstr "„%s“ не може да се отвори"
 
-#: ../src/tracker/tracker-process.c:268
+#: ../src/tracker/tracker-process.c:322
 #, c-format
 msgid "Could not terminate process %d - '%s'"
 msgstr "Процес %d не може да се прекъсне — „%s“"
 
-#: ../src/tracker/tracker-process.c:274
+#: ../src/tracker/tracker-process.c:328
 #, c-format
 msgid "Terminated process %d - '%s'"
 msgstr "Процес %d е прекъснат — „%s“"
 
-#: ../src/tracker/tracker-process.c:289
+#: ../src/tracker/tracker-process.c:343
 #, c-format
 msgid "Could not kill process %d - '%s'"
 msgstr "Процес %d не може да се убие — „%s“"
 
-#: ../src/tracker/tracker-process.c:295
+#: ../src/tracker/tracker-process.c:349
 #, c-format
 msgid "Killed process %d - '%s'"
 msgstr "Процес %d е убит — „%s“"

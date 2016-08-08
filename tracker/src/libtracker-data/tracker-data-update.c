@@ -949,7 +949,6 @@ tracker_data_resource_buffer_flush (GError **error)
 	if (resource_buffer->fts_updated) {
 		TrackerProperty *prop;
 		GArray *values;
-		gboolean create = resource_buffer->create;
 		GPtrArray *properties, *text;
 
 		properties = text = NULL;
@@ -982,8 +981,7 @@ tracker_data_resource_buffer_flush (GError **error)
 			tracker_db_interface_sqlite_fts_update_text (iface,
 			                                             resource_buffer->id,
 			                                             (const gchar **) properties->pdata,
-			                                             (const gchar **) text->pdata,
-			                                             create);
+			                                             (const gchar **) text->pdata);
 			update_buffer.fts_ever_updated = TRUE;
 			g_ptr_array_free (properties, TRUE);
 			g_ptr_array_free (text, TRUE);
@@ -1465,17 +1463,26 @@ get_old_property_values (TrackerProperty  *property,
 					if (tracker_property_get_fulltext_indexed (prop)
 					    && check_property_domain (prop)) {
 						const gchar *property_name;
+						GString *str;
 						gint i;
 
 						old_values = get_property_values (prop);
 						property_name = tracker_property_get_name (prop);
+						str = g_string_new (NULL);
 
 						/* delete old fts entries */
 						for (i = 0; i < old_values->len; i++) {
-							tracker_db_interface_sqlite_fts_delete_text (iface,
-							                                             resource_buffer->id,
-							                                             property_name);
+							GValue *value = &g_array_index (old_values, GValue, i);
+							if (i != 0)
+								g_string_append_c (str, ',');
+							g_string_append (str, g_value_get_string (value));
 						}
+
+						tracker_db_interface_sqlite_fts_delete_text (iface,
+						                                             resource_buffer->id,
+						                                             property_name,
+						                                             str->str);
+						g_string_free (str, TRUE);
 					}
 				}
 
@@ -1645,28 +1652,35 @@ cache_insert_metadata_decomposed (TrackerProperty  *property,
 	GError             *new_error = NULL;
 	gboolean            change = FALSE;
 
-	/* also insert super property values */
-	super_properties = tracker_property_get_super_properties (property);
-	while (*super_properties) {
-		change |= cache_insert_metadata_decomposed (*super_properties, value, value_id,
-		                                            graph, graph_id, &new_error);
-		if (new_error) {
-			g_propagate_error (error, new_error);
-			return FALSE;
-		}
-		super_properties++;
-	}
-
-	multiple_values = tracker_property_get_multiple_values (property);
-	table_name = tracker_property_get_table_name (property);
-	field_name = tracker_property_get_name (property);
-
 	/* read existing property values */
 	old_values = get_old_property_values (property, &new_error);
 	if (new_error) {
 		g_propagate_error (error, new_error);
 		return FALSE;
 	}
+
+	/* also insert super property values */
+	super_properties = tracker_property_get_super_properties (property);
+	multiple_values = tracker_property_get_multiple_values (property);
+
+	while (*super_properties) {
+		gboolean super_is_multi;
+
+		super_is_multi = tracker_property_get_multiple_values (*super_properties);
+
+		if (super_is_multi || old_values->len == 0) {
+			change |= cache_insert_metadata_decomposed (*super_properties, value, value_id,
+			                                            graph, graph_id, &new_error);
+			if (new_error) {
+				g_propagate_error (error, new_error);
+				return FALSE;
+			}
+		}
+		super_properties++;
+	}
+
+	table_name = tracker_property_get_table_name (property);
+	field_name = tracker_property_get_name (property);
 
 	if (value) {
 		string_to_gvalue (value, tracker_property_get_data_type (property), &gvalue, &new_error);
@@ -2068,9 +2082,11 @@ cache_delete_resource_type_full (TrackerClass *class,
 	iface = tracker_db_manager_get_db_interface ();
 
 	if (!single_type) {
-		if (!HAVE_TRACKER_FTS &&
-		    strcmp (tracker_class_get_uri (class), TRACKER_PREFIX_RDFS "Resource") == 0 &&
+		if (strcmp (tracker_class_get_uri (class), TRACKER_PREFIX_RDFS "Resource") == 0 &&
 		    g_hash_table_size (resource_buffer->tables) == 0) {
+#if HAVE_TRACKER_FTS
+			tracker_db_interface_sqlite_fts_delete_id (iface, resource_buffer->id);
+#endif
 			/* skip subclass query when deleting whole resource
 			   to improve performance */
 
@@ -2134,9 +2150,8 @@ cache_delete_resource_type_full (TrackerClass *class,
 		}
 	}
 
-	/* bypass buffer if possible
-	   we need old property values with FTS */
-	direct_delete = (!HAVE_TRACKER_FTS && g_hash_table_size (resource_buffer->tables) == 0);
+	/* bypass buffer if possible */
+	direct_delete = g_hash_table_size (resource_buffer->tables) == 0;
 
 	/* delete all property values */
 
@@ -3314,8 +3329,6 @@ tracker_data_begin_transaction (GError **error)
 	}
 #endif /* DISABLE_JOURNAL */
 
-	iface = tracker_db_manager_get_db_interface ();
-
 	in_transaction = TRUE;
 }
 
@@ -3738,12 +3751,9 @@ tracker_data_replay_journal (TrackerBusyCallback   busy_callback,
 				GError *new_error = NULL;
 
 				if (object && rdf_type == property) {
-					TrackerClass *class = NULL;
+					TrackerClass *class;
 
-					uri = tracker_ontologies_get_uri_by_id (object_id);
-					if (uri) {
-						class = tracker_ontologies_get_class_by_uri (uri);
-					}
+					class = tracker_ontologies_get_class_by_uri (object);
 					if (class != NULL) {
 						cache_delete_resource_type (class, NULL, graph_id);
 					} else {

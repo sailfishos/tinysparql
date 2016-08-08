@@ -1,5 +1,5 @@
 # Brazilian Portuguese translation of Tracker.
-# Copyright (C) 2007-2014 Free Software Foundation, Inc.
+# Copyright (C) 2007-2015 Free Software Foundation, Inc.
 # This file is distributed under the same license as the tracker package.
 # Luiz Armesto <luiz.armesto@gmail.com>, 2007, 2008.
 # Leonardo Ferreira Fontenelle <leo.fontenelle@gmail.com>, 2008.
@@ -8,26 +8,25 @@
 # Djavan Fagundes <djavan@syst.com.br>, 2010.
 # Gabriel F. Vilar <cogumm@gmail.com>, 2011.
 # Gabriel Speckhahn <gabspeck@gmail.com>, 2011.
-# Rafael Fontenelle <rffontenelle@gmail.com>, 2013, 2014, 2016.
-# Enrico Nicoletto <liverig@gmail.com>, 2013, 2014.
-# Gustavo Marques <gutodisse@gmail.com>, 2015.
+# Rafael Ferreira <rafael.f.f1@gmail.com>, 2013, 2014.
+# Enrico Nicoletto <liverig@gmail.com>, 2013, 2014, 2015.
 # Felipe Braga <fbobraga@gmail.com>, 2015.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: tracker\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=tracker&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-02-22 03:05+0000\n"
-"PO-Revision-Date: 2015-04-21 21:56-0200\n"
-"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
-"Language-Team: Brazilian Portuguese GNOME Translation Team <gnome-pt_br-"
-"list@gnome.org>\n"
+"POT-Creation-Date: 2015-09-19 12:23+0000\n"
+"PO-Revision-Date: 2015-09-19 20:47-0300\n"
+"Last-Translator: Felipe Braga <fbobraga@gmail.com>\n"
+"Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Virtaal 0.7.1\n"
+"X-Generator: Poedit 1.8.1\n"
 "X-Project-Style: gnome\n"
 
 #: ../examples/rss-reader/rss_viewer.ui.h:1
@@ -183,11 +182,11 @@ msgstr "Onde armazenar um pedaço do diário que atingiu o tamanho máximo."
 #: ../src/libtracker-data/tracker-data-backup.c:500
 #: ../src/libtracker-data/tracker-data-backup.c:620
 msgid "Error starting 'tar' program"
-msgstr "Erro ao iniciar o programa \"tar\""
+msgstr "Erro ao iniciar programa 'tar'"
 
 #: ../src/libtracker-data/tracker-data-backup.c:501
 #: ../src/libtracker-data/tracker-data-backup.c:621
-#: ../src/miners/rss/tracker-main.c:114
+#: ../src/miners/rss/tracker-main.c:106
 #: ../src/plugins/nautilus/tracker-tags-view.c:241
 #: ../src/tracker-extract/tracker-extract.c:146
 #: ../src/tracker-needle/tracker-tags-view.vala:159
@@ -201,8 +200,8 @@ msgstr "Erro ao iniciar o programa \"tar\""
 #: ../src/tracker/tracker-index.c:123 ../src/tracker/tracker-index.c:155
 #: ../src/tracker/tracker-index.c:196 ../src/tracker/tracker-index.c:272
 #: ../src/tracker/tracker-index.c:329 ../src/tracker/tracker-info.c:264
-#: ../src/tracker/tracker-process.c:66 ../src/tracker/tracker-process.c:186
-#: ../src/tracker/tracker-process.c:271 ../src/tracker/tracker-process.c:292
+#: ../src/tracker/tracker-process.c:75 ../src/tracker/tracker-process.c:196
+#: ../src/tracker/tracker-process.c:325 ../src/tracker/tracker-process.c:346
 #: ../src/tracker/tracker-search.c:1579 ../src/tracker/tracker-sparql.c:168
 #: ../src/tracker/tracker-sparql.c:1078 ../src/tracker/tracker-status.c:176
 #: ../src/tracker/tracker-status.c:422 ../src/tracker/tracker-status.c:432
@@ -214,7 +213,7 @@ msgstr "Nenhum erro informado"
 #: ../src/libtracker-data/tracker-data-backup.c:634
 #, c-format
 msgid "Unknown error, 'tar' exited with status %d"
-msgstr "Erro desconhecido, o \"tar\" terminou com status %d"
+msgstr "Erro desconhecido, 'tar' encerrou com status %d"
 
 #: ../src/libtracker-miner/tracker-enumerator.c:114
 #: ../src/libtracker-miner/tracker-enumerator.c:165
@@ -612,11 +611,11 @@ msgstr "Devem ser monitorados"
 msgid "- start the tracker indexer"
 msgstr "- inicia o indexador do Tracker"
 
-#: ../src/miners/fs/tracker-miner-files.c:1354
+#: ../src/miners/fs/tracker-miner-files.c:1357
 msgid "Low battery"
 msgstr "Bateria baixa"
 
-#: ../src/miners/fs/tracker-miner-files.c:1481
+#: ../src/miners/fs/tracker-miner-files.c:1484
 msgid "Low disk space"
 msgstr "Pouco espaço em disco"
 
@@ -636,15 +635,16 @@ msgstr "Feeds RSS/ATOM"
 msgid "Fetch RSS/ATOM Feeds"
 msgstr "Obter atualizações de RSS/ATOM"
 
-#: ../src/miners/rss/tracker-main.c:44
-msgid "Add feed (must be used with --title)"
-msgstr "Adicionar feed (deve ser usado com --title)"
-
+#. Translators: this is a "feed" as in RSS
 #: ../src/miners/rss/tracker-main.c:45
+msgid "Add feed"
+msgstr "Adicionar fonte"
+
+#: ../src/miners/rss/tracker-main.c:46
 msgid "URL"
 msgstr "URL"
 
-#: ../src/miners/rss/tracker-main.c:48
+#: ../src/miners/rss/tracker-main.c:49
 msgid "Title to use (must be used with --add-feed)"
 msgstr "Título a usar (deve ser usado com --add-feed)"
 
@@ -655,11 +655,7 @@ msgstr "Título a usar (deve ser usado com --add-feed)"
 msgid "- start the feeds indexer"
 msgstr "- inicia o indexador de feeds"
 
-#: ../src/miners/rss/tracker-main.c:78
-msgid "Adding a feed requires --add-feed and --title"
-msgstr "Adicionar um feed exige --add-feed e --title"
-
-#: ../src/miners/rss/tracker-main.c:113 ../src/tracker/tracker-index.c:195
+#: ../src/miners/rss/tracker-main.c:105 ../src/tracker/tracker-index.c:195
 #: ../src/tracker/tracker-info.c:263 ../src/tracker/tracker-search.c:1578
 #: ../src/tracker/tracker-sparql.c:167 ../src/tracker/tracker-sparql.c:1077
 #: ../src/tracker/tracker-status.c:175 ../src/tracker/tracker-status.c:505
@@ -667,7 +663,7 @@ msgstr "Adicionar um feed exige --add-feed e --title"
 msgid "Could not establish a connection to Tracker"
 msgstr "Não foi possível estabelecer uma conexão com o Tracker"
 
-#: ../src/miners/rss/tracker-main.c:139
+#: ../src/miners/rss/tracker-main.c:133
 msgid "Could not add feed"
 msgstr "Não foi possível adicionar o feed"
 
@@ -788,11 +784,11 @@ msgstr ""
 "restritos em que é importante listar arquivos o mais rápido possível e pode "
 "esperar para obter metadados depois."
 
-#: ../src/tracker-extract/tracker-extract.c:789
+#: ../src/tracker-extract/tracker-extract.c:797
 msgid "Metadata extraction failed"
 msgstr "Extrator de metadados falhou"
 
-#: ../src/tracker-extract/tracker-extract.c:854
+#: ../src/tracker-extract/tracker-extract.c:862
 msgid "No metadata or extractor modules found to handle this file"
 msgstr ""
 "Não foram encontrados módulos de metadados ou extratores para lidar com este "
@@ -846,6 +842,21 @@ msgstr "Extrator de metadados do Tracker"
 msgid "Extracts metadata from local files"
 msgstr "Extrai metadados de arquivos locais"
 
+#: ../src/tracker-needle/org.freedesktop.Tracker.Needle.gschema.xml.in.h:1
+msgid "Default View"
+msgstr "Visão padrão"
+
+#: ../src/tracker-needle/org.freedesktop.Tracker.Needle.gschema.xml.in.h:2
+msgid ""
+"When 0, default view of tracker-needle will be Icons view. When 1, default "
+"view of tracker-needle will be Categories view. When 2, default view of "
+"tracker-needle will be Files view."
+msgstr ""
+"Se for 0, o modo de exibição padrão do tracker-needle será visão de ícones. "
+"Se for 1, o modo de exibição padrão do tracker-needle será a visão de "
+"categorias. Se for 2, o modo de exibição padrão do tracker-needle será a "
+"visão de arquivos."
+
 #: ../src/tracker-needle/tracker-needle.desktop.in.in.h:1
 #: ../src/tracker-needle/tracker-needle.ui.h:1
 msgid "Desktop Search"
@@ -884,52 +895,58 @@ msgid "Find search criteria in file titles"
 msgstr "Localizar critérios de pesquisa nos títulos dos arquivos"
 
 #: ../src/tracker-needle/tracker-needle.ui.h:7
+msgid "Find search criteria in file tags only (separated by comma)"
+msgstr ""
+"Localizar critérios de pesquisa apenas em etiquetas de arquivos (separadas "
+"por vírgulas)"
+
+#: ../src/tracker-needle/tracker-needle.ui.h:8
 msgid "_Search:"
 msgstr "_Pesquisar:"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:8
+#: ../src/tracker-needle/tracker-needle.ui.h:9
 msgid "Show tagging panel which allows editing tags of selected results"
 msgstr ""
 "Exibir painel de etiquetagem, que permite a edição de etiquetas de "
 "resultados selecionados"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:9
+#: ../src/tracker-needle/tracker-needle.ui.h:10
 msgid "Show statistics about the data stored"
 msgstr "Exibir estatísticas sobre os dados armazenados"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:11
+#: ../src/tracker-needle/tracker-needle.ui.h:12
 #, no-c-format
 msgid "_Set the tags you want to associate with the %d selected items:"
 msgstr ""
 "_Defina as etiquetas que você deseja associar com os %d itens selecionados:"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:12
+#: ../src/tracker-needle/tracker-needle.ui.h:13
 msgid "Add tag"
 msgstr "Adicionar etiqueta"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:13
+#: ../src/tracker-needle/tracker-needle.ui.h:14
 msgid "Remove selected tag"
 msgstr "Remover a etiqueta selecionada"
 
-#: ../src/tracker-needle/tracker-needle.vala:71
+#: ../src/tracker-needle/tracker-needle.vala:75
 msgid "Search criteria was too generic"
 msgstr "Critério de pesquisa muito genérico"
 
-#: ../src/tracker-needle/tracker-needle.vala:72
+#: ../src/tracker-needle/tracker-needle.vala:76
 msgid "Only the first 500 items will be displayed"
 msgstr "Somente os primeiros 500 itens serão exibidos"
 
-#: ../src/tracker-needle/tracker-needle.vala:731
+#: ../src/tracker-needle/tracker-needle.vala:811
 #: ../src/tracker-preferences/tracker-preferences.vala:1016
 msgid "Print version"
 msgstr "Mostrar versão"
 
-#: ../src/tracker-needle/tracker-needle.vala:738
-#: ../src/tracker-needle/tracker-needle.vala:739
+#: ../src/tracker-needle/tracker-needle.vala:818
+#: ../src/tracker-needle/tracker-needle.vala:819
 msgid "[SEARCH-CRITERIA]"
 msgstr "[CRITÉRIOS-PESQUISA]"
 
-#: ../src/tracker-needle/tracker-needle.vala:744
+#: ../src/tracker-needle/tracker-needle.vala:824
 msgid "Desktop Search user interface using Tracker"
 msgstr "Interface de usuário da busca na área de trabalho usando o Tracker"
 
@@ -1234,9 +1251,9 @@ msgid ""
 "This option allows you to make Tracker take a back seat and not eat up too "
 "much CPU time if you have other applications more deserving of it."
 msgstr ""
-"O agendador é um componente do kernel que decide qual o próximo aplicativo "
-"será executado pela CPU. Cada aplicativo tem uma política e prioridade de "
-"agendamento associada.\n"
+"O agendador é um componente do kernel que decide qual aplicativo executável "
+"será executado pela próxima CPU. Cada aplicativo tem uma política e "
+"prioridade de agendamento associada.\n"
 "\n"
 "Esta opção permite que você faça com que o Tracker tome uma posição mais "
 "modesta e não consuma tanto tempo de CPU se você tem outros aplicativos que "
@@ -1628,7 +1645,7 @@ msgstr ""
 
 #: ../src/tracker/tracker-compatible.c:221
 msgid "The 'tracker-control' command is no longer available"
-msgstr "O comando \"tracker-control\" não está mais disponível"
+msgstr "O comando 'tracker-control' não está mais disponível"
 
 #: ../src/tracker/tracker-daemon.c:121 ../src/tracker/tracker-daemon.c:429
 msgid "Unavailable"
@@ -2018,8 +2035,8 @@ msgstr "talvez um plug-in desativado?"
 msgid ""
 "If no arguments are given, the status of the store and data miners is shown"
 msgstr ""
-"Se nenhum argumento é passado, o estado da armazenagem e dos mineradores de "
-"dados é exibido"
+"Se nenhum argumento for fornecido, são mostrados o status do armazenamento e "
+"as minerações de dados"
 
 #: ../src/tracker/tracker-daemon.c:1741 ../src/tracker/tracker-index.c:410
 #: ../src/tracker/tracker-info.c:422 ../src/tracker/tracker-reset.c:315
@@ -2040,7 +2057,7 @@ msgstr "Não foi possível criar um proxy D-Bus para o armazenamento do tracker"
 #: ../src/tracker/tracker-help.c:59 ../src/tracker/tracker-help.c:71
 #, c-format
 msgid "failed to exec '%s': %s"
-msgstr "falha ao executar \"%s\": %s"
+msgstr "falha ao exec '%s': %s"
 
 #: ../src/tracker/tracker-index.c:56
 msgid ""
@@ -2056,16 +2073,17 @@ msgstr "Pedir aos mineradores que (re)indexem um determinado arquivo"
 
 #: ../src/tracker/tracker-index.c:62
 msgid "Backup current index / database to the file provided"
-msgstr "Fazer backup dos índices / bancos de dados no arquivo fornecido"
+msgstr "Efetua backup do índice / banco de dados atual no arquivo fornecido"
 
 #: ../src/tracker/tracker-index.c:65
 msgid "Restore a database from a previous backup (see --backup)"
 msgstr ""
-"Restaurar o banco de dados a partir de um backup anterior (veja --backup)"
+"Restaura um banco de dados a partir de um backup anterior (veja --backup)"
 
 #: ../src/tracker/tracker-index.c:68
 msgid "Import a dataset from the provided file (in Turtle format)"
-msgstr "Importar um conjunto de dados do arquivo fornecido (no formato Turtle)"
+msgstr ""
+"Importar um conjunto de dados de um arquivo fornecido (em formato Turtle)"
 
 #: ../src/tracker/tracker-index.c:122
 #, c-format
@@ -2122,12 +2140,12 @@ msgid ""
 "Only one action (--backup, --restore, --index-file or --import) can be used "
 "at a time"
 msgstr ""
-"Apenas uma única ação (--backup, --restore, --index-file ou --import) pode "
-"ser usada por vez"
+"Apenas uma ação (--backup, --restore, --index-file ou --import) pode ser "
+"usada a cada vez"
 
 #: ../src/tracker/tracker-index.c:437
 msgid "Missing one or more files which are required"
-msgstr "Faltando um ou mais arquivos necessários"
+msgstr "Faltam um ou mais arquivos que são necessários"
 
 #: ../src/tracker/tracker-index.c:439
 msgid "Only one file can be used with --backup and --restore"
@@ -2192,54 +2210,57 @@ msgstr "Resultados"
 
 #: ../src/tracker/tracker-main.c:48
 msgid "See 'tracker help <command>' to read about a specific subcommand."
-msgstr "Veja detalhes sobre subcomandos com \"tracker help <command>\""
+msgstr "Veja 'tracker help <comando>' para ler sobre um subcomando específico."
 
 #: ../src/tracker/tracker-main.c:97
 msgid "Start, stop, pause and list processes responsible for indexing content"
 msgstr ""
-"Inicia, para, pausa e lista processos responsáveis por indexar conteúdo"
+"Inicie, pare, pause e liste processos responsáveis por indexação de conteúdo"
 
 #: ../src/tracker/tracker-main.c:98
 msgid "Get help on how to use Tracker and any of these commands"
-msgstr "Obtenha ajuda em como usar o Tracker e qualquer destes comandos"
+msgstr "Obtenha ajuda de como usar o Tracker e qualquer um destes comandos"
 
 #: ../src/tracker/tracker-main.c:99
 msgid "Show information known about local files or items indexed"
-msgstr "Exibe informações conhecidas sobre arquivos locais ou item indexados"
+msgstr ""
+"Mostra informações conhecidas a respeito de arquivos locais ou itens "
+"indexados"
 
 #: ../src/tracker/tracker-main.c:100
 msgid "Backup, restore, import and (re)index by MIME type or file name"
 msgstr ""
-"Cria backup, restaura, importa e (re)indexa por tipo MIME ou nome de arquivo"
+"Efetua backup, restaura, importa e (re)indexa por tipo MIME ou nome de "
+"arquivo"
 
 #: ../src/tracker/tracker-main.c:101
 msgid "Reset or remove index and revert configurations to defaults"
-msgstr "Restaura ou remove o índice e reverte as configurações para o padrão"
+msgstr "Reinicia ou remove o índice e reverte as configurações ao padrão"
 
 #: ../src/tracker/tracker-main.c:102
 msgid "Search for content indexed or show content by type"
-msgstr "Procura por conteúdo indexado ou mostra conteúdo por tipo"
+msgstr "Pesquise por conteúdo indexado ou mostre conteúdo por tipo"
 
 #: ../src/tracker/tracker-main.c:103
 msgid ""
 "Query and update the index using SPARQL or search, list and tree the ontology"
 msgstr ""
-"Consulta e atualiza o índice usando SPARQL ou busca, lista e exibe a "
+"Consulte e atualize o índice usando SPARQL ou pesquisa, liste e ramifique a "
 "ontologia"
 
 #: ../src/tracker/tracker-main.c:104
 msgid "Query the database at the lowest level using SQL"
-msgstr "Consulta o banco de dados diretamente usando SQL"
+msgstr "Consulte o banco de dados até o nível mais baixo usando SQL"
 
 #: ../src/tracker/tracker-main.c:105
 msgid "Show the indexing progress, content statistics and index state"
 msgstr ""
-"Exibe o progresso da indexação, estatísticas sobre o conteúdo e o estado do "
+"Mostra o progresso da indexação, estatísticas do conteúdo e o estado do "
 "índice"
 
 #: ../src/tracker/tracker-main.c:106
 msgid "Create, list or delete tags for indexed content"
-msgstr "Cria, lista ou exclui etiquetas no conteúdo indexado"
+msgstr "Cria, lista ou exclui etiquetas de conteúdo indexado"
 
 #: ../src/tracker/tracker-main.c:107
 msgid "Show the license and version in use"
@@ -2248,44 +2269,44 @@ msgstr "Mostra a licença e versão em uso"
 #: ../src/tracker/tracker-main.c:152
 #, c-format
 msgid "'%s' is not a tracker command. See 'tracker --help'"
-msgstr "\"%s\" não é um comando do tracker. Veja \"tracker --help\""
+msgstr "'%s' não é um comando do tracker. Veja 'tracker --help'"
 
 #: ../src/tracker/tracker-main.c:175
 msgid "Available tracker commands are:"
-msgstr "Comandos disponíveis para o tracker são:"
+msgstr "Comandos disponíveis do tracker são:"
 
-#: ../src/tracker/tracker-process.c:65
+#: ../src/tracker/tracker-process.c:74
 msgid "Could not open /proc"
 msgstr "Não foi possível abrir /proc"
 
-#: ../src/tracker/tracker-process.c:115
+#: ../src/tracker/tracker-process.c:124
 msgid "Could not stat() file"
 msgstr "Não foi possível efetuar \"stat()\" sobre o arquivo"
 
-#: ../src/tracker/tracker-process.c:183
+#: ../src/tracker/tracker-process.c:193
 #, c-format
 msgid "Could not open '%s'"
 msgstr "Não foi possível abrir \"%s\""
 
-#: ../src/tracker/tracker-process.c:268
+#: ../src/tracker/tracker-process.c:322
 #, c-format
 msgid "Could not terminate process %d - '%s'"
-msgstr "Não foi possível terminar o processo %d - \"%s\""
+msgstr "Não foi possível terminar o processo %d - '%s'"
 
-#: ../src/tracker/tracker-process.c:274
+#: ../src/tracker/tracker-process.c:328
 #, c-format
 msgid "Terminated process %d - '%s'"
-msgstr "Processo %d terminado - \"%s\""
+msgstr "Processo %d terminado - '%s'"
 
-#: ../src/tracker/tracker-process.c:289
+#: ../src/tracker/tracker-process.c:343
 #, c-format
 msgid "Could not kill process %d - '%s'"
-msgstr "Não foi possível matar o processo %d - \"%s\""
+msgstr "Não foi possível matar o processo %d - '%s'"
 
-#: ../src/tracker/tracker-process.c:295
+#: ../src/tracker/tracker-process.c:349
 #, c-format
 msgid "Killed process %d - '%s'"
-msgstr "Processo %d morto - \"%s\""
+msgstr "Processo %d morto - '%s'"
 
 #: ../src/tracker/tracker-reset.c:48
 msgid "Kill all Tracker processes and remove all databases"
@@ -2294,8 +2315,7 @@ msgstr "Mata todos os processos do Tracker e remove todas as bases de dados"
 #: ../src/tracker/tracker-reset.c:51
 msgid "Same as --hard but the backup & journal are restored after restart"
 msgstr ""
-"Mesmo que --hard-reset mas o backup & diário são restaurados depois de "
-"reiniciar"
+"É o mesmo que o --hard mas o backup & diário são restaurados após reiniciar"
 
 #: ../src/tracker/tracker-reset.c:54
 msgid "Remove all configuration files so they are re-generated on next start"
@@ -2305,7 +2325,7 @@ msgstr ""
 
 #: ../src/tracker/tracker-reset.c:132
 msgid "You can not use the --hard and --soft arguments together"
-msgstr "Você não pode usar os argumentos --hard-reset e --soft-reset juntos"
+msgstr "Você não pode usar os argumentos --hard e --soft juntos"
 
 #: ../src/tracker/tracker-reset.c:232
 msgid "Removing configuration files…"
@@ -2686,7 +2706,7 @@ msgstr "Prefixos"
 msgid ""
 "Could not find property for class prefix, e.g. :Resource in 'rdfs:Resource'"
 msgstr ""
-"Não foi possível encontrar propriedades para o prefixo da classe. Ex: :"
+"Não foi possível encontrar propriedades para o prefixo da classe. Ex: "
 "Recurso em \"rdfs:Recurso\""
 
 #: ../src/tracker/tracker-sparql.c:1182
@@ -2783,6 +2803,7 @@ msgid "SQL query"
 msgstr "Consulta SQL"
 
 #: ../src/tracker/tracker-sql.c:48
+#| msgid "SPARQL"
 msgid "SQL"
 msgstr "SQL"
 
@@ -2796,7 +2817,7 @@ msgstr "Definição de resultado vazio"
 
 #: ../src/tracker/tracker-status.c:52
 msgid "Show statistics for current index / data set"
-msgstr "Exibe estatísticas sobre o índice / conjunto de dados atuais"
+msgstr "Mostra estatísticas para o índice / conjunto de dados atual"
 
 #: ../src/tracker/tracker-status.c:56
 msgid ""
@@ -2812,7 +2833,7 @@ msgid ""
 "results are output to terminal"
 msgstr ""
 "Coleta informações de depuração, úteis para informar problemas e "
-"investigações, os resultados são exibidos no terminal"
+"investigações, os resultados são emitidos no terminal."
 
 #: ../src/tracker/tracker-status.c:187
 msgid "Could not get Tracker statistics"
@@ -2877,7 +2898,7 @@ msgstr "Atualmente o banco de dados está vazio"
 
 #: ../src/tracker/tracker-status.c:524 ../src/tracker/tracker-status.c:547
 msgid "Could not get basic status for Tracker"
-msgstr "Não foi possível obter o status básico para o Tracker"
+msgstr "Não foi possível obter o status básico do Tracker"
 
 #: ../src/tracker/tracker-status.c:631
 #, c-format
@@ -2886,16 +2907,17 @@ msgstr "Atualmente indexado"
 
 #: ../src/tracker/tracker-status.c:666
 msgid "Data is still being indexed"
-msgstr "Os dados ainda estão sendo indexado"
+msgstr "Os dados ainda estão sendo indexados"
 
 #: ../src/tracker/tracker-status.c:667
 #, c-format
 msgid "Estimated %s left"
-msgstr "Estimado %s faltando"
+msgstr "Restam aproximadamente %s"
 
 #: ../src/tracker/tracker-status.c:671
 msgid "All data miners are idle, indexing complete"
-msgstr "Todos os mineradores de dados estão ociosos, indexação completa"
+msgstr ""
+"Todos os mineradores de dados estão ociosos, a indexação foi completada"
 
 #: ../src/tracker/tracker-tag.c:53
 msgid ""
@@ -3068,6 +3090,12 @@ msgstr "- inicia o serviço de writeback do Tracker"
 #: ../utils/gtk-sparql/gtk-sparql.ui.h:1
 msgid "Saved queries"
 msgstr "Consultas salvas"
+
+#~ msgid "Add feed (must be used with --title)"
+#~ msgstr "Adicionar feed (deve ser usado com --title)"
+
+#~ msgid "Adding a feed requires --add-feed and --title"
+#~ msgstr "Adicionar um feed exige --add-feed e --title"
 
 #~ msgid " - Manage Tracker processes and data"
 #~ msgstr " - Gerencia os processos e os dados do Tracker"

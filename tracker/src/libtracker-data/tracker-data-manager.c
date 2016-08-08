@@ -650,6 +650,7 @@ tracker_data_ontology_load_statement (const gchar *ontology_path,
 					tracker_property_set_is_inverse_functional_property (property, FALSE);
 					tracker_property_set_default_value (property, NULL);
 					tracker_property_set_multiple_values (property, TRUE);
+					tracker_property_set_fulltext_indexed (property, FALSE);
 				}
 				return;
 			}
@@ -1140,29 +1141,8 @@ tracker_data_ontology_load_statement (const gchar *ontology_path,
 			return;
 		}
 
-		is_new = tracker_property_get_is_new (property);
-		if (is_new != in_update) {
-			/* Detect unsupported ontology change (this needs a journal replay) */
-			if (in_update == TRUE && is_new == FALSE) {
-				if (check_unsupported_property_value_change (ontology_path,
-				                                             "tracker:fulltextIndexed",
-				                                             subject,
-				                                             predicate,
-				                                             object)) {
-					handle_unsupported_ontology_change (ontology_path,
-					                                    tracker_property_get_name (property),
-					                                    "tracker:fulltextIndexed",
-					                                    tracker_property_get_fulltext_indexed (property) ? "true" : "false",
-					                                    g_strcmp0 (object, "true") == 0 ? "true" : "false",
-					                                    error);
-				}
-			}
-			return;
-		}
-
-		if (strcmp (object, "true") == 0) {
-			tracker_property_set_fulltext_indexed (property, TRUE);
-		}
+		tracker_property_set_fulltext_indexed (property,
+		                                       strcmp (object, "true") == 0);
 	} else if (g_strcmp0 (predicate, TRACKER_PREFIX_TRACKER "defaultValue") == 0) {
 		TrackerProperty *property;
 
@@ -2436,6 +2416,7 @@ db_get_static_data (TrackerDBInterface  *iface,
 				tracker_property_set_secondary_index (property, tracker_ontologies_get_property_by_uri (secondary_index_uri));
 			}
 
+			tracker_property_set_orig_fulltext_indexed (property, fulltext_indexed);
 			tracker_property_set_fulltext_indexed (property, fulltext_indexed);
 			tracker_property_set_is_inverse_functional_property (property, is_inverse_functional_property);
 
@@ -2625,6 +2606,12 @@ create_decomposed_metadata_property_table (TrackerDBInterface *iface,
 					g_propagate_error (error, internal_error);
 					goto error_out;
 				}
+			} else if (in_change && tracker_property_get_cardinality_changed (property)) {
+				/* We should be dropping all indices colliding with the new table name */
+				tracker_db_interface_execute_query (iface, &internal_error,
+				                                    "DROP INDEX IF EXISTS \"%s_%s\"",
+				                                    service_name,
+				                                    field_name);
 			}
 
 			sql = g_string_new ("");
@@ -3608,55 +3595,61 @@ load_ontologies_gvdb (GError **error)
 #if HAVE_TRACKER_FTS
 static gboolean
 ontology_get_fts_properties (gboolean     only_new,
-			     GHashTable **fts_properties,
-			     GHashTable **multivalued)
+                             GHashTable **fts_properties,
+                             GHashTable **multivalued)
 {
 	TrackerProperty **properties;
-	gboolean has_new = FALSE;
-	GHashTable *hashtable;
+	gboolean has_changed = FALSE;
 	guint i, len;
 
 	properties = tracker_ontologies_get_properties (&len);
-	hashtable = g_hash_table_new_full (g_str_hash, g_str_equal, NULL,
-					   (GDestroyNotify) g_list_free);
-
-	if (multivalued) {
-		*multivalued = g_hash_table_new (g_str_hash, g_str_equal);
-	}
+	*multivalued = g_hash_table_new (g_str_hash, g_str_equal);
+	*fts_properties = g_hash_table_new_full (g_str_hash, g_str_equal,
+	                                         NULL, (GDestroyNotify) g_list_free);
 
 	for (i = 0; i < len; i++) {
 		const gchar *name, *table_name;
 		GList *list;
 
+		if (tracker_property_get_fulltext_indexed (properties[i]) !=
+		    tracker_property_get_orig_fulltext_indexed (properties[i])) {
+			has_changed |= TRUE;
+		}
+
 		if (!tracker_property_get_fulltext_indexed (properties[i])) {
 			continue;
 		}
 
-		has_new |= tracker_property_get_is_new (properties[i]);
+		has_changed |= tracker_property_get_is_new (properties[i]);
 		table_name = tracker_property_get_table_name (properties[i]);
-
-		if (multivalued &&
-		    tracker_property_get_multiple_values (properties[i])) {
-			g_hash_table_insert (*multivalued, (gpointer) table_name,
-					     GUINT_TO_POINTER (TRUE));
-		}
-
 		name = tracker_property_get_name (properties[i]);
-		list = g_hash_table_lookup (hashtable, table_name);
+		list = g_hash_table_lookup (*fts_properties, table_name);
+
+		if (tracker_property_get_multiple_values (properties[i])) {
+			g_hash_table_insert (*multivalued, (gpointer) table_name,
+			                     GUINT_TO_POINTER (TRUE));
+		}
 
 		if (!list) {
 			list = g_list_prepend (NULL, (gpointer) name);
-			g_hash_table_insert (hashtable, (gpointer) table_name, list);
+			g_hash_table_insert (*fts_properties, (gpointer) table_name, list);
 		} else {
 			list = g_list_append (list, (gpointer) name);
 		}
 	}
 
-	if (fts_properties) {
-		*fts_properties = hashtable;
-	}
+	return has_changed;
+}
 
-	return has_new;
+static void
+rebuild_fts_tokens (TrackerDBInterface *iface)
+{
+	g_debug ("Rebuilding FTS tokens, this may take a moment...");
+	tracker_db_interface_sqlite_fts_rebuild_tokens (iface);
+	g_debug ("FTS tokens rebuilt");
+
+	/* Update the stamp file */
+	tracker_db_manager_tokenizer_update ();
 }
 #endif
 
@@ -4638,6 +4631,12 @@ tracker_data_manager_init (TrackerDBManagerFlags   flags,
 		}
 
 		tracker_db_manager_set_current_locale ();
+
+#if HAVE_TRACKER_FTS
+		rebuild_fts_tokens (iface);
+	} else if (!read_only && tracker_db_manager_get_tokenizer_changed ()) {
+		rebuild_fts_tokens (iface);
+#endif
 	}
 
 	if (!read_only) {

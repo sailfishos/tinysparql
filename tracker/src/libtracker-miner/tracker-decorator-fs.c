@@ -23,8 +23,8 @@
 #include <libtracker-common/tracker-common.h>
 #include <libtracker-sparql/tracker-sparql.h>
 
+#include "tracker-decorator-private.h"
 #include "tracker-decorator-fs.h"
-#include "tracker-decorator-internal.h"
 
 #define TRACKER_DECORATOR_FS_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TRACKER_TYPE_DECORATOR_FS, TrackerDecoratorFSPrivate))
 
@@ -130,6 +130,31 @@ remove_files_cb (GObject *object,
 }
 
 static void
+_tracker_decorator_query_append_rdf_type_filter (TrackerDecorator *decorator,
+                                                 GString          *query)
+{
+       const gchar **class_names;
+       gint i = 0;
+
+       class_names = tracker_decorator_get_class_names (decorator);
+
+       if (!class_names || !*class_names)
+               return;
+
+       g_string_append (query, "&& ?type IN (");
+
+       while (class_names[i]) {
+               if (i != 0)
+                       g_string_append (query, ",");
+
+               g_string_append (query, class_names[i]);
+               i++;
+       }
+
+       g_string_append (query, ") ");
+}
+
+static void
 check_files (TrackerDecorator    *decorator,
              const gchar         *mount_point_urn,
              gboolean             available,
@@ -215,6 +240,7 @@ mount_point_removed_cb (GVolumeMonitor *monitor,
 
 	uuid = mount_point_get_uuid (mount);
 	urn = g_strdup_printf (TRACKER_PREFIX_DATASOURCE_URN "%s", uuid);
+	_tracker_decorator_invalidate_cache (user_data);
 	check_files (user_data, urn, FALSE, remove_files_cb);
 	g_free (urn);
 	g_free (uuid);
@@ -232,6 +258,8 @@ tracker_decorator_fs_iface_init (GInitable     *initable,
 	priv->volume_monitor = g_volume_monitor_get ();
 	g_signal_connect_object (priv->volume_monitor, "mount-added",
 	                         G_CALLBACK (mount_point_added_cb), initable, 0);
+	g_signal_connect_object (priv->volume_monitor, "mount-pre-unmount",
+	                         G_CALLBACK (mount_point_removed_cb), initable, 0);
 	g_signal_connect_object (priv->volume_monitor, "mount-removed",
 	                         G_CALLBACK (mount_point_removed_cb), initable, 0);
 
