@@ -3,7 +3,6 @@ libtrackerfts_dir = libtracker-fts
 endif
 
 SUBDIRS =                                              \
-	sqlite                                         \
 	ontologies				       \
 	gvdb                                           \
 	libtracker-common                              \

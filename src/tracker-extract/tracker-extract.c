@@ -88,6 +88,7 @@ typedef struct {
 	gchar *file;
 	gchar *mimetype;
 	gchar *graph;
+	gchar *urn;
 
 	TrackerMimetypeInfo *mimetype_handlers;
 
@@ -296,11 +297,12 @@ get_file_metadata (TrackerExtractTask  *task,
 	GFile *file;
 	gchar *mime_used = NULL;
 	gint items = 0;
+	gboolean success = FALSE;
 
 	*info_out = NULL;
 
 	file = g_file_new_for_uri (task->file);
-	info = tracker_extract_info_new (file, task->mimetype, task->graph);
+	info = tracker_extract_info_new (file, task->mimetype, task->graph, task->urn);
 	g_object_unref (file);
 
 #ifdef HAVE_LIBMEDIAART
@@ -322,17 +324,20 @@ get_file_metadata (TrackerExtractTask  *task,
 		if (task->cur_func) {
 			TrackerSparqlBuilder *statements;
 
-			g_debug ("Using %s...", g_module_name (task->cur_module));
+			g_debug ("Using %s...",
+				 task->cur_module ?
+				 g_module_name (task->cur_module) :
+				 "Dummy extraction");
 
-			(task->cur_func) (info);
+			success = (task->cur_func) (info);
 
 			statements = tracker_extract_info_get_metadata_builder (info);
 			items = tracker_sparql_builder_get_length (statements);
 
-			if (items > 0) {
+			if (items > 0)
 				tracker_sparql_builder_insert_close (statements);
-				task->success = TRUE;
-			}
+
+			task->success = success;
 		}
 
 		g_free (mime_used);
@@ -340,14 +345,14 @@ get_file_metadata (TrackerExtractTask  *task,
 
 	g_debug ("Done (%d objects added)\n", items);
 
-	if (items == 0) {
+	if (!success) {
 		tracker_extract_info_unref (info);
 		info = NULL;
 	}
 
 	*info_out = info;
 
-	return (items > 0);
+	return success;
 }
 
 /* This function is called on the thread calling g_cancellable_cancel() */
@@ -378,6 +383,7 @@ extract_task_new (TrackerExtract *extract,
                   const gchar    *uri,
                   const gchar    *mimetype,
                   const gchar    *graph,
+                  const gchar    *urn,
                   GCancellable   *cancellable,
                   GAsyncResult   *res,
                   GError        **error)
@@ -418,6 +424,7 @@ extract_task_new (TrackerExtract *extract,
 	task->file = g_strdup (uri);
 	task->mimetype = mimetype_used;
 	task->graph = g_strdup (graph);
+	task->urn = g_strdup (urn);
 	task->extract = extract;
 
 	if (task->cancellable) {
@@ -450,6 +457,7 @@ extract_task_free (TrackerExtractTask *task)
 		tracker_mimetype_info_free (task->mimetype_handlers);
 	}
 
+	g_free (task->urn);
 	g_free (task->graph);
 	g_free (task->mimetype);
 	g_free (task->file);
@@ -464,6 +472,10 @@ filter_module (TrackerExtract *extract,
 	TrackerExtractPrivate *priv;
 	gchar *module_basename, *filter_name;
 	gboolean filter;
+
+	if (!module) {
+		return FALSE;
+	}
 
 	priv = TRACKER_EXTRACT_GET_PRIVATE (extract);
 
@@ -511,25 +523,15 @@ get_metadata (TrackerExtractTask *task)
 	         task->file);
 #endif /* THREAD_ENABLE_TRACE */
 
-	if (task->cancellable &&
-	    g_cancellable_is_cancelled (task->cancellable)) {
-		g_simple_async_result_set_error ((GSimpleAsyncResult *) task->res,
-		                                 G_IO_ERROR, G_IO_ERROR_CANCELLED,
-		                                 "Extraction of '%s' was cancelled",
-		                                 task->file);
-
-		g_simple_async_result_complete_in_idle ((GSimpleAsyncResult *) task->res);
+	if (g_task_return_error_if_cancelled (G_TASK (task->res))) {
 		extract_task_free (task);
 		return FALSE;
 	}
 
 	if (!filter_module (task->extract, task->cur_module) &&
 	    get_file_metadata (task, &info)) {
-		g_simple_async_result_set_op_res_gpointer ((GSimpleAsyncResult *) task->res,
-		                                           info,
-		                                           (GDestroyNotify) tracker_extract_info_unref);
-
-		g_simple_async_result_complete_in_idle ((GSimpleAsyncResult *) task->res);
+		g_task_return_pointer (G_TASK (task->res), info,
+		                       (GDestroyNotify) tracker_extract_info_unref);
 		extract_task_free (task);
 	} else {
 		/* Reinject the task into the main thread
@@ -609,17 +611,15 @@ dispatch_task_cb (TrackerExtractTask *task)
 	}
 
 	if (error) {
-		g_simple_async_result_set_from_error ((GSimpleAsyncResult *) task->res, error);
-		g_simple_async_result_complete_in_idle ((GSimpleAsyncResult *) task->res);
+		g_task_return_error (G_TASK (task->res), error);
 		extract_task_free (task);
-		g_error_free (error);
 
 		return FALSE;
 	}
 
 	task->cur_module = module = tracker_mimetype_info_get_module (task->mimetype_handlers, &task->cur_func, &thread_awareness);
 
-	if (!module || !task->cur_func) {
+	if (!task->cur_func) {
 		g_warning ("Discarding task, no module able to handle '%s'", task->file);
 		priv->unhandled_count++;
 		extract_task_free (task);
@@ -629,12 +629,11 @@ dispatch_task_cb (TrackerExtractTask *task)
 	switch (thread_awareness) {
 	case TRACKER_MODULE_NONE:
 		/* Error out */
-		g_simple_async_result_set_error ((GSimpleAsyncResult *) task->res,
-		                                 tracker_extract_error_quark (),
-		                                 TRACKER_EXTRACT_ERROR_NO_EXTRACTOR,
-		                                 "Module '%s' initialization failed",
-		                                 g_module_name (module));
-		g_simple_async_result_complete_in_idle ((GSimpleAsyncResult *) task->res);
+		g_task_return_new_error (G_TASK (task->res),
+		                         tracker_extract_error_quark (),
+		                         TRACKER_EXTRACT_ERROR_NO_EXTRACTOR,
+		                         "Module '%s' initialization failed",
+		                         g_module_name (module));
 		extract_task_free (task);
 		break;
 	case TRACKER_MODULE_MAIN_THREAD:
@@ -662,8 +661,7 @@ dispatch_task_cb (TrackerExtractTask *task)
 			                           g_async_queue_ref (async_queue),
 			                           &error);
 			if (!thread) {
-				g_simple_async_result_take_error ((GSimpleAsyncResult *) task->res, error);
-				g_simple_async_result_complete_in_idle ((GSimpleAsyncResult *) task->res);
+				g_task_return_error (G_TASK (task->res), error);
 				extract_task_free (task);
 				return FALSE;
 			}
@@ -686,10 +684,8 @@ dispatch_task_cb (TrackerExtractTask *task)
 		g_thread_pool_push (priv->thread_pool, task, &error);
 
 		if (error) {
-			g_simple_async_result_set_from_error ((GSimpleAsyncResult *) task->res, error);
-			g_simple_async_result_complete_in_idle ((GSimpleAsyncResult *) task->res);
+			g_task_return_error (G_TASK (task->res), error);
 			extract_task_free (task);
-			g_error_free (error);
 
 			return FALSE;
 		}
@@ -706,13 +702,14 @@ tracker_extract_file (TrackerExtract      *extract,
                       const gchar         *file,
                       const gchar         *mimetype,
                       const gchar         *graph,
+                      const gchar         *urn,
                       GCancellable        *cancellable,
                       GAsyncReadyCallback  cb,
                       gpointer             user_data)
 {
-	GSimpleAsyncResult *res;
 	GError *error = NULL;
 	TrackerExtractTask *task;
+	GTask *async_task;
 
 	g_return_if_fail (TRACKER_IS_EXTRACT (extract));
 	g_return_if_fail (file != NULL);
@@ -724,16 +721,14 @@ tracker_extract_file (TrackerExtract      *extract,
 	         file);
 #endif /* THREAD_ENABLE_TRACE */
 
-	res = g_simple_async_result_new (G_OBJECT (extract), cb, user_data, NULL);
+	async_task = g_task_new (extract, cancellable, cb, user_data);
 
-	task = extract_task_new (extract, file, mimetype, graph,
-	                         cancellable, G_ASYNC_RESULT (res), &error);
+	task = extract_task_new (extract, file, mimetype, graph, urn,
+	                         cancellable, G_ASYNC_RESULT (async_task), &error);
 
 	if (error) {
 		g_warning ("Could not get mimetype, %s", error->message);
-		g_simple_async_result_set_from_error (res, error);
-		g_simple_async_result_complete_in_idle (res);
-		g_error_free (error);
+		g_task_return_error (async_task, error);
 	} else {
 		TrackerExtractPrivate *priv;
 
@@ -747,7 +742,7 @@ tracker_extract_file (TrackerExtract      *extract,
 	}
 
 	/* Task takes a ref and if this fails, we want to unref anyway */
-	g_object_unref (res);
+	g_object_unref (async_task);
 }
 
 #ifdef HAVE_LIBMEDIAART
@@ -782,7 +777,7 @@ tracker_extract_get_metadata_by_cmdline (TrackerExtract *object,
 
 	g_return_if_fail (uri != NULL);
 
-	task = extract_task_new (object, uri, mime, NULL, NULL, NULL, &error);
+	task = extract_task_new (object, uri, mime, NULL, "_:file", NULL, NULL, &error);
 
 	if (error) {
 		g_printerr ("%s, %s\n",
@@ -796,7 +791,7 @@ tracker_extract_get_metadata_by_cmdline (TrackerExtract *object,
 	task->mimetype_handlers = tracker_extract_module_manager_get_mimetype_handlers (task->mimetype);
 	task->cur_module = tracker_mimetype_info_get_module (task->mimetype_handlers, &task->cur_func, NULL);
 
-	while (task->cur_module && task->cur_func) {
+	while (task->cur_func) {
 		if (!filter_module (object, task->cur_module) &&
 		    get_file_metadata (task, &info)) {
 			const gchar *preupdate_str, *postupdate_str, *statements_str, *where;
@@ -855,4 +850,16 @@ tracker_extract_get_metadata_by_cmdline (TrackerExtract *object,
 	}
 
 	extract_task_free (task);
+}
+
+TrackerExtractInfo *
+tracker_extract_file_finish (TrackerExtract  *extract,
+                             GAsyncResult    *res,
+                             GError         **error)
+{
+	g_return_val_if_fail (TRACKER_IS_EXTRACT (extract), NULL);
+	g_return_val_if_fail (G_IS_ASYNC_RESULT (res), NULL);
+	g_return_val_if_fail (!error || !*error, NULL);
+
+	return g_task_propagate_pointer (G_TASK (res), error);
 }

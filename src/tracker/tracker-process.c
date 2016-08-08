@@ -26,6 +26,20 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 
+#ifdef __OpenBSD__
+#include <sys/param.h>
+#include <sys/proc.h>
+#include <sys/sysctl.h>
+#include <fcntl.h>
+#include <kvm.h>
+#include <unistd.h>
+#endif
+
+#ifdef __sun
+#define _STRUCTURED_PROC 1
+#include <sys/procfs.h>
+#endif
+
 #include "tracker-process.h"
 
 static TrackerProcessData *
@@ -96,15 +110,18 @@ tracker_process_get_uid_for_pid (const gchar  *pid_as_string,
 	GFileInfo *info;
 	GError *error = NULL;
 	gchar *fn;
+	gchar *proc_dir_name;
 	guint uid;
 
+	proc_dir_name = g_build_filename ("/proc", pid_as_string, NULL);
+
 #ifdef __sun /* Solaris */
-	fn = g_build_filename ("/proc", pid_as_string, "psinfo", NULL);
+	fn = g_build_filename (proc_dir_name, "psinfo", NULL);
 #else
-	fn = g_build_filename ("/proc", pid_as_string, "cmdline", NULL);
+	fn = g_build_filename (proc_dir_name, "cmdline", NULL);
 #endif
 
-	f = g_file_new_for_path (fn);
+	f = g_file_new_for_path (proc_dir_name);
 	info = g_file_query_info (f,
 	                          G_FILE_ATTRIBUTE_UNIX_UID,
 	                          G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
@@ -112,13 +129,15 @@ tracker_process_get_uid_for_pid (const gchar  *pid_as_string,
 	                          &error);
 
 	if (error) {
-		g_printerr ("%s '%s', %s", _("Could not stat() file"), fn, error->message);
+		g_printerr ("%s '%s', %s", _("Could not stat() file"), proc_dir_name, error->message);
 		g_error_free (error);
 		uid = 0;
 	} else {
 		uid = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_UID);
 		g_object_unref (info);
 	}
+
+	g_free (proc_dir_name);
 
 	if (filename) {
 		*filename = fn;
@@ -134,6 +153,7 @@ tracker_process_get_uid_for_pid (const gchar  *pid_as_string,
 GSList *
 tracker_process_find_all (void)
 {
+#ifndef __OpenBSD__
 	GSList *pids, *l;
 	GSList *found_pids = NULL;
 	guint32 own_pid;
@@ -221,6 +241,50 @@ tracker_process_find_all (void)
 	g_slist_free (pids);
 
 	return g_slist_reverse (found_pids);
+#else /* ! __OpenBSD__ */
+	GSList *found_pids = NULL;
+	gchar **strv;
+	gchar *basename;
+	pid_t pid;
+	gint i, nproc;
+	gchar buf[_POSIX2_LINE_MAX];
+	struct kinfo_proc *plist, *kp;
+	kvm_t *kd;
+
+	if ((kd = kvm_openfiles (NULL, NULL, NULL, KVM_NO_FILES, buf)) == NULL)
+		return NULL;
+
+	if ((plist = kvm_getprocs (kd, KERN_PROC_ALL, 0, sizeof (*plist), &nproc)) == NULL)
+		return NULL;
+
+	for (i = 0, kp = plist; i < nproc; i++, kp++) {
+		if ((kp->p_flag & P_SYSTEM) != 0)
+			continue;
+		if ((strv = kvm_getargv (kd, kp, 0)) == NULL)
+			continue;
+
+		pid = kp->p_pid;
+
+		/* Don't return our own PID */
+		if (pid == getpid ())
+			continue;
+
+		/* Don't return PID we don't own */
+		if (kp->p_uid != getuid ())
+			continue;
+
+		basename = g_path_get_basename (strv[0]);
+
+		if ((g_str_has_prefix (basename, "tracker") ||
+		     g_str_has_prefix (basename, "lt-tracker"))) {
+			found_pids = g_slist_prepend (found_pids, process_data_new (basename, pid));
+		} else {
+			g_free (basename);
+		}
+	}
+
+	return g_slist_reverse (found_pids);
+#endif
 }
 
 gint

@@ -95,8 +95,7 @@ typedef enum {
 	EXTRACT_MIME_AUDIO,
 	EXTRACT_MIME_VIDEO,
 	EXTRACT_MIME_IMAGE,
-	EXTRACT_MIME_GUESS,
-	EXTRACT_MIME_SVG,
+	EXTRACT_MIME_GUESS
 } ExtractMime;
 
 typedef struct {
@@ -255,7 +254,8 @@ get_gst_date_time_to_buf (GstDateTime *date_time,
 	gboolean complete;
 
 	offset_str = "+";
-	year = month = day = hour = minute = second = 0;
+	year = hour = minute = second = 0;
+	month = day = 1;
 	offset = 0.0;
 	complete = TRUE;
 
@@ -297,7 +297,7 @@ get_gst_date_time_to_buf (GstDateTime *date_time,
 		complete = FALSE;
 	}
 
-	snprintf (buf, size, "%04d-%02d-%02dT%02d:%02d:%02d%s%02d00",
+	snprintf (buf, size, "%04d-%02d-%02dT%02d:%02d:%02d%s%02d:00",
 	          year,
 	          month,
 	          day,
@@ -320,7 +320,7 @@ add_date_time_gst_tag_with_mtime_fallback (TrackerSparqlBuilder  *metadata,
 {
 	GstDateTime *date_time;
 	GDate *date;
-	gchar buf[25];
+	gchar buf[26];
 
 	date_time = NULL;
 	date = NULL;
@@ -1013,6 +1013,16 @@ extract_track_metadata (MetadataExtractor    *extractor,
 	if (toc_entry->duration > 0) {
 		tracker_sparql_builder_predicate (postupdate, "nfo:duration");
 		tracker_sparql_builder_object_int64 (postupdate, (gint64)toc_entry->duration);
+	} else if (extractor->toc->entry_list &&
+	           toc_entry == g_list_last (extractor->toc->entry_list)->data) {
+		/* The last element may not have a duration, because it depends
+		 * on the duration of the media file rather than info from the
+		 * cue sheet. In this case figure the data out from the total
+		 * duration.
+		 */
+		tracker_sparql_builder_predicate (postupdate, "nfo:duration");
+		tracker_sparql_builder_object_int64 (postupdate,
+						     (gint64) extractor->duration - toc_entry->start);
 	}
 
 	tracker_sparql_builder_predicate (postupdate, "nfo:audioOffset");
@@ -1046,7 +1056,7 @@ delete_existing_tracks (TrackerSparqlBuilder *postupdate,
 
 	tracker_sparql_builder_subject_variable (postupdate, "track");
 	tracker_sparql_builder_predicate (postupdate, "a");
-	tracker_sparql_builder_object (postupdate, "rdfs:Resource");
+	tracker_sparql_builder_object (postupdate, "nmm:MusicPiece");
 
 	if (graph) {
 		tracker_sparql_builder_graph_close (postupdate);
@@ -1200,12 +1210,7 @@ extract_metadata (MetadataExtractor      *extractor,
 #endif
 		} else {
 			tracker_sparql_builder_object (metadata, "nfo:Image");
-
-			if (extractor->mime != EXTRACT_MIME_SVG) {
-				tracker_sparql_builder_object (metadata, "nmm:Photo");
-			} else {
-				tracker_sparql_builder_object (metadata, "nfo:VectorImage");
-			}
+			tracker_sparql_builder_object (metadata, "nmm:Photo");
 		}
 	}
 
@@ -1381,7 +1386,6 @@ common_extract_stream_metadata (MetadataExtractor    *extractor,
 	}
 
 	if (extractor->mime == EXTRACT_MIME_IMAGE ||
-	    extractor->mime == EXTRACT_MIME_SVG ||
 	    extractor->mime == EXTRACT_MIME_VIDEO) {
 
 		if (extractor->width >= 0) {
@@ -1510,7 +1514,10 @@ discoverer_init_and_run (MetadataExtractor *extractor,
 			g_message ("Missing a GStreamer plugin for %s. %s", uri,
 			           required_plugins_message);
 			g_free (required_plugins_message);
-		} else {
+		} else if (error->domain != GST_STREAM_ERROR ||
+		           (error->code != GST_STREAM_ERROR_TYPE_NOT_FOUND &&
+		            error->code != GST_STREAM_ERROR_WRONG_TYPE &&
+		            error->code != GST_STREAM_ERROR_DECODE)) {
 			g_warning ("Call to gst_discoverer_discover_uri(%s) failed: %s",
 			           uri, error->message);
 		}
@@ -1662,7 +1669,9 @@ tracker_extract_gstreamer (const gchar          *uri,
 		                  graph);
 
 #ifdef HAVE_LIBMEDIAART
-		if (extractor->media_art_type != MEDIA_ART_NONE) {
+		if (extractor->media_art_type != MEDIA_ART_NONE &&
+		    (extractor->media_art_artist != NULL ||
+		     extractor->media_art_title != NULL)) {
 			GError *error = NULL;
 			gboolean success = TRUE;
 
@@ -1742,9 +1751,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	} else
 #endif /* GSTREAMER_BACKEND_GUPNP_DLNA */
 
-	if (strcmp (mimetype, "image/svg+xml") == 0) {
-		tracker_extract_gstreamer (uri, info, EXTRACT_MIME_SVG, graph);
-	} else if (strcmp (mimetype, "video/3gpp") == 0 ||
+	if (strcmp (mimetype, "video/3gpp") == 0 ||
 	           strcmp (mimetype, "video/mp4") == 0 ||
                    strcmp (mimetype, "video/x-ms-asf") == 0 ||
                    strcmp (mimetype, "application/vnd.ms-asf") == 0 ||

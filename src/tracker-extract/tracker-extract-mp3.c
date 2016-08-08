@@ -675,12 +675,21 @@ get_encoding (const gchar *data,
               gsize        size,
               gboolean    *encoding_found)
 {
+	gdouble confidence = 1;
 	gchar *encoding;
 
 	/* Try to guess encoding */
 	encoding = (data && size ?
-	            tracker_encoding_guess (data, size) :
+	            tracker_encoding_guess (data, size, &confidence) :
 	            NULL);
+
+	if (confidence < 0.5) {
+		/* Confidence on the results was too low, bail out and
+		 * fallback to the default ISO-8859-1/Windows-1252 encoding.
+		 */
+		g_free (encoding);
+		encoding = NULL;
+	}
 
 	/* Notify if a proper detection was done */
 	if (encoding_found) {
@@ -1001,7 +1010,7 @@ mp3_parse_header (const gchar          *data,
 	return TRUE;
 }
 
-static void
+static gboolean
 mp3_parse (const gchar          *data,
            size_t                size,
            size_t                offset,
@@ -1016,7 +1025,7 @@ mp3_parse (const gchar          *data,
 	do {
 		/* Seek for frame start */
 		if (pos + sizeof (header) > size) {
-			return;
+			return FALSE;
 		}
 
 		memcpy (&header, &data[pos], sizeof (header));
@@ -1024,13 +1033,15 @@ mp3_parse (const gchar          *data,
 		if ((header & sync_mask) == sync_mask) {
 			/* Found header sync */
 			if (mp3_parse_header (data, size, pos, uri, metadata, filedata)) {
-				return;
+				return TRUE;
 			}
 		}
 
 		pos++;
 		counter++;
 	} while (counter < MAX_MP3_SCAN_DEEP);
+
+	return FALSE;
 }
 
 static gssize
@@ -1826,7 +1837,7 @@ parse_id3v24 (const gchar           *data,
 		 * simply the total tag size excluding the frames and
 		 * the headers, in other words the padding.
 		 */
-		if (tsize + ext_header_size > size) {
+		if (tsize + header_size + ext_header_size > size) {
 			g_message ("[v24] Expected MP3 tag size and extended header size to be within file size boundaries");
 			return;
 		}
@@ -1834,7 +1845,7 @@ parse_id3v24 (const gchar           *data,
 		pos += ext_header_size;
 	}
 
-	while (pos < size) {
+	while (pos < tsize + header_size) {
 		const char *frame_name;
 		id3v24frame frame;
 		size_t csize;
@@ -1845,15 +1856,26 @@ parse_id3v24 (const gchar           *data,
 		 *   Size           $xx xx xx xx
 		 *   Flags          $xx xx
 		 */
-		if (pos + frame_size > tsize) {
+		if (pos + frame_size > tsize + header_size) {
 			g_message ("[v24] Expected MP3 frame size (%d) to be within tag size (%d) boundaries, position = %d",
 			           frame_size,
-			           tsize,
+			           tsize + header_size,
 			           pos);
 			break;
 		}
 
 		frame_name = &data[pos];
+
+		/* We found padding after all frames */
+		if (frame_name[0] == '\0')
+			break;
+
+		/* We found a IDv2 footer */
+		if (frame_name[0] == '3' &&
+		    frame_name[1] == 'D' &&
+		    frame_name[2] == 'I')
+			break;
+
 		frame = id3v24_get_frame (frame_name);
 
 		csize = (((data[pos+4] & 0x7F) << 21) |
@@ -1877,8 +1899,8 @@ parse_id3v24 (const gchar           *data,
 
 		/* If content size is more than size of file, stop. If
 		 * If content size is 0 then continue to next frame. */
-		if (pos + csize > tsize) {
-			g_debug ("[v24] Position (%d) + content size (%" G_GSIZE_FORMAT ") > tag size (%d), not processing any more frames", pos, csize, tsize);
+		if (pos + csize > tsize + header_size) {
+			g_debug ("[v24] Position (%d) + content size (%" G_GSIZE_FORMAT ") > tag size (%d), not processing any more frames", pos, csize, tsize + header_size);
 			break;
 		} else if (csize == 0) {
 			g_debug ("[v24] Content size was 0, moving to next frame");
@@ -2019,7 +2041,7 @@ parse_id3v23 (const gchar          *data,
 		 * simply the total tag size excluding the frames and
 		 * the headers, in other words the padding.
 		 */
-		if (tsize + ext_header_size > size) {
+		if (tsize + header_size + ext_header_size > size) {
 			g_message ("[v23] Expected MP3 tag size and extended header size to be within file size boundaries");
 			return;
 		}
@@ -2027,7 +2049,7 @@ parse_id3v23 (const gchar          *data,
 		pos += ext_header_size;
 	}
 
-	while (pos < size) {
+	while (pos < tsize + header_size) {
 		const char *frame_name;
 		id3v24frame frame;
 		size_t csize;
@@ -2038,15 +2060,20 @@ parse_id3v23 (const gchar          *data,
 		 *   Size           $xx xx xx xx
 		 *   Flags          $xx xx
 		 */
-		if (pos + frame_size > tsize) {
+		if (pos + frame_size > tsize + header_size) {
 			g_message ("[v23] Expected MP3 frame size (%d) to be within tag size (%d) boundaries, position = %d",
 			           frame_size,
-			           tsize,
+			           tsize + header_size,
 			           pos);
 			break;
 		}
 
 		frame_name = &data[pos];
+
+		/* We found padding after all frames */
+		if (frame_name[0] == '\0')
+			break;
+
 		frame = id3v24_get_frame (frame_name);
 
 		csize = (((unsigned char)(data[pos + 4]) << 24) |
@@ -2070,8 +2097,8 @@ parse_id3v23 (const gchar          *data,
 
 		/* If content size is more than size of file, stop. If
 		 * If content size is 0 then continue to next frame. */
-		if (pos + csize > tsize) {
-			g_debug ("[v23] Position (%d) + content size (%" G_GSIZE_FORMAT ") > tag size (%d), not processing any more frames", pos, csize, tsize);
+		if (pos + csize > tsize + header_size) {
+			g_debug ("[v23] Position (%d) + content size (%" G_GSIZE_FORMAT ") > tag size (%d), not processing any more frames", pos, csize, tsize + header_size);
 			break;
 		} else if (csize == 0) {
 			g_debug ("[v23] Content size was 0, moving to next frame");
@@ -2158,20 +2185,25 @@ parse_id3v20 (const gchar          *data,
 
 	pos = header_size;
 
-	while (pos < size) {
+	while (pos < tsize + header_size) {
 		const char *frame_name;
 		id3v2frame frame;
 		size_t csize;
 
-		if (pos + frame_size > tsize)  {
+		if (pos + frame_size > tsize + header_size)  {
 			g_message ("[v20] Expected MP3 frame size (%d) to be within tag size (%d) boundaries, position = %d",
 			           frame_size,
-			           tsize,
+			           tsize + header_size,
 			           pos);
 			break;
 		}
 
 		frame_name = &data[pos];
+
+		/* We found padding after all frames */
+		if (frame_name[0] == '\0')
+			break;
+
 		frame = id3v2_get_frame (frame_name);
 
 		csize = (((unsigned char)(data[pos + 3]) << 16) +
@@ -2189,8 +2221,8 @@ parse_id3v20 (const gchar          *data,
 
 		/* If content size is more than size of file, stop. If
 		 * If content size is 0 then continue to next frame. */
-		if (pos + csize > tsize) {
-			g_debug ("[v20] Position (%d) + content size (%" G_GSIZE_FORMAT ") > tag size (%d), not processing any more frames", pos, csize, tsize);
+		if (pos + csize > tsize + header_size) {
+			g_debug ("[v20] Position (%d) + content size (%" G_GSIZE_FORMAT ") > tag size (%d), not processing any more frames", pos, csize, tsize + header_size);
 			break;
 		} else if (csize == 0) {
 			g_debug ("[v20] Content size was 0, moving to next frame");
@@ -2257,6 +2289,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	TrackerSparqlBuilder *metadata, *preupdate;
 	GFile *file;
 	const gchar *graph;
+	gboolean parsed;
 
 	graph = tracker_extract_info_get_graph (info);
 	metadata = tracker_extract_info_get_metadata_builder (info);
@@ -2655,10 +2688,10 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	g_free (md.album_uri);
 
 	/* Get mp3 stream info */
-	mp3_parse (buffer, buffer_size, audio_offset, uri, metadata, &md);
+	parsed = mp3_parse (buffer, buffer_size, audio_offset, uri, metadata, &md);
 
 #ifdef HAVE_LIBMEDIAART
-	if (md.performer || md.album) {
+	if (parsed && (md.performer || md.album)) {
 		MediaArtProcess *media_art_process;
 		GError *error = NULL;
 		gboolean success = TRUE;
@@ -2711,6 +2744,6 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	g_free (filename);
 	g_free (uri);
 
-	return TRUE;
+	return parsed;
 }
 

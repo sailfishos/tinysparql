@@ -929,6 +929,9 @@ init_mount_points (TrackerMinerFiles *miner_files)
 
 		urn = tracker_sparql_cursor_get_string (cursor, 0, NULL);
 
+		if (!urn)
+			continue;
+
 		if (strcmp (urn, TRACKER_DATASOURCE_URN_NON_REMOVABLE_MEDIA) == 0) {
 			/* Report non-removable media to be mounted by HAL as well */
 			state |= VOLUME_MOUNTED;
@@ -1152,9 +1155,6 @@ mount_point_removed_cb (TrackerStorage *storage,
 	g_debug ("Mount point removed for URN '%s'", urn);
 
 	mount_point_file = g_file_new_for_path (mount_point);
-
-	/* Notify extractor about cancellation of all tasks under the mount point */
-	tracker_extract_client_cancel_for_prefix (mount_point_file);
 
 	/* Tell TrackerMinerFS to skip monitoring everything under the mount
 	 *  point (in case there was no pre-unmount notification) */
@@ -2133,6 +2133,41 @@ process_file_cb (GObject      *object,
 
 	data->mime_type = g_strdup (mime_type);
 
+	if (is_iri) {
+		gchar *delete_properties_sparql;
+
+		/* Update: delete all statements inserted by miner except:
+		 *  - rdf:type statements as they could cause implicit deletion of user data
+		 *  - nie:contentCreated so it persists across updates
+		 *
+		 * Additionally, delete also nie:url as it might have been set by 3rd parties,
+		 * and it's used to know whether a file is known to tracker or not.
+		 */
+		delete_properties_sparql =
+			g_strdup_printf ("DELETE {"
+			                 "  GRAPH <%s> {"
+			                 "    <%s> ?p ?o"
+			                 "  } "
+			                 "} "
+			                 "WHERE {"
+			                 "  GRAPH <%s> {"
+			                 "    <%s> ?p ?o"
+			                 "    FILTER (?p != rdf:type && ?p != nie:contentCreated)"
+			                 "  } "
+			                 "} "
+			                 "DELETE {"
+			                 "  <%s> nie:url ?o"
+			                 "} WHERE {"
+			                 "  <%s> nie:url ?o"
+			                 "}",
+			                 TRACKER_OWN_GRAPH_URN, urn,
+			                 TRACKER_OWN_GRAPH_URN, urn,
+			                 urn, urn);
+
+		tracker_sparql_builder_prepend (sparql, delete_properties_sparql);
+		g_free (delete_properties_sparql);
+	}
+
 	tracker_sparql_builder_insert_silent_open (sparql, NULL);
 	tracker_sparql_builder_graph_open (sparql, TRACKER_OWN_GRAPH_URN);
 
@@ -2321,6 +2356,18 @@ process_file_attributes_cb (GObject      *object,
 	tracker_sparql_builder_object_date (sparql, (time_t *) &time_);
 	tracker_sparql_builder_graph_close (sparql);
 	tracker_sparql_builder_insert_close (sparql);
+
+	/* Delete data sources from other miners/decorators */
+	tracker_sparql_builder_delete_open (sparql, NULL);
+	tracker_sparql_builder_subject_iri (sparql, urn);
+	tracker_sparql_builder_predicate (sparql, "nie:dataSource");
+	tracker_sparql_builder_object_variable (sparql, "datasource");
+	tracker_sparql_builder_delete_close (sparql);
+	tracker_sparql_builder_where_open (sparql);
+	tracker_sparql_builder_subject_iri (sparql, urn);
+	tracker_sparql_builder_predicate (sparql, "nie:dataSource");
+	tracker_sparql_builder_object_variable (sparql, "datasource");
+	tracker_sparql_builder_where_close (sparql);
 
 	g_object_unref (file_info);
 	g_free (uri);

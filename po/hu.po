@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: tracker master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=tracker&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-08-31 12:03+0000\n"
-"PO-Revision-Date: 2015-08-31 19:25+0200\n"
+"POT-Creation-Date: 2015-07-17 00:07+0000\n"
+"PO-Revision-Date: 2015-07-17 16:42+0200\n"
 "Last-Translator: Balázs Úr <urbalazs@gmail.com>\n"
 "Language-Team: Hungarian <openscope at googlegroups dot com>\n"
 "Language: hu\n"
@@ -175,7 +175,7 @@ msgstr "Hiba a „tar” program indításakor"
 
 #: ../src/libtracker-data/tracker-data-backup.c:501
 #: ../src/libtracker-data/tracker-data-backup.c:621
-#: ../src/miners/rss/tracker-main.c:114
+#: ../src/miners/rss/tracker-main.c:106
 #: ../src/plugins/nautilus/tracker-tags-view.c:241
 #: ../src/tracker-extract/tracker-extract.c:146
 #: ../src/tracker-needle/tracker-tags-view.vala:159
@@ -189,8 +189,8 @@ msgstr "Hiba a „tar” program indításakor"
 #: ../src/tracker/tracker-index.c:123 ../src/tracker/tracker-index.c:155
 #: ../src/tracker/tracker-index.c:196 ../src/tracker/tracker-index.c:272
 #: ../src/tracker/tracker-index.c:329 ../src/tracker/tracker-info.c:264
-#: ../src/tracker/tracker-process.c:66 ../src/tracker/tracker-process.c:186
-#: ../src/tracker/tracker-process.c:271 ../src/tracker/tracker-process.c:292
+#: ../src/tracker/tracker-process.c:75 ../src/tracker/tracker-process.c:196
+#: ../src/tracker/tracker-process.c:325 ../src/tracker/tracker-process.c:346
 #: ../src/tracker/tracker-search.c:1579 ../src/tracker/tracker-sparql.c:168
 #: ../src/tracker/tracker-sparql.c:1078 ../src/tracker/tracker-status.c:176
 #: ../src/tracker/tracker-status.c:422 ../src/tracker/tracker-status.c:432
@@ -615,15 +615,16 @@ msgstr "RSS/ATOM hírforrások"
 msgid "Fetch RSS/ATOM Feeds"
 msgstr "RSS/ATOM hírforrások lekérése"
 
-#: ../src/miners/rss/tracker-main.c:44
-msgid "Add feed (must be used with --title)"
-msgstr "Hírforrás hozzáadása  (a --title kapcsolóval együtt használandó)"
-
+#. Translators: this is a "feed" as in RSS
 #: ../src/miners/rss/tracker-main.c:45
+msgid "Add feed"
+msgstr "Hírforrás hozzáadása"
+
+#: ../src/miners/rss/tracker-main.c:46
 msgid "URL"
 msgstr "URL"
 
-#: ../src/miners/rss/tracker-main.c:48
+#: ../src/miners/rss/tracker-main.c:49
 msgid "Title to use (must be used with --add-feed)"
 msgstr "Használandó cím (a --add-feed kapcsolóval együtt használandó)"
 
@@ -634,11 +635,7 @@ msgstr "Használandó cím (a --add-feed kapcsolóval együtt használandó)"
 msgid "- start the feeds indexer"
 msgstr "– a hírforrás-indexelő elindítása"
 
-#: ../src/miners/rss/tracker-main.c:78
-msgid "Adding a feed requires --add-feed and --title"
-msgstr "Hírforrás hozzáadásához a --add-feed és a --title is szükséges"
-
-#: ../src/miners/rss/tracker-main.c:113 ../src/tracker/tracker-index.c:195
+#: ../src/miners/rss/tracker-main.c:105 ../src/tracker/tracker-index.c:195
 #: ../src/tracker/tracker-info.c:263 ../src/tracker/tracker-search.c:1578
 #: ../src/tracker/tracker-sparql.c:167 ../src/tracker/tracker-sparql.c:1077
 #: ../src/tracker/tracker-status.c:175 ../src/tracker/tracker-status.c:505
@@ -646,7 +643,7 @@ msgstr "Hírforrás hozzáadásához a --add-feed és a --title is szükséges"
 msgid "Could not establish a connection to Tracker"
 msgstr "Nem hozható létre kapcsolat a Trackerhez"
 
-#: ../src/miners/rss/tracker-main.c:139
+#: ../src/miners/rss/tracker-main.c:133
 msgid "Could not add feed"
 msgstr "A hírforrás nem vehető fel"
 
@@ -764,11 +761,11 @@ msgstr ""
 "korlátozott környezetben hasznos, ahol fontos a fájlok felsorolása a lehető "
 "leggyorsabban, de a metaadatokra lehet várni."
 
-#: ../src/tracker-extract/tracker-extract.c:789
+#: ../src/tracker-extract/tracker-extract.c:790
 msgid "Metadata extraction failed"
 msgstr "A metaadatok kinyerése sikertelen"
 
-#: ../src/tracker-extract/tracker-extract.c:854
+#: ../src/tracker-extract/tracker-extract.c:855
 msgid "No metadata or extractor modules found to handle this file"
 msgstr "Nem találhatók metaadat- vagy kinyerő modulok ezen fájl kezeléséhez"
 
@@ -820,6 +817,20 @@ msgstr "Tracker metaadat-kinyerő"
 msgid "Extracts metadata from local files"
 msgstr "Metaadatok kinyerése helyi fájlokból"
 
+#: ../src/tracker-needle/org.freedesktop.Tracker.Needle.gschema.xml.in.h:1
+msgid "Default View"
+msgstr "Alapértelmezett nézet"
+
+#: ../src/tracker-needle/org.freedesktop.Tracker.Needle.gschema.xml.in.h:2
+msgid ""
+"When 0, default view of tracker-needle will be Icons view. When 1, default "
+"view of tracker-needle will be Categories view. When 2, default view of "
+"tracker-needle will be Files view."
+msgstr ""
+"Ha 0, akkor a tracker-needle alapértelmezett nézete Ikonok nézet lesz. Ha 1, "
+"akkor a tracker-needle alapértelmezett nézete Kategóriák nézet lesz. Ha 2, "
+"akkor a tracker-needle alapértelmezett nézete Fájlok nézet lesz."
+
 #: ../src/tracker-needle/tracker-needle.desktop.in.in.h:1
 #: ../src/tracker-needle/tracker-needle.ui.h:1
 msgid "Desktop Search"
@@ -852,58 +863,62 @@ msgstr "Talált képek megjelenítése"
 
 #: ../src/tracker-needle/tracker-needle.ui.h:5
 msgid "Find search criteria inside files"
-msgstr "Keresőkifejezés keresése fájltartalomban"
+msgstr "Keresési feltétel keresése fájltartalomban"
 
 #: ../src/tracker-needle/tracker-needle.ui.h:6
 msgid "Find search criteria in file titles"
-msgstr "Keresőkifejezés keresése fájlnevekben"
+msgstr "Keresési feltétel keresése fájlnevekben"
 
 #: ../src/tracker-needle/tracker-needle.ui.h:7
+msgid "Find search criteria in file tags only (separated by comma)"
+msgstr "Keresési feltétel keresése csak fájlcímkékben (vesszővel elválasztva)"
+
+#: ../src/tracker-needle/tracker-needle.ui.h:8
 msgid "_Search:"
 msgstr "K_eresés:"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:8
+#: ../src/tracker-needle/tracker-needle.ui.h:9
 msgid "Show tagging panel which allows editing tags of selected results"
 msgstr ""
 "Címkézés panel megjelenítése, amely lehetővé teszi a kijelölt találatok "
 "címkéinek szerkesztését"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:9
+#: ../src/tracker-needle/tracker-needle.ui.h:10
 msgid "Show statistics about the data stored"
 msgstr "Statisztika a tárolt adatokról"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:11
+#: ../src/tracker-needle/tracker-needle.ui.h:12
 #, no-c-format
 msgid "_Set the tags you want to associate with the %d selected items:"
 msgstr "Állítsa be a kijelölt %d elemhez társítandó _címkéket:"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:12
+#: ../src/tracker-needle/tracker-needle.ui.h:13
 msgid "Add tag"
 msgstr "Címke hozzáadása"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:13
+#: ../src/tracker-needle/tracker-needle.ui.h:14
 msgid "Remove selected tag"
 msgstr "Kijelölt címke eltávolítása"
 
-#: ../src/tracker-needle/tracker-needle.vala:71
+#: ../src/tracker-needle/tracker-needle.vala:75
 msgid "Search criteria was too generic"
 msgstr "A keresési feltétel túl általános"
 
-#: ../src/tracker-needle/tracker-needle.vala:72
+#: ../src/tracker-needle/tracker-needle.vala:76
 msgid "Only the first 500 items will be displayed"
 msgstr "Csak az első 500 találat jelenik meg"
 
-#: ../src/tracker-needle/tracker-needle.vala:731
+#: ../src/tracker-needle/tracker-needle.vala:811
 #: ../src/tracker-preferences/tracker-preferences.vala:1016
 msgid "Print version"
 msgstr "Verzió kiírása"
 
-#: ../src/tracker-needle/tracker-needle.vala:738
-#: ../src/tracker-needle/tracker-needle.vala:739
+#: ../src/tracker-needle/tracker-needle.vala:818
+#: ../src/tracker-needle/tracker-needle.vala:819
 msgid "[SEARCH-CRITERIA]"
-msgstr "[KERESÉSI FELTÉTELEK]"
+msgstr "[KERESÉSI-FELTÉTELEK]"
 
-#: ../src/tracker-needle/tracker-needle.vala:744
+#: ../src/tracker-needle/tracker-needle.vala:824
 msgid "Desktop Search user interface using Tracker"
 msgstr "Asztali keresés a Tracker használatával"
 
@@ -2219,35 +2234,35 @@ msgstr "A(z) „%s” nem tracker parancs. Lásd: „tracker --help”"
 msgid "Available tracker commands are:"
 msgstr "Az elérhető tracker parancsok:"
 
-#: ../src/tracker/tracker-process.c:65
+#: ../src/tracker/tracker-process.c:74
 msgid "Could not open /proc"
 msgstr "Nem nyitható meg a /proc"
 
-#: ../src/tracker/tracker-process.c:115
+#: ../src/tracker/tracker-process.c:124
 msgid "Could not stat() file"
 msgstr "A fájl nem érhető el"
 
-#: ../src/tracker/tracker-process.c:183
+#: ../src/tracker/tracker-process.c:193
 #, c-format
 msgid "Could not open '%s'"
 msgstr "Nem nyitható meg a következő: „%s”"
 
-#: ../src/tracker/tracker-process.c:268
+#: ../src/tracker/tracker-process.c:322
 #, c-format
 msgid "Could not terminate process %d - '%s'"
 msgstr "Nem fejeztethető be a(z) %d számú folyamat - „%s”"
 
-#: ../src/tracker/tracker-process.c:274
+#: ../src/tracker/tracker-process.c:328
 #, c-format
 msgid "Terminated process %d - '%s'"
 msgstr "A(z) %d számú folyamat befejeztetve - „%s”"
 
-#: ../src/tracker/tracker-process.c:289
+#: ../src/tracker/tracker-process.c:343
 #, c-format
 msgid "Could not kill process %d - '%s'"
 msgstr "A(z) %d számú folyamat nem lőhető ki - „%s”"
 
-#: ../src/tracker/tracker-process.c:295
+#: ../src/tracker/tracker-process.c:349
 #, c-format
 msgid "Killed process %d - '%s'"
 msgstr "A(z) %d számú folyamat kilőve - „%s”"
@@ -3035,6 +3050,12 @@ msgstr "– a Tracker visszaíró szolgáltatásának elindítása"
 #: ../utils/gtk-sparql/gtk-sparql.ui.h:1
 msgid "Saved queries"
 msgstr "Mentett lekérdezések"
+
+#~ msgid "Add feed (must be used with --title)"
+#~ msgstr "Hírforrás hozzáadása  (a --title kapcsolóval együtt használandó)"
+
+#~ msgid "Adding a feed requires --add-feed and --title"
+#~ msgstr "Hírforrás hozzáadásához a --add-feed és a --title is szükséges"
 
 #~ msgid " - Manage Tracker processes and data"
 #~ msgstr " – Tracker folyamatok és adatok kezelése"
