@@ -45,6 +45,7 @@ BuildRequires:  pkgconfig(totem-plparser)
 BuildRequires:  pkgconfig(uuid)
 #BuildRequires:  pkgconfig(libvala-0.16)
 BuildRequires:  pkgconfig(vorbis)
+BuildRequires:  pkgconfig(flac)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(libavcodec)
@@ -138,7 +139,7 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --enable-guarantee-metadata \
     --with-unicode-support=libicu \
     --enable-libvorbis \
-    --enable-qt \
+    --enable-libflac \
     --enable-generic-media-extractor=libav \
     --disable-enca \
     --disable-journal \
