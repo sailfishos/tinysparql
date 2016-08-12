@@ -18,6 +18,8 @@ bin_PROGRAMS = tracker
 
 tracker_SOURCES = \
 	tracker-main.c \
+	tracker-compatible.c \
+	tracker-compatible.h \	
 	tracker-config.c \
 	tracker-config.h \
 	tracker-color.h \
@@ -55,10 +57,33 @@ tracker_LDADD = \
 	$(BUILD_LIBS) \
 	$(TRACKER_LIBS)
 
+install-data-hook: tracker-compat
+	$(AM_V_GEN) cp -f ./$^ "$(DESTDIR)${bindir}/tracker-control"
+	$(AM_V_GEN) cp -f ./$^ "$(DESTDIR)${bindir}/tracker-import"
+	$(AM_V_GEN) cp -f ./$^ "$(DESTDIR)${bindir}/tracker-info"
+	$(AM_V_GEN) cp -f ./$^ "$(DESTDIR)${bindir}/tracker-search"
+	$(AM_V_GEN) cp -f ./$^ "$(DESTDIR)${bindir}/tracker-sparql"
+	$(AM_V_GEN) cp -f ./$^ "$(DESTDIR)${bindir}/tracker-stats"
+	$(AM_V_GEN) cp -f ./$^ "$(DESTDIR)${bindir}/tracker-tag"
+
+uninstall-hook:
+	$(RM) "$(DESTDIR)$(bindir)/tracker-control" && \
+	$(RM) "$(DESTDIR)$(bindir)/tracker-import" && \
+	$(RM) "$(DESTDIR)$(bindir)/tracker-info" && \
+	$(RM) "$(DESTDIR)$(bindir)/tracker-search" && \
+	$(RM) "$(DESTDIR)$(bindir)/tracker-sparql" && \
+	$(RM) "$(DESTDIR)$(bindir)/tracker-stats" && \
+	$(RM) "$(DESTDIR)$(bindir)/tracker-tag"
+
 # Bash completion
 if WITH_BASH_COMPLETION
 bashcompletiondir = $(BASH_COMPLETION_DIR)
 bashcompletion_DATA = bash-completion/tracker
 endif
 
-EXTRA_DIST = $(bashcompletion_DATA)
+tracker-compat: tracker-compat.in
+	$(AM_V_at)sed -e "s|@bindir[@]|${bindir}|" $< > $@
+	$(AM_V_at)chmod +x $@
+
+EXTRA_DIST = $(bashcompletion_DATA) tracker-compat.in
+CLEANFILES = tracker-compat
