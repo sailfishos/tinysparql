@@ -247,7 +247,7 @@ cd /usr/share/tracker-tests/
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-miner-fs.service
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-store.service
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-extract.service
-%{_oneshotdir}/tracker-configs.sh
+%attr(0755, -, -) %{_oneshotdir}/tracker-configs.sh
 
 %files tests
 %defattr(-,root,root,-)
