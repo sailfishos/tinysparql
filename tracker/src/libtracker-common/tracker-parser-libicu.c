@@ -155,7 +155,6 @@ tracker_parser_unaccent_nfkd_string (gpointer  str,
 
 	g_return_val_if_fail (str != NULL, FALSE);
 	g_return_val_if_fail (str_length != NULL, FALSE);
-	g_return_val_if_fail (*str_length > 0, FALSE);
 
 	word = (UChar *)str;
 	word_length = *str_length;
@@ -650,6 +649,9 @@ tracker_parser_reset (TrackerParser *parser,
 	parser->word_position = 0;
 
 	parser->cursor = 0;
+
+	if (parser->txt_size == 0)
+		return;
 
 	/* Open converter UTF-8 to UChar */
 	converter = ucnv_open ("UTF-8", &error);

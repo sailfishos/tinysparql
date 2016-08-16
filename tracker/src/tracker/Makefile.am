@@ -19,7 +19,7 @@ bin_PROGRAMS = tracker
 tracker_SOURCES = \
 	tracker-main.c \
 	tracker-compatible.c \
-	tracker-compatible.h \
+	tracker-compatible.h \	
 	tracker-config.c \
 	tracker-config.h \
 	tracker-color.h \
@@ -83,6 +83,7 @@ endif
 
 tracker-compat: tracker-compat.in
 	$(AM_V_at)sed -e "s|@bindir[@]|${bindir}|" $< > $@
+	$(AM_V_at)chmod +x $@
 
 EXTRA_DIST = $(bashcompletion_DATA) tracker-compat.in
 CLEANFILES = tracker-compat

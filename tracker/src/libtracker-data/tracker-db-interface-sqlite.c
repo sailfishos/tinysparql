@@ -90,7 +90,7 @@ struct TrackerDBInterface {
 	gpointer busy_user_data;
 	gchar *busy_status;
 
-	gchar *fts_insert_str;
+	gchar *fts_properties;
 };
 
 struct TrackerDBInterfaceClass {
@@ -890,6 +890,186 @@ function_sparql_unaccent (sqlite3_context *context,
 
 #endif
 
+static void
+function_sparql_encode_for_uri (sqlite3_context *context,
+                                int              argc,
+                                sqlite3_value   *argv[])
+{
+	const gchar *str;
+	gchar *encoded;
+
+	if (argc != 1) {
+		sqlite3_result_error (context, "Invalid argument count", -1);
+		return;
+	}
+
+	str = sqlite3_value_text (argv[0]);
+	encoded = g_uri_escape_string (str, NULL, FALSE);
+	sqlite3_result_text (context, encoded, -1, g_free);
+}
+
+static void
+function_sparql_string_before (sqlite3_context *context,
+                               int              argc,
+                               sqlite3_value   *argv[])
+{
+	const gchar *str, *substr, *loc;
+	gchar *encoded;
+	gint len;
+
+	if (argc != 2) {
+		sqlite3_result_error (context, "Invalid argument count", -1);
+		return;
+	}
+
+	if (sqlite3_value_type (argv[0]) != SQLITE_TEXT ||
+	    sqlite3_value_type (argv[1]) != SQLITE_TEXT) {
+		sqlite3_result_error (context, "Invalid argument types", -1);
+		return;
+	}
+
+	str = sqlite3_value_text (argv[0]);
+	substr = sqlite3_value_text (argv[1]);
+	len = strlen (substr);
+
+	if (len == 0) {
+		sqlite3_result_text (context, "", -1, NULL);
+		return;
+	}
+
+	loc = strstr (str, substr);
+
+	if (!loc) {
+		sqlite3_result_text (context, "", -1, NULL);
+		return;
+	}
+
+	sqlite3_result_text (context, str, loc - str, NULL);
+}
+
+static void
+function_sparql_string_after (sqlite3_context *context,
+                              int              argc,
+                              sqlite3_value   *argv[])
+{
+	const gchar *str, *substr, *loc;
+	gchar *encoded;
+	gint len;
+
+	if (argc != 2) {
+		sqlite3_result_error (context, "Invalid argument count", -1);
+		return;
+	}
+
+	if (sqlite3_value_type (argv[0]) != SQLITE_TEXT ||
+	    sqlite3_value_type (argv[1]) != SQLITE_TEXT) {
+		sqlite3_result_error (context, "Invalid argument types", -1);
+		return;
+	}
+
+	str = sqlite3_value_text (argv[0]);
+	substr = sqlite3_value_text (argv[1]);
+	len = strlen (substr);
+
+	if (len == 0) {
+		sqlite3_result_text (context, g_strdup (str), -1, g_free);
+		return;
+	}
+
+	loc = strstr (str, substr);
+
+	if (!loc) {
+		sqlite3_result_text (context, "", -1, NULL);
+		return;
+	}
+
+	sqlite3_result_text (context, loc + len, -1, NULL);
+}
+
+static void
+function_sparql_ceil (sqlite3_context *context,
+                      int              argc,
+                      sqlite3_value   *argv[])
+{
+	gdouble value;
+
+	if (argc != 1) {
+		sqlite3_result_error (context, "Invalid argument count", -1);
+		return;
+	}
+
+	value = sqlite3_value_double (argv[0]);
+	sqlite3_result_double (context, ceil (value));
+}
+
+static void
+function_sparql_floor (sqlite3_context *context,
+                       int              argc,
+                       sqlite3_value   *argv[])
+{
+	gdouble value;
+
+	if (argc != 1) {
+		sqlite3_result_error (context, "Invalid argument count", -1);
+		return;
+	}
+
+	value = sqlite3_value_double (argv[0]);
+	sqlite3_result_double (context, floor (value));
+}
+
+static void
+function_sparql_rand (sqlite3_context *context,
+                      int              argc,
+                      sqlite3_value   *argv[])
+{
+	if (argc != 0) {
+		sqlite3_result_error (context, "Invalid argument count", -1);
+		return;
+	}
+
+	sqlite3_result_double (context, g_random_double ());
+}
+
+static void
+function_sparql_checksum (sqlite3_context *context,
+			  int              argc,
+			  sqlite3_value   *argv[])
+{
+	const gchar *str, *checksumstr;
+	GChecksumType checksum;
+	gchar *result;
+
+	if (argc != 2) {
+		sqlite3_result_error (context, "Invalid argument count", -1);
+		return;
+	}
+
+	str = sqlite3_value_text (argv[0]);
+	checksumstr = sqlite3_value_text (argv[1]);
+
+	if (!str || !checksumstr) {
+		sqlite3_result_error (context, "Invalid arguments", -1);
+		return;
+	}
+
+	if (g_ascii_strcasecmp (checksumstr, "md5") == 0)
+		checksum = G_CHECKSUM_MD5;
+	else if (g_ascii_strcasecmp (checksumstr, "sha1") == 0)
+		checksum = G_CHECKSUM_SHA1;
+	else if (g_ascii_strcasecmp (checksumstr, "sha256") == 0)
+		checksum = G_CHECKSUM_SHA256;
+	else if (g_ascii_strcasecmp (checksumstr, "sha512") == 0)
+		checksum = G_CHECKSUM_SHA512;
+	else {
+		sqlite3_result_error (context, "Invalid checksum method specified", -1);
+		return;
+	}
+
+	result = g_compute_checksum_for_string (checksum, str, -1);
+	sqlite3_result_text (context, result, -1, g_free);
+}
+
 static inline int
 stmt_step (sqlite3_stmt *stmt)
 {
@@ -1011,6 +1191,32 @@ open_database (TrackerDBInterface  *db_interface,
 
 	sqlite3_create_function (db_interface->db, "SparqlFormatTime", 1, SQLITE_ANY,
 	                         db_interface, &function_sparql_format_time,
+	                         NULL, NULL);
+
+	sqlite3_create_function (db_interface->db, "SparqlEncodeForUri", 1, SQLITE_ANY,
+	                         db_interface, &function_sparql_encode_for_uri,
+	                         NULL, NULL);
+
+	sqlite3_create_function (db_interface->db, "SparqlStringBefore", 2, SQLITE_ANY,
+	                         db_interface, &function_sparql_string_before,
+	                         NULL, NULL);
+	sqlite3_create_function (db_interface->db, "SparqlStringAfter", 2, SQLITE_ANY,
+	                         db_interface, &function_sparql_string_after,
+	                         NULL, NULL);
+
+	sqlite3_create_function (db_interface->db, "SparqlCeil", 1, SQLITE_ANY,
+	                         db_interface, &function_sparql_ceil,
+	                         NULL, NULL);
+	sqlite3_create_function (db_interface->db, "SparqlFloor", 1, SQLITE_ANY,
+	                         db_interface, &function_sparql_floor,
+	                         NULL, NULL);
+
+	sqlite3_create_function (db_interface->db, "SparqlRand", 0, SQLITE_ANY,
+	                         db_interface, &function_sparql_rand,
+	                         NULL, NULL);
+
+	sqlite3_create_function (db_interface->db, "SparqlChecksum", 2, SQLITE_ANY,
+	                         db_interface, &function_sparql_checksum,
 	                         NULL, NULL);
 
 	sqlite3_extended_result_codes (db_interface->db, 0);
@@ -1149,7 +1355,7 @@ tracker_db_interface_sqlite_fts_init (TrackerDBInterface  *db_interface,
 	tracker_fts_init_db (db_interface->db, properties);
 
 	if (create &&
-	    !tracker_fts_create_table (db_interface->db, "fts",
+	    !tracker_fts_create_table (db_interface->db, "fts5",
 				       properties, multivalued)) {
 		g_warning ("FTS tables creation failed");
 	}
@@ -1157,27 +1363,18 @@ tracker_db_interface_sqlite_fts_init (TrackerDBInterface  *db_interface,
 	fts_columns = _fts_create_properties (properties);
 
 	if (fts_columns) {
-		GString *insert, *select;
-		gint i = 0;
+		GString *fts_properties;
+		gint i;
 
-		insert = g_string_new ("INSERT INTO fts (docid");
-		select = g_string_new ("SELECT rowid");
+		fts_properties = g_string_new (NULL);
 
-		while (fts_columns[i]) {
-			g_string_append_printf (insert, ", \"%s\"",
-						fts_columns[i]);
-			g_string_append_printf (select, ", \"%s\"",
-						fts_columns[i]);
-			i++;
+		for (i = 0; fts_columns[i] != NULL; i++) {
+			g_string_append_printf (fts_properties, ", \"%s\"",
+			                        fts_columns[i]);
 		}
 
-		g_string_append (select, " FROM fts_view WHERE rowid=?");
-		g_string_append (insert, ") ");
-		g_string_append (insert, select->str);
-
-		g_string_free (select, TRUE);
-		db_interface->fts_insert_str = g_string_free (insert, FALSE);
-
+		db_interface->fts_properties = g_string_free (fts_properties,
+		                                              FALSE);
 		g_strfreev (fts_columns);
 	}
 #endif
@@ -1190,68 +1387,134 @@ tracker_db_interface_sqlite_fts_alter_table (TrackerDBInterface  *db_interface,
 					     GHashTable          *properties,
 					     GHashTable          *multivalued)
 {
-	if (!tracker_fts_alter_table (db_interface->db, "fts", properties, multivalued)) {
+	if (!tracker_fts_alter_table (db_interface->db, "fts5", properties, multivalued)) {
 		g_critical ("Failed to update FTS columns");
 	}
+}
+
+static gchar *
+tracker_db_interface_sqlite_fts_create_query (TrackerDBInterface  *db_interface,
+                                              gboolean             delete,
+                                              const gchar        **properties)
+{
+	GString *insert_str, *values_str;
+	gint i;
+
+	insert_str = g_string_new ("INSERT INTO fts5 (");
+	values_str = g_string_new (NULL);
+
+	if (delete) {
+		g_string_append (insert_str, "fts5,");
+		g_string_append (values_str, "'delete',");
+	}
+
+	g_string_append (insert_str, "rowid");
+	g_string_append (values_str, "?");
+
+	for (i = 0; properties[i] != NULL; i++) {
+		g_string_append_printf (insert_str, ",\"%s\"", properties[i]);
+		g_string_append (values_str, ",?");
+	}
+
+	g_string_append_printf (insert_str, ") VALUES (%s)", values_str->str);
+	g_string_free (values_str, TRUE);
+
+	return g_string_free (insert_str, FALSE);
+}
+
+static gchar *
+tracker_db_interface_sqlite_fts_create_delete_all_query (TrackerDBInterface *db_interface)
+{
+	GString *insert_str;
+
+	insert_str = g_string_new (NULL);
+	g_string_append_printf (insert_str,
+	                        "INSERT INTO fts5 (fts5, rowid %s) "
+	                        "SELECT 'delete', rowid %s FROM fts_view "
+	                        "WHERE rowid = ?",
+	                        db_interface->fts_properties,
+	                        db_interface->fts_properties);
+	return g_string_free (insert_str, FALSE);
 }
 
 gboolean
 tracker_db_interface_sqlite_fts_update_text (TrackerDBInterface  *db_interface,
                                              int                  id,
                                              const gchar        **properties,
-                                             const gchar        **text,
-                                             gboolean             create)
+                                             const gchar        **text)
 {
 	TrackerDBStatement *stmt;
 	GError *error = NULL;
+	gchar *query;
+	gint i;
 
-	if (!create) {
-		stmt = tracker_db_interface_create_statement (db_interface,
-							      TRACKER_DB_STATEMENT_CACHE_TYPE_UPDATE,
-							      &error,
-							      "DELETE FROM fts WHERE docid=?");
-
-		if (!stmt || error) {
-			if (error) {
-				g_warning ("Could not create FTS update statement: %s",
-				           error->message);
-				g_error_free (error);
-			}
-			return FALSE;
-		}
-
-		tracker_db_statement_bind_int (stmt, 0, id);
-		tracker_db_statement_execute (stmt, &error);
-		g_object_unref (stmt);
-
-		if (error) {
-			g_warning ("Could not update FTS text: %s", error->message);
-			g_error_free (error);
-			return FALSE;
-		}
-	}
-
+	query = tracker_db_interface_sqlite_fts_create_query (db_interface,
+	                                                      FALSE, properties);
 	stmt = tracker_db_interface_create_statement (db_interface,
 	                                              TRACKER_DB_STATEMENT_CACHE_TYPE_UPDATE,
 	                                              &error,
-	                                              "%s",
-	                                              db_interface->fts_insert_str);
+	                                              "%s", query);
+	g_free (query);
+
+        if (!stmt || error) {
+                if (error) {
+                        g_warning ("Could not create FTS insert statement: %s\n",
+                                   error->message);
+                        g_error_free (error);
+                }
+                return FALSE;
+        }
+
+        tracker_db_statement_bind_int (stmt, 0, id);
+        for (i = 0; text[i] != NULL; i++) {
+	        tracker_db_statement_bind_text (stmt, i + 1, text[i]);
+        }
+
+        tracker_db_statement_execute (stmt, &error);
+        g_object_unref (stmt);
+
+        if (error) {
+                g_warning ("Could not insert FTS text: %s", error->message);
+                g_error_free (error);
+                return FALSE;
+        }
+
+        return TRUE;
+}
+
+gboolean
+tracker_db_interface_sqlite_fts_delete_text (TrackerDBInterface  *db_interface,
+                                             int                  rowid,
+                                             const gchar         *property,
+                                             const gchar         *old_text)
+{
+	TrackerDBStatement *stmt;
+	GError *error = NULL;
+	const gchar *properties[] = { property, NULL };
+	gchar *query;
+
+	query = tracker_db_interface_sqlite_fts_create_query (db_interface,
+	                                                      TRUE, properties);
+	stmt = tracker_db_interface_create_statement (db_interface,
+	                                              TRACKER_DB_STATEMENT_CACHE_TYPE_UPDATE,
+	                                              &error,
+	                                              "%s", query);
+	g_free (query);
 
 	if (!stmt || error) {
-		if (error) {
-			g_warning ("Could not create FTS insert statement: %s\n",
-			           error->message);
-			g_error_free (error);
-		}
+		g_warning ("Could not create FTS delete statement: %s",
+		           error ? error->message : "No error given");
+		g_clear_error (&error);
 		return FALSE;
 	}
 
-	tracker_db_statement_bind_int (stmt, 0, id);
+	tracker_db_statement_bind_int (stmt, 0, rowid);
+	tracker_db_statement_bind_text (stmt, 1, old_text);
 	tracker_db_statement_execute (stmt, &error);
 	g_object_unref (stmt);
 
 	if (error) {
-		g_warning ("Could not insert FTS text: %s", error->message);
+		g_warning ("Could not delete FTS text: %s", error->message);
 		g_error_free (error);
 		return FALSE;
 	}
@@ -1260,22 +1523,23 @@ tracker_db_interface_sqlite_fts_update_text (TrackerDBInterface  *db_interface,
 }
 
 gboolean
-tracker_db_interface_sqlite_fts_delete_text (TrackerDBInterface *db_interface,
-                                             int                 id,
-					     const gchar        *property)
+tracker_db_interface_sqlite_fts_delete_id (TrackerDBInterface *db_interface,
+                                           int                 id)
 {
 	TrackerDBStatement *stmt;
 	GError *error = NULL;
+	gchar *query;
 
+	query = tracker_db_interface_sqlite_fts_create_delete_all_query (db_interface);
 	stmt = tracker_db_interface_create_statement (db_interface,
 	                                              TRACKER_DB_STATEMENT_CACHE_TYPE_UPDATE,
 	                                              &error,
-	                                              "UPDATE fts SET \"%s\" = '' WHERE docid = ?",
-	                                              property);
+	                                              "%s", query);
+	g_free (query);
 
 	if (!stmt || error) {
 		if (error) {
-			g_warning ("Could not create FTS update statement: %s\n",
+			g_warning ("Could not create FTS delete statement: %s",
 			           error->message);
 			g_error_free (error);
 		}
@@ -1287,12 +1551,18 @@ tracker_db_interface_sqlite_fts_delete_text (TrackerDBInterface *db_interface,
 	g_object_unref (stmt);
 
 	if (error) {
-		g_warning ("Could not execute FTS update: %s", error->message);
+		g_warning ("Could not delete FTS content: %s", error->message);
 		g_error_free (error);
 		return FALSE;
 	}
 
 	return TRUE;
+}
+
+void
+tracker_db_interface_sqlite_fts_rebuild_tokens (TrackerDBInterface *interface)
+{
+	tracker_fts_rebuild_tokens (interface->db, "fts5");
 }
 
 #endif
@@ -1342,7 +1612,7 @@ tracker_db_interface_sqlite_finalize (GObject *object)
 	db_interface = TRACKER_DB_INTERFACE (object);
 
 	close_database (db_interface);
-	g_free (db_interface->fts_insert_str);
+	g_free (db_interface->fts_properties);
 
 	g_message ("Closed sqlite3 database:'%s'", db_interface->filename);
 
@@ -1908,21 +2178,22 @@ tracker_db_cursor_get_property (GObject    *object,
 }
 
 static void
-tracker_db_cursor_iter_next_thread (GSimpleAsyncResult *res,
-                                    GObject            *object,
-                                    GCancellable       *cancellable)
+tracker_db_cursor_iter_next_thread (GTask        *task,
+                                    gpointer      object,
+                                    gpointer      task_data,
+                                    GCancellable *cancellable)
 {
 	/* run in thread */
 
-	TrackerDBCursor *cursor = TRACKER_DB_CURSOR (object);
+	TrackerDBCursor *cursor = object;
 	GError *error = NULL;
 	gboolean result;
 
 	result = db_cursor_iter_next (cursor, cancellable, &error);
 	if (error) {
-		g_simple_async_result_set_from_error (res, error);
+		g_task_return_error (task, error);
 	} else {
-		g_simple_async_result_set_op_res_gboolean (res, result);
+		g_task_return_boolean (task, result);
 	}
 }
 
@@ -1932,11 +2203,11 @@ tracker_db_cursor_iter_next_async (TrackerDBCursor     *cursor,
                                    GAsyncReadyCallback  callback,
                                    gpointer             user_data)
 {
-	GSimpleAsyncResult *res;
+	GTask *task;
 
-	res = g_simple_async_result_new (G_OBJECT (cursor), callback, user_data, tracker_db_cursor_iter_next_async);
-	g_simple_async_result_run_in_thread (res, tracker_db_cursor_iter_next_thread, 0, cancellable);
-	g_object_unref (res);
+	task = g_task_new (G_OBJECT (cursor), cancellable, callback, user_data);
+	g_task_run_in_thread (task, tracker_db_cursor_iter_next_thread);
+	g_object_unref (task);
 }
 
 static gboolean
@@ -1944,10 +2215,7 @@ tracker_db_cursor_iter_next_finish (TrackerDBCursor  *cursor,
                                     GAsyncResult     *res,
                                     GError          **error)
 {
-	if (g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (res), error)) {
-		return FALSE;
-	}
-	return g_simple_async_result_get_op_res_gboolean (G_SIMPLE_ASYNC_RESULT (res));
+	return g_task_propagate_boolean (G_TASK (res), error);
 }
 
 static void

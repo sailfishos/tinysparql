@@ -4,15 +4,15 @@
 # This file is distributed under the same license as the tracker package.
 # Gintautas Miliauskas <gintas@akl.lt>, 2008.
 # Žygimantas Beručka <zygis@gnome.org>, 2009, 2010, 2013.
-# Aurimas Černius <aurisc4@gmail.com>, 2013, 2014, 2015.
+# Aurimas Černius <aurisc4@gmail.com>, 2013, 2014, 2015, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=tracker&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-08-02 12:08+0000\n"
-"PO-Revision-Date: 2015-08-02 17:55+0300\n"
+"POT-Creation-Date: 2016-01-05 02:59+0000\n"
+"PO-Revision-Date: 2016-01-10 17:57+0200\n"
 "Last-Translator: Aurimas Černius <aurisc4@gmail.com>\n"
 "Language-Team: Lietuvių <gnome-lt@lists.akl.lt>\n"
 "Language: lt\n"
@@ -186,7 +186,7 @@ msgstr "Klaida paleidžiant „tar“ programą"
 
 #: ../src/libtracker-data/tracker-data-backup.c:501
 #: ../src/libtracker-data/tracker-data-backup.c:621
-#: ../src/miners/rss/tracker-main.c:114
+#: ../src/miners/rss/tracker-main.c:106
 #: ../src/plugins/nautilus/tracker-tags-view.c:241
 #: ../src/tracker-extract/tracker-extract.c:146
 #: ../src/tracker-needle/tracker-tags-view.vala:159
@@ -200,8 +200,8 @@ msgstr "Klaida paleidžiant „tar“ programą"
 #: ../src/tracker/tracker-index.c:123 ../src/tracker/tracker-index.c:155
 #: ../src/tracker/tracker-index.c:196 ../src/tracker/tracker-index.c:272
 #: ../src/tracker/tracker-index.c:329 ../src/tracker/tracker-info.c:264
-#: ../src/tracker/tracker-process.c:66 ../src/tracker/tracker-process.c:186
-#: ../src/tracker/tracker-process.c:271 ../src/tracker/tracker-process.c:292
+#: ../src/tracker/tracker-process.c:75 ../src/tracker/tracker-process.c:201
+#: ../src/tracker/tracker-process.c:330 ../src/tracker/tracker-process.c:351
 #: ../src/tracker/tracker-search.c:1579 ../src/tracker/tracker-sparql.c:168
 #: ../src/tracker/tracker-sparql.c:1078 ../src/tracker/tracker-status.c:176
 #: ../src/tracker/tracker-status.c:422 ../src/tracker/tracker-status.c:432
@@ -601,11 +601,11 @@ msgstr "Bus stebimi"
 msgid "- start the tracker indexer"
 msgstr "– paleisti „Tracker“ indeksavimo programą"
 
-#: ../src/miners/fs/tracker-miner-files.c:1354
+#: ../src/miners/fs/tracker-miner-files.c:1357
 msgid "Low battery"
 msgstr "Akumuliatorius išsikrauna"
 
-#: ../src/miners/fs/tracker-miner-files.c:1481
+#: ../src/miners/fs/tracker-miner-files.c:1484
 msgid "Low disk space"
 msgstr "Mažai vietos diske"
 
@@ -625,15 +625,16 @@ msgstr "RSS/ATOM įrašai"
 msgid "Fetch RSS/ATOM Feeds"
 msgstr "Parsiųsti RSS/ATOM įrašus"
 
-#: ../src/miners/rss/tracker-main.c:44
-msgid "Add feed (must be used with --title)"
-msgstr "Pridėti sklaidos kanalą (reikia naudoti su --title)"
-
+#. Translators: this is a "feed" as in RSS
 #: ../src/miners/rss/tracker-main.c:45
+msgid "Add feed"
+msgstr "Pridėti sklaidos kanalą"
+
+#: ../src/miners/rss/tracker-main.c:46
 msgid "URL"
 msgstr "URL"
 
-#: ../src/miners/rss/tracker-main.c:48
+#: ../src/miners/rss/tracker-main.c:49
 msgid "Title to use (must be used with --add-feed)"
 msgstr "Naudotinas pavadinimas (reikia naudoti su --add-feed)"
 
@@ -644,11 +645,7 @@ msgstr "Naudotinas pavadinimas (reikia naudoti su --add-feed)"
 msgid "- start the feeds indexer"
 msgstr "– paleisti sklaidos kanalų indeksavimo programą"
 
-#: ../src/miners/rss/tracker-main.c:78
-msgid "Adding a feed requires --add-feed and --title"
-msgstr "Norint pridėti sklaidos kanalą reikia naudoti --add-feed ir --title"
-
-#: ../src/miners/rss/tracker-main.c:113 ../src/tracker/tracker-index.c:195
+#: ../src/miners/rss/tracker-main.c:105 ../src/tracker/tracker-index.c:195
 #: ../src/tracker/tracker-info.c:263 ../src/tracker/tracker-search.c:1578
 #: ../src/tracker/tracker-sparql.c:167 ../src/tracker/tracker-sparql.c:1077
 #: ../src/tracker/tracker-status.c:175 ../src/tracker/tracker-status.c:505
@@ -656,7 +653,7 @@ msgstr "Norint pridėti sklaidos kanalą reikia naudoti --add-feed ir --title"
 msgid "Could not establish a connection to Tracker"
 msgstr "Nepavyko užmegzti ryšio su „Tracker“ sistema"
 
-#: ../src/miners/rss/tracker-main.c:139
+#: ../src/miners/rss/tracker-main.c:133
 msgid "Could not add feed"
 msgstr "Nepavyko pridėti sklaidos kanalo"
 
@@ -775,11 +772,11 @@ msgstr ""
 "aplinkoje, kur yra svarbu išvardinti failus kiek galima greičiau bei galima "
 "palaukti metaduomenų."
 
-#: ../src/tracker-extract/tracker-extract.c:789
+#: ../src/tracker-extract/tracker-extract.c:779
 msgid "Metadata extraction failed"
 msgstr "Metaduomenų išgavavimas nepavyko"
 
-#: ../src/tracker-extract/tracker-extract.c:854
+#: ../src/tracker-extract/tracker-extract.c:844
 msgid "No metadata or extractor modules found to handle this file"
 msgstr "Nerasta metaduomenų išgavėjo modulių šio failo apdorojimui"
 
@@ -830,10 +827,24 @@ msgstr "Tracker metaduomenų išgavėjas"
 msgid "Extracts metadata from local files"
 msgstr "Išgauna metaduomenis iš vietinių failų"
 
+#: ../src/tracker-needle/org.freedesktop.Tracker.Needle.gschema.xml.in.h:1
+msgid "Default View"
+msgstr "Numatytasis vaizdas"
+
+#: ../src/tracker-needle/org.freedesktop.Tracker.Needle.gschema.xml.in.h:2
+msgid ""
+"When 0, default view of tracker-needle will be Icons view. When 1, default "
+"view of tracker-needle will be Categories view. When 2, default view of "
+"tracker-needle will be Files view."
+msgstr ""
+"Kai 0, numatytasis tracker-needle vaizdas bus piktogramų. Kai 1, numatytasis "
+"tracker-needle vaizdas bus ketegorijų. Kai 2, numatytasis tracker-needle "
+"vaizdas bus failų."
+
 #: ../src/tracker-needle/tracker-needle.desktop.in.in.h:1
 #: ../src/tracker-needle/tracker-needle.ui.h:1
 msgid "Desktop Search"
-msgstr "Darbastalio paieška"
+msgstr "Darbalaukio paieška"
 
 #: ../src/tracker-needle/tracker-needle.desktop.in.in.h:2
 msgid ""
@@ -868,51 +879,55 @@ msgid "Find search criteria in file titles"
 msgstr "Rasti paieškos užklausą failų pavadinimuose"
 
 #: ../src/tracker-needle/tracker-needle.ui.h:7
+msgid "Find search criteria in file tags only (separated by comma)"
+msgstr "Rasti paieškos užklausą tik žymose (skiriama kableliu)"
+
+#: ../src/tracker-needle/tracker-needle.ui.h:8
 msgid "_Search:"
 msgstr "_Paieška:"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:8
+#: ../src/tracker-needle/tracker-needle.ui.h:9
 msgid "Show tagging panel which allows editing tags of selected results"
 msgstr "Rodyti žymų skydelį, kuris leidžia keisti pasirinktų rezultatų žymas"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:9
+#: ../src/tracker-needle/tracker-needle.ui.h:10
 msgid "Show statistics about the data stored"
 msgstr "Rodyti statistiką pagal laikomus duomenis"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:11
+#: ../src/tracker-needle/tracker-needle.ui.h:12
 #, no-c-format
 msgid "_Set the tags you want to associate with the %d selected items:"
 msgstr "_Nustatyti žymas susiejimui su %d pažymėtais elementais:"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:12
+#: ../src/tracker-needle/tracker-needle.ui.h:13
 msgid "Add tag"
 msgstr "Pridėti žymą"
 
-#: ../src/tracker-needle/tracker-needle.ui.h:13
+#: ../src/tracker-needle/tracker-needle.ui.h:14
 msgid "Remove selected tag"
 msgstr "Pašalinti pasirinktą žymą"
 
-#: ../src/tracker-needle/tracker-needle.vala:71
+#: ../src/tracker-needle/tracker-needle.vala:75
 msgid "Search criteria was too generic"
 msgstr "Paieškos užklausa per daug bendra"
 
-#: ../src/tracker-needle/tracker-needle.vala:72
+#: ../src/tracker-needle/tracker-needle.vala:76
 msgid "Only the first 500 items will be displayed"
 msgstr "Bus rodomi tik pirmi 500 elementų"
 
-#: ../src/tracker-needle/tracker-needle.vala:731
+#: ../src/tracker-needle/tracker-needle.vala:811
 #: ../src/tracker-preferences/tracker-preferences.vala:1016
 msgid "Print version"
 msgstr "Parodyti versijos numerį"
 
-#: ../src/tracker-needle/tracker-needle.vala:738
-#: ../src/tracker-needle/tracker-needle.vala:739
+#: ../src/tracker-needle/tracker-needle.vala:818
+#: ../src/tracker-needle/tracker-needle.vala:819
 msgid "[SEARCH-CRITERIA]"
 msgstr "[PAIEŠKOS-KRITERIJAI]"
 
-#: ../src/tracker-needle/tracker-needle.vala:744
+#: ../src/tracker-needle/tracker-needle.vala:824
 msgid "Desktop Search user interface using Tracker"
-msgstr "Darbo aplinkos paieškos naudotoja sąsaja, naudojanti „Tracker“ sistemą"
+msgstr "Darbalaukio paieškos naudotojo sąsaja, naudojanti „Tracker“ sistemą"
 
 #. Label for dialog
 #: ../src/tracker-needle/tracker-stats.vala:71
@@ -1193,7 +1208,7 @@ msgstr "Konfigūruoti failų indeksavimą, atliekamą naudojant „Tracker“ pr
 
 #: ../src/tracker-preferences/tracker-preferences.ui.h:1
 msgid "Indexing Preferences"
-msgstr "Indeksavimo nustatymai"
+msgstr "Indeksavimo nuostatos"
 
 #: ../src/tracker-preferences/tracker-preferences.ui.h:2
 msgid "_Monitor file and directory changes"
@@ -1236,7 +1251,7 @@ msgstr ""
 "procesorius toliau vykdys. Kiekvienai programai priskiriama planavimo tvarką "
 "ir pirmenybė.\n"
 "\n"
-"Ši parinktis leidžia sumažinti „Tracker“ sistemos pirmenybę, kad ši "
+"Šis parametras leidžia sumažinti „Tracker“ sistemos pirmenybę, kad ši "
 "nenaudotų daug procesoriaus laiko, jei tuo metu vykdomos kitos programos."
 
 #: ../src/tracker-preferences/tracker-preferences.ui.h:12
@@ -1452,7 +1467,7 @@ msgstr ""
 "<b>Įspėjimas: visi indeksuoti duomenys bus pašalinti! Jų nebebus galima "
 "atgauti! Jūsų TIKRIEJI duomenys bei failai nebus paliesti.</b>\n"
 "\n"
-"Šio mygtuko paspaudimas taip pat užvers nustatymus."
+"Šio mygtuko paspaudimas taip pat užvers nuostatas."
 
 #: ../src/tracker-preferences/tracker-preferences.ui.h:59
 msgid "Yes, remove all indexes"
@@ -1497,7 +1512,7 @@ msgid ""
 "The changes you have made to your preferences here require a reindex to "
 "ensure all your data is correctly indexed as you have requested."
 msgstr ""
-"Jūsų atlikti nustatymų pakeitimai reikalauja perindeksuoti, siekiant "
+"Jūsų atlikti nuostatų pakeitimai reikalauja perindeksuoti, siekiant "
 "užtikrinti, kad visi jūsų duomenys yra suindeksuoti taip, kaip prašoma."
 
 #: ../src/tracker-preferences/tracker-preferences.vala:323
@@ -1522,7 +1537,7 @@ msgid ""
 "The changes you have made to your preferences require restarting tracker "
 "processes."
 msgstr ""
-"Jūsų atlikti nustatymų pakeitimai reikalauja iš naujo paleisti tracker "
+"Jūsų atlikti nuostatų pakeitimai reikalauja iš naujo paleisti tracker "
 "procesus."
 
 #: ../src/tracker-preferences/tracker-preferences.vala:347
@@ -1573,7 +1588,7 @@ msgstr "Rekursyviai"
 
 #: ../src/tracker-preferences/tracker-preferences.vala:1022
 msgid "Desktop Search preferences"
-msgstr "Darbo aplinkos paieškos nustatymai"
+msgstr "Darbalaukio paieškos nuostatos"
 
 #. Indexer options
 #: ../src/tracker-store/tracker-main.vala:51
@@ -1597,7 +1612,7 @@ msgstr "„Tracker“ saugykla"
 
 #: ../src/tracker-store/tracker-store.desktop.in.in.h:2
 msgid "Metadata database store and lookup manager"
-msgstr "Metaduomenų saugyklos ir peržiūros valdyklė"
+msgstr "Metaduomenų saugyklos ir peržiūros tvarkytuvė"
 
 #: ../src/tracker-store/org.freedesktop.Tracker.Store.gschema.xml.in.h:3
 msgid "GraphUpdated delay"
@@ -1614,7 +1629,7 @@ msgstr ""
 #: ../src/tracker/tracker-config.c:59
 #, c-format
 msgid "Could not get GSettings for miners, manager could not be created, %s"
-msgstr "Nepavyko gauti gavėjų GSettings, valdyklė negali būti sukurta, %s"
+msgstr "Nepavyko gauti gavėjų GSettings, tvarkytuvė negali būti sukurta, %s"
 
 #: ../src/tracker/tracker-compatible.c:221
 msgid "The 'tracker-control' command is no longer available"
@@ -1818,7 +1833,7 @@ msgstr "Nepavyko SPARQL užklausai iškviesti tracker_sparql_cursor_next()"
 #: ../src/tracker/tracker-daemon.c:889
 #, c-format
 msgid "Could not pause miner, manager could not be created, %s"
-msgstr "Nepavyko sustabdyti gavėjo, nepavyko sukurti valdyklės, %s"
+msgstr "Nepavyko sustabdyti gavėjo, nepavyko sukurti tvarkytuvės, %s"
 
 #: ../src/tracker/tracker-daemon.c:896
 #, c-format
@@ -1843,7 +1858,7 @@ msgstr "Spauskite Vald+C sustojimui"
 #: ../src/tracker/tracker-daemon.c:947
 #, c-format
 msgid "Could not resume miner, manager could not be created, %s"
-msgstr "Nepavyko pratęsti gavėjo, nepavyko sukurti valdyklės, %s"
+msgstr "Nepavyko pratęsti gavėjo, nepavyko sukurti tvarkytuvės, %s"
 
 #: ../src/tracker/tracker-daemon.c:954
 #, c-format
@@ -1863,7 +1878,7 @@ msgstr "Atlikta"
 #: ../src/tracker/tracker-daemon.c:982
 #, c-format
 msgid "Could not list miners, manager could not be created, %s"
-msgstr "Nepavyko išvardinti gavėjų, nepavyko sukurti valdyklės, %s"
+msgstr "Nepavyko išvardinti gavėjų, nepavyko sukurti tvarkytuvės, %s"
 
 #: ../src/tracker/tracker-daemon.c:996
 #, c-format
@@ -1884,7 +1899,8 @@ msgstr[2] "Rasta %d veikiančių gavėjų"
 #: ../src/tracker/tracker-daemon.c:1051
 #, c-format
 msgid "Could not get pause details, manager could not be created, %s"
-msgstr "Nepavyko gauti sustojimo informacijos, nepavyko sukurti valdyklės, %s"
+msgstr ""
+"Nepavyko gauti sustojimo informacijos, nepavyko sukurti tvarkytuvės, %s"
 
 #: ../src/tracker/tracker-daemon.c:1061
 msgid "No miners are running"
@@ -1905,7 +1921,7 @@ msgstr "Nėra sustabdytų gavėjų"
 
 #: ../src/tracker/tracker-daemon.c:1207
 msgid "Only one of 'all', 'store' and 'miners' options are allowed"
-msgstr "Leidžiama tik „all“, „store“ arba „miners“"
+msgstr "Leidžiami tik „all“, „store“ arba „miners“ parametrai"
 
 #: ../src/tracker/tracker-daemon.c:1242
 msgid "Could not get SPARQL connection"
@@ -1926,7 +1942,7 @@ msgstr "Dažnos būsenos yra"
 #: ../src/tracker/tracker-daemon.c:1308 ../src/tracker/tracker-status.c:576
 #, c-format
 msgid "Could not get status, manager could not be created, %s"
-msgstr "Nepavyko gauti gavėjo būsenos, nepavyko sukurti valdyklės, %s"
+msgstr "Nepavyko gauti gavėjo būsenos, nepavyko sukurti tvarkytuvės, %s"
 
 #. Display states
 #: ../src/tracker/tracker-daemon.c:1329
@@ -1988,7 +2004,7 @@ msgstr "Paleidžiami gavėjai…"
 #: ../src/tracker/tracker-daemon.c:1667
 #, c-format
 msgid "Could not start miners, manager could not be created, %s"
-msgstr "Nepavyko paleisti gavėjų, nepavyko sukurti valdyklės, %s"
+msgstr "Nepavyko paleisti gavėjų, nepavyko sukurti tvarkytuvės, %s"
 
 #: ../src/tracker/tracker-daemon.c:1692
 msgid "perhaps a disabled plugin?"
@@ -2005,7 +2021,7 @@ msgstr "Nepateikti argumentai, rodomi gavėjai ir saugyklos duomenys"
 #: ../src/tracker/tracker-sql.c:228 ../src/tracker/tracker-status.c:703
 #: ../src/tracker/tracker-tag.c:1079
 msgid "Unrecognized options"
-msgstr "Neatpažintos parinktys"
+msgstr "Neatpažinti parametrai"
 
 #: ../src/tracker/tracker-dbus.c:44
 msgid "Could not get D-Bus connection"
@@ -2047,7 +2063,7 @@ msgstr "Importuoti duomenis iš nurodyto failo (Turtle formatas)"
 #: ../src/tracker/tracker-index.c:122
 #, c-format
 msgid "Could not reindex mimetypes, manager could not be created, %s"
-msgstr "Nepavyko perindeksuoti MIME tipų, nepavyko sukurti valdyklės, %s"
+msgstr "Nepavyko perindeksuoti MIME tipų, nepavyko sukurti tvarkytuvės, %s"
 
 #: ../src/tracker/tracker-index.c:132
 msgid "Could not reindex mimetypes"
@@ -2060,7 +2076,7 @@ msgstr "MIME tipai sėkmingai perindeksuoti"
 #: ../src/tracker/tracker-index.c:154
 #, c-format
 msgid "Could not (re)index file, manager could not be created, %s"
-msgstr "Nepavyko (per)indeksuoti failo, nepavyko sukurti valdyklės, %s"
+msgstr "Nepavyko (per)indeksuoti failo, nepavyko sukurti tvarkytuvės, %s"
 
 #: ../src/tracker/tracker-index.c:169
 msgid "Could not (re)index file"
@@ -2229,35 +2245,35 @@ msgstr "„%s“ nėra tracker komanda. Žiūrėti „tracker --help“"
 msgid "Available tracker commands are:"
 msgstr "Galimos tracker komandos yra:"
 
-#: ../src/tracker/tracker-process.c:65
+#: ../src/tracker/tracker-process.c:74
 msgid "Could not open /proc"
 msgstr "Nepavyko atverti /proc"
 
-#: ../src/tracker/tracker-process.c:115
+#: ../src/tracker/tracker-process.c:127
 msgid "Could not stat() file"
 msgstr "Nepavyko failui įvykdyti stat()"
 
-#: ../src/tracker/tracker-process.c:183
+#: ../src/tracker/tracker-process.c:198
 #, c-format
 msgid "Could not open '%s'"
 msgstr "Nepavyko atverti „%s“"
 
-#: ../src/tracker/tracker-process.c:268
+#: ../src/tracker/tracker-process.c:327
 #, c-format
 msgid "Could not terminate process %d - '%s'"
 msgstr "Nepavyko užbaigti proceso %d - „%s“"
 
-#: ../src/tracker/tracker-process.c:274
+#: ../src/tracker/tracker-process.c:333
 #, c-format
 msgid "Terminated process %d - '%s'"
 msgstr "Baigtas procesas %d - „%s“"
 
-#: ../src/tracker/tracker-process.c:289
+#: ../src/tracker/tracker-process.c:348
 #, c-format
 msgid "Could not kill process %d - '%s'"
 msgstr "Nepavyko nutraukti proceso %d - „%s“"
 
-#: ../src/tracker/tracker-process.c:295
+#: ../src/tracker/tracker-process.c:354
 #, c-format
 msgid "Killed process %d - '%s'"
 msgstr "Nutrauktas procesas %d - „%s“"
@@ -2740,23 +2756,20 @@ msgstr ""
 "argumentu"
 
 #: ../src/tracker/tracker-sql.c:43
-#| msgid "Path to use to run a query or update from file"
 msgid "Path to use to run a query from file"
 msgstr "Naudotinas kelias užklausos vykdymui iš failo"
 
 #: ../src/tracker/tracker-sql.c:47
-#| msgid "SPARQL query"
 msgid "SQL query"
 msgstr "SQL užklausa"
 
 #: ../src/tracker/tracker-sql.c:48
-#| msgid "SPARQL"
 msgid "SQL"
 msgstr "SQL"
 
 #: ../src/tracker/tracker-sql.c:110
 msgid "Failed to initialize data manager"
-msgstr "Nepavyko inicializuoti duomenų valdyklės"
+msgstr "Nepavyko inicijuoti duomenų tvarkytuvės"
 
 #: ../src/tracker/tracker-sql.c:170
 msgid "Empty result set"
@@ -2999,7 +3012,7 @@ msgstr "Failas neindeksuojamas arba jau atžymėtas"
 
 #: ../src/tracker/tracker-tag.c:1088
 msgid "The --list option is required for --show-files"
-msgstr "Parinktis --list yra privaloma su --show-files"
+msgstr "Parametras --list yra privalomas su --show-files"
 
 #: ../src/tracker/tracker-tag.c:1090
 msgid ""
@@ -3014,7 +3027,7 @@ msgstr "Pridėjimo ir trynimo veiksmai negali būti naudojami kartu"
 
 #: ../src/tracker/tracker-tag.c:1094
 msgid "The --description option can only be used with --add"
-msgstr "Parinktis --description gali būti naudojama tik su --add"
+msgstr "Parametras --description gali būti naudojamas tik su --add"
 
 #: ../src/tracker-writeback/tracker-main.c:62
 msgid "Disable shutting down after 30 seconds of inactivity"
@@ -3030,6 +3043,12 @@ msgstr "- paleisti tracker rašymo posistemę"
 #: ../utils/gtk-sparql/gtk-sparql.ui.h:1
 msgid "Saved queries"
 msgstr "Išsaugotos užklausos"
+
+#~ msgid "Add feed (must be used with --title)"
+#~ msgstr "Pridėti sklaidos kanalą (reikia naudoti su --title)"
+
+#~ msgid "Adding a feed requires --add-feed and --title"
+#~ msgstr "Norint pridėti sklaidos kanalą reikia naudoti --add-feed ir --title"
 
 #~ msgid " - Manage Tracker processes and data"
 #~ msgstr " – „Tracker“ procesų ir duomenų valdymas"

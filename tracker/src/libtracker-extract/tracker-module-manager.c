@@ -42,6 +42,13 @@ typedef struct {
 	guint initialized : 1;
 } ModuleInfo;
 
+static gboolean dummy_extract_func (TrackerExtractInfo *info);
+
+static ModuleInfo dummy_module = {
+	NULL, TRACKER_MODULE_MAIN_THREAD,
+	dummy_extract_func, NULL, NULL, TRUE
+};
+
 static GHashTable *modules = NULL;
 static GHashTable *mimetype_map = NULL;
 static gboolean initialized = FALSE;
@@ -55,6 +62,12 @@ struct _TrackerMimetypeInfo {
 };
 
 static gboolean
+dummy_extract_func (TrackerExtractInfo *info)
+{
+	return TRUE;
+}
+
+static gboolean
 load_extractor_rule (GKeyFile  *key_file,
                      GError   **error)
 {
@@ -65,10 +78,14 @@ load_extractor_rule (GKeyFile  *key_file,
 
 	module_path = g_key_file_get_string (key_file, "ExtractorRule", "ModulePath", &local_error);
 
-	if (local_error &&
-	    local_error->code != G_KEY_FILE_ERROR_KEY_NOT_FOUND) {
-		g_propagate_error (error, local_error);
-		return FALSE;
+	if (local_error) {
+		if (!g_error_matches (local_error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
+			g_propagate_error (error, local_error);
+			return FALSE;
+		} else {
+			/* Ignore */
+			g_clear_error (&local_error);
+		}
 	}
 
 	if (module_path &&
@@ -307,7 +324,7 @@ load_module (RuleInfo *info,
 	ModuleInfo *module_info = NULL;
 
 	if (!info->module_path) {
-		return NULL;
+		return &dummy_module;
 	}
 
 	if (modules) {

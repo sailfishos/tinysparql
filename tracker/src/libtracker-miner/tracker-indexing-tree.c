@@ -42,6 +42,7 @@ struct _NodeData
 	GFile *file;
 	guint flags;
 	guint shallow : 1;
+	guint removing : 1;
 };
 
 struct _PatternData
@@ -89,10 +90,9 @@ node_data_new (GFile *file,
 {
 	NodeData *data;
 
-	data = g_slice_new (NodeData);
+	data = g_slice_new0 (NodeData);
 	data->file = g_object_ref (file);
 	data->flags = flags;
-	data->shallow = FALSE;
 
 	return data;
 }
@@ -566,6 +566,12 @@ tracker_indexing_tree_remove (TrackerIndexingTree *tree,
 	}
 
 	data = node->data;
+
+	if (data->removing) {
+		return;
+	}
+
+	data->removing = TRUE;
 
 	if (!node->parent) {
 		/* Node is the config tree
