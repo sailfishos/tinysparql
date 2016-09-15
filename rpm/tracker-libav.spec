@@ -6,7 +6,7 @@ Summary:    An object database, tag/metadata database, search tool and indexer
 Version:    1.8.0
 Release:    1
 Group:      Data Management/Content Framework
-License:    GPLv2+
+License:    GPLv2+ and LGPLv2.1+ and BSD-3-clause
 URL:        http://ftp.gnome.org/pub/GNOME/sources/tracker/0.10/
 Source0:    http://ftp.gnome.org/pub/GNOME/sources/%{name}/0.14/%{name}-%{version}.tar.xz
 Source1:    tracker-libav-rpmlintrc
@@ -159,7 +159,6 @@ mkdir -p %{buildroot}%{_libdir}/systemd/user/
 cp -a %{SOURCE3} %{buildroot}%{_libdir}/systemd/user/
 cp -a %{SOURCE4} %{buildroot}%{_libdir}/systemd/user/
 
-
 mkdir -p %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants
 ln -s ../tracker-store.service %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants/
 ln -s ../tracker-miner-fs.service %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants/
@@ -240,6 +239,7 @@ cd /usr/share/tracker-tests/
 %{_libexecdir}/tracker-miner-fs
 %{_libexecdir}/tracker-store
 %{_libexecdir}/tracker-writeback
+%doc COPYING COPYING.GPL COPYING.LGPL
 %exclude %{_sysconfdir}/xdg/autostart/*.desktop
 %{_libdir}/systemd/user/tracker-miner-fs.service
 %{_libdir}/systemd/user/tracker-store.service
