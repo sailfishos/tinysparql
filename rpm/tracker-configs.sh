@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
-[ "$MIC_RUN" = "" ] || exit 1
+if [ "$MIC_RUN" != "" ]; then
+	echo "tracker-configs.sh - returning FAIL to postpone oneshot to first boot"
+	exit 1
+fi
 
 gsettings set org.freedesktop.Tracker.Miner.Files index-removable-devices true
 gsettings set org.freedesktop.Tracker.Miner.Files crawling-interval 0
