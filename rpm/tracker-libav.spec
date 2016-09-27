@@ -37,7 +37,6 @@ BuildRequires:  pkgconfig(libgsf-1)
 BuildRequires:  pkgconfig(libiptcdata)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libxml-2.0)
-BuildRequires:  pkgconfig(ossp-uuid)
 BuildRequires:  pkgconfig(poppler-glib)
 BuildRequires:  pkgconfig(sqlite3) >= 3.11
 BuildRequires:  pkgconfig(taglib)
