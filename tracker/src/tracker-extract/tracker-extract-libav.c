@@ -185,7 +185,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	}
 
 	if (!audio_stream && !video_stream) {
-		avformat_free_context (format);
+		avformat_close_input (&format);
 		g_free (uri);
 		return FALSE;
 	}
@@ -403,7 +403,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 
 	g_free (uri);
 
-	avformat_free_context (format);
+	avformat_close_input (&format);
 
 	return TRUE;
 }
