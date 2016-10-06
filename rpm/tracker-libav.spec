@@ -143,6 +143,8 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --enable-generic-media-extractor=libav \
     --disable-enca \
     --disable-journal \
+    --disable-icon \
+    --disable-artwork \
     --enable-libgif \
     --disable-cfg-man-pages
 
@@ -219,6 +221,7 @@ cd /usr/share/tracker-tests/
 %{_datadir}/vala/vapi/*
 %{_datadir}/tracker/extract-rules/*
 %dir %{_datadir}/tracker
+%dir %{_datadir}/tracker/miners
 %dir %{_datadir}/tracker/stop-words
 %dir %{_datadir}/tracker/ontologies
 %dir %{_datadir}/tracker/extract-rules
