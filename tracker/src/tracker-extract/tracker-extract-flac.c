@@ -28,6 +28,10 @@
 
 #include <FLAC/metadata.h>
 
+#ifdef HAVE_LIBMEDIAART
+#include <libmediaart/mediaart.h>
+#endif
+
 #include <libtracker-common/tracker-common.h>
 
 #include <libtracker-extract/tracker-extract.h>
@@ -62,6 +66,9 @@ typedef struct {
 	guint channels;
 	guint bps;
 	guint64 total;
+	unsigned char *media_art_data;
+	size_t media_art_size;
+	gchar *media_art_mime;
 } FlacData;
 
 static void
@@ -155,7 +162,7 @@ G_MODULE_EXPORT gboolean
 tracker_extract_get_metadata (TrackerExtractInfo *info)
 {
 	FLAC__Metadata_SimpleIterator *iter;
-	FLAC__StreamMetadata *stream = NULL, *vorbis, *picture;
+	FLAC__StreamMetadata *stream = NULL, *vorbis;
 	FLAC__bool success;
 	FlacData fd = { 0 };
 	TrackerSparqlBuilder *preupdate, *metadata;
@@ -201,13 +208,18 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			parse_vorbis_comments (&(vorbis->data.vorbis_comment), &fd);
 			FLAC__metadata_object_delete (vorbis);
 			break;
-
+#ifdef HAVE_LIBMEDIAART
 		case FLAC__METADATA_TYPE_PICTURE:
-			picture = FLAC__metadata_simple_iterator_get_block (iter);
-			/* Deal with picture */
-			FLAC__metadata_object_delete (picture);
+			vorbis = FLAC__metadata_simple_iterator_get_block (iter);
+			FLAC__StreamMetadata_Picture picture = vorbis->data.picture;
+			if (picture.data_length > 0) {
+				fd.media_art_data = g_memdup(picture.data, picture.data_length);
+				fd.media_art_mime = g_strdup (picture.mime_type);
+				fd.media_art_size = picture.data_length;
+			}
+			FLAC__metadata_object_delete (vorbis);
 			break;
-
+#endif
 		default:
 			break;
 		}
@@ -460,6 +472,45 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 		                                     stream->data.stream_info.total_samples /
 		                                     stream->data.stream_info.sample_rate);
 	}
+#ifdef HAVE_LIBMEDIAART
+	if ((fd.albumartist || fd.artist) || fd.album) {
+		MediaArtProcess *media_art_process;
+		GError *error = NULL;
+		gboolean success = TRUE;
+
+		media_art_process = tracker_extract_info_get_media_art_process (info);
+
+		if (fd.media_art_data) {
+			success = media_art_process_buffer (media_art_process,
+			                                    MEDIA_ART_ALBUM,
+			                                    MEDIA_ART_PROCESS_FLAGS_NONE,
+			                                    file,
+			                                    fd.media_art_data,
+			                                    fd.media_art_size,
+			                                    fd.media_art_mime,
+												fd.albumartist ? fd.albumartist : fd.artist,
+			                                    fd.album,
+			                                    NULL,
+			                                    &error);
+		} else {
+			success = media_art_process_file (media_art_process,
+			                                  MEDIA_ART_ALBUM,
+			                                  MEDIA_ART_PROCESS_FLAGS_NONE,
+			                                  file,
+											  fd.albumartist ? fd.albumartist : fd.artist,
+			                                  fd.album,
+			                                  NULL,
+			                                  &error);
+		}
+
+		if (!success || error) {
+			g_warning ("Could not process media art for '%s', %s",
+			           uri,
+			           error ? error->message : "No error given");
+			g_clear_error (&error);
+		}
+	}
+#endif
 
 	g_free (fd.artist);
 	g_free (fd.album);
@@ -486,6 +537,8 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 	g_free (fd.organisation);
 	g_free (fd.location);
 	g_free (fd.publisher);
+	g_free (fd.media_art_data);
+	g_free (fd.media_art_mime);
 	g_free (uri);
 
 	return TRUE;

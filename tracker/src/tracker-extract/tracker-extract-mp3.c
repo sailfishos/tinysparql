@@ -1270,9 +1270,8 @@ get_id3v24_tags (id3v24frame           frame,
 			offset = pos + 1 + mime_len + 2;
 			offset += id3v2_strlen (text_type, desc, csize - offset) + id3v2_nul_size (text_type);
 
-			filedata->media_art_data = g_malloc0 (csize - offset);
+			filedata->media_art_data = g_memdup(&data[offset], csize - offset);
 			filedata->media_art_mime = g_strndup (mime, mime_len);
-			memcpy (filedata->media_art_data, &data[offset], csize - offset);
 			filedata->media_art_size = csize - offset;
 		}
 		break;
@@ -1460,9 +1459,8 @@ get_id3v23_tags (id3v24frame           frame,
 			offset = pos + 1 + mime_len + 2;
 			offset += id3v2_strlen (text_type, desc, csize - offset) + id3v2_nul_size (text_type);
 
-			filedata->media_art_data = g_malloc0 (csize - offset);
+			filedata->media_art_data = g_memdup(&data[offset], csize - offset);
 			filedata->media_art_mime = g_strndup (mime, mime_len);
-			memcpy (filedata->media_art_data, &data[offset], csize - offset);
 			filedata->media_art_size = csize - offset;
 		}
 		break;
@@ -1643,8 +1641,7 @@ get_id3v20_tags (id3v2frame            frame,
 			offset += id3v2_strlen (text_type, desc, csize - offset) + id3v2_nul_size (text_type);
 
 			filedata->media_art_mime = g_strndup (mime, 3);
-			filedata->media_art_data = g_malloc0 (csize - offset);
-			memcpy (filedata->media_art_data, &data[offset], csize - offset);
+			filedata->media_art_data = g_memdup(&data[offset], csize - offset);
 			filedata->media_art_size = csize - offset;
 		}
 	} else {
