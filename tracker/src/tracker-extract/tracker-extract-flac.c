@@ -213,6 +213,8 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 		}
 	} while (FLAC__metadata_simple_iterator_next (iter));
 
+	FLAC__metadata_simple_iterator_delete (iter);
+
 	creator = tracker_coalesce_strip (3, fd.artist, fd.albumartist,
 	                                  fd.performer);
 
