@@ -18,6 +18,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
+#include "config.h"
 
 #include <glib.h>
 
@@ -27,7 +28,7 @@
 #include <libtracker-extract/tracker-extract.h>
 
 #ifdef HAVE_LIBMEDIAART
-#include <tracker-media-art.h>
+#include <libmediaart/mediaart.h>
 #endif
 
 #include <libavcodec/avcodec.h>
@@ -199,7 +200,7 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 		}
 	}
 
-	if (video_stream) {
+	if (video_stream && !(video_stream->disposition & AV_DISPOSITION_ATTACHED_PIC)) {
 		tracker_sparql_builder_predicate (metadata, "a");
 		tracker_sparql_builder_object (metadata, "nmm:Video");
 
@@ -247,6 +248,16 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 		const char *album_artist = NULL;
 		gchar *album_artist_uri = NULL;
 		gchar *performer_uri = NULL;
+#ifdef HAVE_LIBMEDIAART
+		unsigned char *media_art_data = NULL;
+		size_t media_art_size = 0;
+
+		if (video_stream) { // single frame - album art
+			AVPacket albumartpkt = video_stream->attached_pic;
+			media_art_data = g_memdup(albumartpkt.data, albumartpkt.size);
+			media_art_size = albumartpkt.size;
+		}
+#endif
 
 		tracker_sparql_builder_predicate (metadata, "a");
 		tracker_sparql_builder_object (metadata, "nmm:MusicPiece");
@@ -346,13 +357,28 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 			gboolean success;
 
 			media_art_process = tracker_extract_info_get_media_art_process (info);
-			success = media_art_process_file (media_art_process,
-			                                  MEDIA_ART_ALBUM,
-			                                  MEDIA_ART_PROCESS_FLAGS_NONE,
-			                                  file,
-			                                  album_artist,
-			                                  album_title,
-			                                  &error);
+			if (media_art_size > 0) {
+				success = media_art_process_buffer (media_art_process,
+				                                    MEDIA_ART_ALBUM,
+				                                    MEDIA_ART_PROCESS_FLAGS_NONE,
+				                                    file,
+				                                    media_art_data,
+				                                    media_art_size,
+				                                    NULL,
+				                                    album_artist,
+				                                    album_title,
+				                                    NULL,
+				                                    &error);
+			} else {
+				success = media_art_process_file (media_art_process,
+				                                  MEDIA_ART_ALBUM,
+				                                  MEDIA_ART_PROCESS_FLAGS_NONE,
+				                                  file,
+				                                  album_artist,
+				                                  album_title,
+				                                  NULL,
+				                                  &error);
+			}
 
 			if (!success || error) {
 				g_warning ("Could not process media art for '%s', %s",
@@ -361,6 +387,8 @@ tracker_extract_get_metadata (TrackerExtractInfo *info)
 				g_clear_error (&error);
 			}
 		}
+
+		g_free (media_art_data);
 #endif
 
 		g_free(performer_uri);
