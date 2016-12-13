@@ -63,7 +63,6 @@
 #define MAX_MP3_SCAN_DEEP 16768
 
 #define MAX_FRAMES_SCAN   512
-#define VBR_THRESHOLD     16
 
 #define ID3V1_SIZE        128
 
@@ -973,14 +972,13 @@ parse_xing (const gchar *data, size_t size, size_t offset, MP3Data *filedata, mp
 	pos += 4; /* skip audio frame header */
 	pos += side_info_size_table[finfo->n_channels - 1][finfo->version - 1];
 
-	if ((data[pos] != 'X') ||
-		(data[pos+1] != 'i') ||
-		(data[pos+2] != 'n') ||
-		(data[pos+3] != 'g')) {
+	if (((data[pos] != 'X') || (data[pos+1] != 'i') || (data[pos+2] != 'n') || (data[pos+3] != 'g'))
+		&& ((data[pos] != 'I') || (data[pos+1] != 'n') || (data[pos+2] != 'f') || (data[pos+3] != 'o')))
+	{
 		/* First audio frame is not a Xing frame */
 		return FALSE;
 	}
-	pos += 4; /* skip "Xing" */
+	pos += 4; /* skip "Xing" or "Info" */
 
 	flags = (((data[pos] & 0xFF) << 24) |
 			 ((data[pos+1] & 0xFF) << 16) |
@@ -1101,7 +1099,7 @@ get_duration (const gchar *data, size_t size, size_t offset,
 
 	if (pos < size || size < filedata->size - filedata->id3v2_size) {
 		/* Whole file has not be scanned, adding an estimated remaining time. */
-		*duration += (filedata->size - filedata->id3v2_size - pos) * 8 * 1000 / *avg_bps;
+		*duration = (int64_t)(filedata->size - filedata->id3v2_size) * 8 * 1000 / *avg_bps;
 	}
 
 	*duration /= 1000; /* milliseconds to seconds */
