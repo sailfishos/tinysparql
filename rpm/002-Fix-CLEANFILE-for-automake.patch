@@ -1,0 +1,11 @@
+diff --git a/docs/reference/ontology/Makefile.am b/docs/reference/ontology/Makefile.am
+index a7eeafa..9a5fa20 100644
+--- a/docs/reference/ontology/Makefile.am
++++ b/docs/reference/ontology/Makefile.am
+@@ -51,5 +51,5 @@
+ 	version.xml.in                                 \
+ 	$(ONTOLOGY_EXPLANATIONS)
+ 
+-CLEANFILES +=                                          \
++CLEANFILES =                                          \
+ 	gen-doc.stamp

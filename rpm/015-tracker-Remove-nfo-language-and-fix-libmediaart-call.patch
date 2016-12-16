@@ -1,0 +1,47 @@
+From 685df718dbe913941a3e5c766e54c819a6799d73 Fri, 16 Dec 2016 15:27:54 +0100
+From: Andrew Branson <andrew.branson@jollamobile.com>
+Date: Mon, 8 Aug 2016 13:25:55 +0200
+Subject: Remove non-existing nfo:language from libav extractor. Avoid calling libmediaart without both artist and album, as it causes a warning.
+
+
+Remove 'nfo:language' tag, as it's not available 
+Avoid warnings when calling libmediaart without both artist and album
+title.
+
+diff --git a/src/tracker-extract/tracker-extract-libav.c b/src/tracker-extract/tracker-extract-libav.c
+index 55499c8..ab86e87 100644
+--- a/src/tracker-extract/tracker-extract-libav.c
++++ b/src/tracker-extract/tracker-extract-libav.c
+@@ -340,7 +340,7 @@
+ 		}
+ 
+ #ifdef HAVE_LIBMEDIAART
+-		if (album_artist || album_title) {
++		if (album_artist && album_title) {
+ 			MediaArtProcess *media_art_process;
+ 			GError *error = NULL;
+ 			gboolean success;
+@@ -393,10 +393,6 @@
+ 
+ 	if ((tag = av_dict_get (format->metadata, "genre", NULL, 0))) {
+ 		set_value_string (metadata, "nfo:genre", tag->value);
+-	}
+-
+-	if ((tag = av_dict_get (format->metadata, "language", NULL, 0))) {
+-		set_value_string (metadata, "nfo:language", tag->value);
+ 	}
+ 
+ 	if ((tag = av_dict_get (format->metadata, "title", NULL, 0))) {
+diff --git a/src/tracker-extract/tracker-extract-mp3.c b/src/tracker-extract/tracker-extract-mp3.c
+index 04c4c09..50c3188 100644
+--- a/src/tracker-extract/tracker-extract-mp3.c
++++ b/src/tracker-extract/tracker-extract-mp3.c
+@@ -2691,7 +2691,7 @@
+ 	parsed = mp3_parse (buffer, buffer_size, audio_offset, uri, metadata, &md);
+ 
+ #ifdef HAVE_LIBMEDIAART
+-	if (parsed && (md.performer || md.album)) {
++	if (parsed && (md.performer && md.album)) {
+ 		MediaArtProcess *media_art_process;
+ 		GError *error = NULL;
+ 		gboolean success = TRUE;

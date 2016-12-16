@@ -14,6 +14,20 @@ Source2:    tracker-store.service
 Source3:    tracker-miner-fs.service
 Source4:    tracker-extract.service
 Source5:    tracker-configs.sh
+Patch1:     001-install-the-data-generation-scripts.patch
+Patch2:     002-Fix-CLEANFILE-for-automake.patch
+Patch3:     003-Add-Systemd-service-to-DBUS.patch
+Patch4:     004-Tracker-config-overrides.patch
+Patch6:     006-Bugfix-for-GB740920-ensure-sourceiri-is-filled-in-on.patch
+Patch7:     007-trackerlibav-get-metadata-from-audio-stream-instead-.patch
+Patch8:     008-trackerlibav-check-format-metadata-for-tags-and-fall.patch
+Patch9:     009-tracker-Drop-15gstreamerguessrule-Fixes-JB37082.patch
+Patch10:    010-tracker-Fix-flac-tag-extraction-Fixes-JB35939.patch
+Patch11:    011-tracker-Fix-memory-leak-trackerextractlibav-Fixes-JB.patch
+Patch12:    012-tracker-Add-album-art-extraction-for-libav-and-flac-.patch
+Patch13:    013-tracker-Use-Xing-mp3-header-when-available-Fixes-JB3.patch
+Patch14:    014-tracker-FLAC-metadata-iterator-wasnt-closed-Fixes-ME.patch
+Patch15:    015-tracker-Remove-nfo-language-and-fix-libmediaart-call.patch
 Requires:   libmediaart
 Requires:   unzip
 Requires:   systemd
@@ -112,37 +126,52 @@ Requires:   %{name} = %{version}-%{release}
 Development files for %{name}.
 
 %prep
-%setup -q -n %{name}-%{version}/%{name}
-
+%setup -q -n %{name}-%{version}/upstream
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+#%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
+%patch14 -p1
+%patch15 -p1
 
 %build
 sed -i -e '/gtkdocize/d' autogen.sh
 echo "EXTRA_DIST = missing-gtk-doc" > gtk-doc.make
-export NOCONFIGURE=1
-%autogen
+
 chmod +x tests/functional-tests/create-tests-xml.py
 
-%configure --disable-static \
+%autogen --disable-static \
     --with-compile-warnings=no \
     --disable-gtk-doc \
+    --disable-introspection \
     --disable-tracker-preferences \
 	--disable-tracker-needle \
     --enable-unit-tests \
     --enable-functional-tests \
+    --disable-introspection \
+    --disable-gtk-doc \
     --disable-miner-evolution \
     --disable-miner-firefox \
     --disable-miner-thunderbird \
     --disable-miner-rss \
     --disable-miner-user-guides \
     --disable-miner-apps \
-    --enable-maemo --enable-nemo \
     --enable-guarantee-metadata \
     --with-unicode-support=libicu \
     --enable-libvorbis \
     --enable-libflac \
     --enable-generic-media-extractor=libav \
     --disable-enca \
-    --disable-journal \
+    --enable-journal \
     --disable-icon \
     --disable-artwork \
     --enable-libgif \
@@ -261,13 +290,14 @@ cd /usr/share/tracker-tests/
 %files utils
 %defattr(-,root,root,-)
 %{_bindir}/tracker
-%{_bindir}/tracker-control
-%{_bindir}/tracker-import
-%{_bindir}/tracker-info
-%{_bindir}/tracker-search
-%{_bindir}/tracker-sparql
-%{_bindir}/tracker-stats
-%{_bindir}/tracker-tag
+# Disable old tracker utils as all scripts have been migrated now
+#%{_bindir}/tracker-control
+#%{_bindir}/tracker-import
+#%{_bindir}/tracker-info
+#%{_bindir}/tracker-search
+#%{_bindir}/tracker-sparql
+#%{_bindir}/tracker-stats
+#%{_bindir}/tracker-tag
 %{_datadir}/bash-completion/completions/tracker
 
 %files devel

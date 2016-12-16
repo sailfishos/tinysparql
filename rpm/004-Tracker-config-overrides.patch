@@ -1,0 +1,108 @@
+From 7d2374237c682b8d68833db1272d710e12d46157 Fri, 16 Dec 2016 13:15:14 +0100
+From: Islam Amer <islam.amer@jollamobile.com>
+Date: Wed, 12 Nov 2014 18:10:53 +0200
+Subject: Tracker config overrides
+
+[PATCH] [schema] change default miner initial sleep to 30 seconds to not hammer the system during bootup
+Set the default delay for GraphUpdated to 350 instead of upstream default of 1000. Helps fixing JB#11570
+[PATCH] [schema] change default fs miner settings to match nemo defaults
+Changing the default settings in the schema should hopefully reduce issues when user resets tracker with tracker-control or similar
+[defaults] match default settings with oneshot configs for throttle
+[schema] change default fs miner settings to better handle android storage
+[schema] exclude Android folder from indexing
+Harmonize ignore folders
+
+diff --git a/src/miners/fs/org.freedesktop.Tracker.Miner.Files.gschema.xml.in b/src/miners/fs/org.freedesktop.Tracker.Miner.Files.gschema.xml.in
+index 94f1a68..8884277 100644
+--- a/src/miners/fs/org.freedesktop.Tracker.Miner.Files.gschema.xml.in
++++ b/src/miners/fs/org.freedesktop.Tracker.Miner.Files.gschema.xml.in
+@@ -29,7 +29,7 @@
+       <_summary>Initial sleep</_summary>
+       <_description>Initial sleep time, in seconds.</_description>
+       <range min="0" max="1000"/>
+-      <default>15</default>
++      <default>30</default>
+     </key>
+ 
+     <key name="sched-idle" enum="org.freedesktop.Tracker.TrackerSchedIdle">
+@@ -46,7 +46,7 @@
+       <_summary>Throttle</_summary>
+       <_description>Indexing speed, the higher the slower.</_description>
+       <range min="0" max="20"/>
+-      <default>0</default>
++      <default>10</default>
+     </key>
+ 
+     <key name="low-disk-space-limit" type="i">
+@@ -64,7 +64,7 @@
+ 	disables it entirely.
+       </_description>
+       <range min="-2" max="365"/>
+-      <default>-1</default>
++      <default>0</default>
+     </key>
+ 
+     <key name="removable-days-threshold" type="i">
+@@ -75,7 +75,7 @@
+ 	maximum is 365.
+       </_description>
+       <range min="0" max="365"/>
+-      <default>3</default>
++      <default>30</default>
+     </key>
+ 
+     <key name="enable-monitors" type="b">
+@@ -87,13 +87,13 @@
+     <key name="enable-writeback" type="b">
+       <_summary>Enable writeback</_summary>
+       <_description>Set to false to completely disable any file writeback</_description>
+-      <default>true</default>
++      <default>false</default>
+     </key>
+ 
+     <key name="index-removable-devices" type="b">
+       <_summary>Index removable devices</_summary>
+       <_description>Set to true to enable indexing mounted directories for removable devices.</_description>
+-      <default>false</default>
++      <default>true</default>
+     </key>
+ 
+     <key name="index-optical-discs" type="b">
+@@ -126,7 +126,7 @@
+ 
+ 	See /etc/xdg/user-dirs.defaults and $HOME/.config/user-dirs.default
+       </_description>
+-      <default>[ '&amp;DESKTOP', '&amp;DOCUMENTS', '&amp;DOWNLOAD', '&amp;MUSIC', '&amp;PICTURES', '&amp;VIDEOS' ]</default>
++      <default>[ '&amp;DESKTOP', '&amp;DOCUMENTS', '&amp;DOWNLOAD', '&amp;MUSIC', '&amp;PICTURES', '&amp;VIDEOS', '$HOME/android_storage/DCIM', '$HOME/android_storage/Download', '$HOME/android_storage/Pictures', '$HOME/android_storage/Podcasts', '$HOME/android_storage/Music' ]</default>
+     </key>
+ 
+     <key name="index-single-directories" type="as">
+@@ -150,12 +150,12 @@
+     <key name="ignored-directories" type="as">
+       <_summary>Ignored directories</_summary>
+       <_description>List of directories to avoid</_description>
+-      <default>[ 'po', 'CVS', 'core-dumps', 'lost+found' ]</default>
++      <default>[ 'po', 'CVS', 'core-dumps', 'lost+found', '$HOME/android_storage/Android' ]</default>
+     </key>
+ 
+     <key name="ignored-directories-with-content" type="as">
+       <_summary>Ignored directories with content</_summary>
+       <_description>Avoid any directory containing a file blacklisted here</_description>
+-      <default>[ '.trackerignore', '.git' ]</default>
++      <default>[ '.trackerignore', 'backup.metadata', '.nomedia' ]</default>
+     </key>
+   </schema>
+ </schemalist>
+diff --git a/src/tracker-store/org.freedesktop.Tracker.Store.gschema.xml.in b/src/tracker-store/org.freedesktop.Tracker.Store.gschema.xml.in
+index f7c4565..9c29b0e 100644
+--- a/src/tracker-store/org.freedesktop.Tracker.Store.gschema.xml.in
++++ b/src/tracker-store/org.freedesktop.Tracker.Store.gschema.xml.in
+@@ -25,7 +25,7 @@
+       <_description>Log verbosity.</_description>
+     </key>
+     <key name="graphupdated-delay" type="i">
+-      <default>1000</default>
++      <default>350</default>
+       <_summary>GraphUpdated delay</_summary>
+       <_description>Delay in ms. at which GraphUpdated will happen when signalling data is available.</_description>
+     </key>

@@ -1,0 +1,248 @@
+From c40ba12785aaea728daae11fb6d3134aa82de914 Fri, 16 Dec 2016 14:58:32 +0100
+From: Andrew Branson <andrew.branson@jollamobile.com>
+Date: Wed, 12 Oct 2016 17:16:48 +0200
+Subject: [PATCH] [tracker] Add album art extraction for libav and flac. Fixes JB#36890, JB#33471
+
+
+Album art video streams in various files were causing files to be incorrectly identified as videos.
+diff --git a/src/tracker-extract/tracker-extract-flac.c b/src/tracker-extract/tracker-extract-flac.c
+index cda8ca6..abe34d0 100644
+--- a/src/tracker-extract/tracker-extract-flac.c
++++ b/src/tracker-extract/tracker-extract-flac.c
+@@ -28,6 +28,10 @@
+ 
+ #include <FLAC/metadata.h>
+ 
++#ifdef HAVE_LIBMEDIAART
++#include <libmediaart/mediaart.h>
++#endif
++
+ #include <libtracker-common/tracker-common.h>
+ 
+ #include <libtracker-extract/tracker-extract.h>
+@@ -62,6 +66,9 @@
+ 	guint channels;
+ 	guint bps;
+ 	guint64 total;
++	unsigned char *media_art_data;
++	size_t media_art_size;
++	gchar *media_art_mime;
+ } FlacData;
+ 
+ static void
+@@ -155,7 +162,7 @@
+ tracker_extract_get_metadata (TrackerExtractInfo *info)
+ {
+ 	FLAC__Metadata_SimpleIterator *iter;
+-	FLAC__StreamMetadata *stream = NULL, *vorbis, *picture;
++	FLAC__StreamMetadata *stream = NULL, *vorbis;
+ 	FLAC__bool success;
+ 	FlacData fd = { 0 };
+ 	TrackerSparqlBuilder *preupdate, *metadata;
+@@ -201,13 +208,18 @@
+ 			parse_vorbis_comments (&(vorbis->data.vorbis_comment), &fd);
+ 			FLAC__metadata_object_delete (vorbis);
+ 			break;
+-
++#ifdef HAVE_LIBMEDIAART
+ 		case FLAC__METADATA_TYPE_PICTURE:
+-			picture = FLAC__metadata_simple_iterator_get_block (iter);
+-			/* Deal with picture */
+-			FLAC__metadata_object_delete (picture);
++			vorbis = FLAC__metadata_simple_iterator_get_block (iter);
++			FLAC__StreamMetadata_Picture picture = vorbis->data.picture;
++			if (picture.data_length > 0) {
++				fd.media_art_data = g_memdup(picture.data, picture.data_length);
++				fd.media_art_mime = g_strdup (picture.mime_type);
++				fd.media_art_size = picture.data_length;
++			}
++			FLAC__metadata_object_delete (vorbis);
+ 			break;
+-
++#endif
+ 		default:
+ 			break;
+ 		}
+@@ -458,6 +470,45 @@
+ 		                                     stream->data.stream_info.total_samples /
+ 		                                     stream->data.stream_info.sample_rate);
+ 	}
++#ifdef HAVE_LIBMEDIAART
++	if ((fd.albumartist || fd.artist) || fd.album) {
++		MediaArtProcess *media_art_process;
++		GError *error = NULL;
++		gboolean success = TRUE;
++
++		media_art_process = tracker_extract_info_get_media_art_process (info);
++
++		if (fd.media_art_data) {
++			success = media_art_process_buffer (media_art_process,
++			                                    MEDIA_ART_ALBUM,
++			                                    MEDIA_ART_PROCESS_FLAGS_NONE,
++			                                    file,
++			                                    fd.media_art_data,
++			                                    fd.media_art_size,
++			                                    fd.media_art_mime,
++												fd.albumartist ? fd.albumartist : fd.artist,
++			                                    fd.album,
++			                                    NULL,
++			                                    &error);
++		} else {
++			success = media_art_process_file (media_art_process,
++			                                  MEDIA_ART_ALBUM,
++			                                  MEDIA_ART_PROCESS_FLAGS_NONE,
++			                                  file,
++											  fd.albumartist ? fd.albumartist : fd.artist,
++			                                  fd.album,
++			                                  NULL,
++			                                  &error);
++		}
++
++		if (!success || error) {
++			g_warning ("Could not process media art for '%s', %s",
++			           uri,
++			           error ? error->message : "No error given");
++			g_clear_error (&error);
++		}
++	}
++#endif
+ 
+ 	g_free (fd.artist);
+ 	g_free (fd.album);
+@@ -484,6 +535,8 @@
+ 	g_free (fd.organisation);
+ 	g_free (fd.location);
+ 	g_free (fd.publisher);
++	g_free (fd.media_art_data);
++	g_free (fd.media_art_mime);
+ 	g_free (uri);
+ 
+ 	return TRUE;
+diff --git a/src/tracker-extract/tracker-extract-libav.c b/src/tracker-extract/tracker-extract-libav.c
+index 8c21e32..d763a75 100644
+--- a/src/tracker-extract/tracker-extract-libav.c
++++ b/src/tracker-extract/tracker-extract-libav.c
+@@ -18,6 +18,7 @@
+  * Boston, MA  02110-1301, USA.
+  */
+ 
++#include "config.h"
+ 
+ #include <glib.h>
+ 
+@@ -27,7 +28,7 @@
+ #include <libtracker-extract/tracker-extract.h>
+ 
+ #ifdef HAVE_LIBMEDIAART
+-#include <tracker-media-art.h>
++#include <libmediaart/mediaart.h>
+ #endif
+ 
+ #include <libavcodec/avcodec.h>
+@@ -199,7 +200,7 @@
+ 		}
+ 	}
+ 
+-	if (video_stream) {
++	if (video_stream && !(video_stream->disposition & AV_DISPOSITION_ATTACHED_PIC)) {
+ 		tracker_sparql_builder_predicate (metadata, "a");
+ 		tracker_sparql_builder_object (metadata, "nmm:Video");
+ 
+@@ -247,6 +248,16 @@
+ 		const char *album_artist = NULL;
+ 		gchar *album_artist_uri = NULL;
+ 		gchar *performer_uri = NULL;
++#ifdef HAVE_LIBMEDIAART
++		unsigned char *media_art_data = NULL;
++		size_t media_art_size = 0;
++
++		if (video_stream) { // single frame - album art
++			AVPacket albumartpkt = video_stream->attached_pic;
++			media_art_data = g_memdup(albumartpkt.data, albumartpkt.size);
++			media_art_size = albumartpkt.size;
++		}
++#endif
+ 
+ 		tracker_sparql_builder_predicate (metadata, "a");
+ 		tracker_sparql_builder_object (metadata, "nmm:MusicPiece");
+@@ -346,13 +357,28 @@
+ 			gboolean success;
+ 
+ 			media_art_process = tracker_extract_info_get_media_art_process (info);
+-			success = media_art_process_file (media_art_process,
+-			                                  MEDIA_ART_ALBUM,
+-			                                  MEDIA_ART_PROCESS_FLAGS_NONE,
+-			                                  file,
+-			                                  album_artist,
+-			                                  album_title,
+-			                                  &error);
++			if (media_art_size > 0) {
++				success = media_art_process_buffer (media_art_process,
++				                                    MEDIA_ART_ALBUM,
++				                                    MEDIA_ART_PROCESS_FLAGS_NONE,
++				                                    file,
++				                                    media_art_data,
++				                                    media_art_size,
++				                                    NULL,
++				                                    album_artist,
++				                                    album_title,
++				                                    NULL,
++				                                    &error);
++			} else {
++				success = media_art_process_file (media_art_process,
++				                                  MEDIA_ART_ALBUM,
++				                                  MEDIA_ART_PROCESS_FLAGS_NONE,
++				                                  file,
++				                                  album_artist,
++				                                  album_title,
++				                                  NULL,
++				                                  &error);
++			}
+ 
+ 			if (!success || error) {
+ 				g_warning ("Could not process media art for '%s', %s",
+@@ -361,6 +387,8 @@
+ 				g_clear_error (&error);
+ 			}
+ 		}
++
++		g_free (media_art_data);
+ #endif
+ 
+ 		g_free(performer_uri);
+diff --git a/src/tracker-extract/tracker-extract-mp3.c b/src/tracker-extract/tracker-extract-mp3.c
+index 50c3188..e80a8f4 100644
+--- a/src/tracker-extract/tracker-extract-mp3.c
++++ b/src/tracker-extract/tracker-extract-mp3.c
+@@ -1270,9 +1270,8 @@
+ 			offset = pos + 1 + mime_len + 2;
+ 			offset += id3v2_strlen (text_type, desc, csize - offset) + id3v2_nul_size (text_type);
+ 
+-			filedata->media_art_data = g_malloc0 (csize - offset);
++			filedata->media_art_data = g_memdup(&data[offset], csize - offset);
+ 			filedata->media_art_mime = g_strndup (mime, mime_len);
+-			memcpy (filedata->media_art_data, &data[offset], csize - offset);
+ 			filedata->media_art_size = csize - offset;
+ 		}
+ 		break;
+@@ -1460,9 +1459,8 @@
+ 			offset = pos + 1 + mime_len + 2;
+ 			offset += id3v2_strlen (text_type, desc, csize - offset) + id3v2_nul_size (text_type);
+ 
+-			filedata->media_art_data = g_malloc0 (csize - offset);
++			filedata->media_art_data = g_memdup(&data[offset], csize - offset);
+ 			filedata->media_art_mime = g_strndup (mime, mime_len);
+-			memcpy (filedata->media_art_data, &data[offset], csize - offset);
+ 			filedata->media_art_size = csize - offset;
+ 		}
+ 		break;
+@@ -1643,8 +1641,7 @@
+ 			offset += id3v2_strlen (text_type, desc, csize - offset) + id3v2_nul_size (text_type);
+ 
+ 			filedata->media_art_mime = g_strndup (mime, 3);
+-			filedata->media_art_data = g_malloc0 (csize - offset);
+-			memcpy (filedata->media_art_data, &data[offset], csize - offset);
++			filedata->media_art_data = g_memdup(&data[offset], csize - offset);
+ 			filedata->media_art_size = csize - offset;
+ 		}
+ 	} else {

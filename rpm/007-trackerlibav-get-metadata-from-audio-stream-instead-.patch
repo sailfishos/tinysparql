@@ -1,0 +1,67 @@
+From 127e355e3a53e3b58a182db01067b32f1a6ccdd2 Fri, 16 Dec 2016 14:41:38 +0100
+From: Mohammed Hassan <mohammed.hassan@jolla.com>
+Date: Thu, 10 Sep 2015 16:55:51 +0300
+Subject: [PATCH] [tracker-libav] get metadata from audio stream instead of the format context. Contributes to JB#27664
+
+
+It does seem that the audio stream metadata contains the actual beef. We need to most likely check both
+but for the sake of simplicity we will just check the audio stream for now.
+
+diff --git a/src/tracker-extract/tracker-extract-libav.c b/src/tracker-extract/tracker-extract-libav.c
+index 78b0071..13c28a3 100644
+--- a/src/tracker-extract/tracker-extract-libav.c
++++ b/src/tracker-extract/tracker-extract-libav.c
+@@ -248,30 +248,30 @@
+ 			set_value_int64 (metadata, "nfo:duration", duration);
+ 		}
+ 
+-		if ((tag = av_dict_get (format->metadata, "track", NULL, 0))) {
++		if ((tag = av_dict_get (audio_stream->metadata, "track", NULL, 0))) {
+ 			int track = atoi(tag->value);
+ 			if (track > 0) {
+ 				set_value_int64 (metadata, "nmm:trackNumber", track);
+ 			}
+ 		}
+ 
+-		if ((tag = av_dict_get (format->metadata, "album", NULL, 0))) {
++		if ((tag = av_dict_get (audio_stream->metadata, "album", NULL, 0))) {
+ 			album_title = tag->value;
+ 		}
+ 
+-		if (album_title && (tag = av_dict_get (format->metadata, "album_artist", NULL, 0))) {
++		if (album_title && (tag = av_dict_get (audio_stream->metadata, "album_artist", NULL, 0))) {
+ 			album_artist_uri = create_artist (preupdate, graph, tag->value);
+ 			album_artist = tag->value;
+ 		}
+ 
+-		if ((tag = av_dict_get (format->metadata, "artist", tag, 0))) {
++		if ((tag = av_dict_get (audio_stream->metadata, "artist", tag, 0))) {
+ 			performer_uri = create_artist (preupdate, graph, tag->value);
+ 			if (!album_artist) {
+ 				album_artist = tag->value;
+ 			}
+ 		}
+ 
+-		if (!performer_uri && (tag = av_dict_get (format->metadata, "performer", tag, 0))) {
++		if (!performer_uri && (tag = av_dict_get (audio_stream->metadata, "performer", tag, 0))) {
+ 			performer_uri = create_artist (preupdate, graph, tag->value);
+ 			if (!album_artist) {
+ 				album_artist = tag->value;
+@@ -284,7 +284,7 @@
+ 			set_value_iri (metadata, "nmm:performer", album_artist_uri);
+ 		}
+ 
+-		if ((tag = av_dict_get (format->metadata, "composer", tag, 0))) {
++		if ((tag = av_dict_get (audio_stream->metadata, "composer", tag, 0))) {
+ 			gchar *composer_uri = create_artist (preupdate, graph, tag->value);
+ 			set_value_iri (metadata, "nmm:composer", composer_uri);
+ 			g_free(composer_uri);
+@@ -306,7 +306,7 @@
+ 			close_insert (preupdate, graph);
+ 
+ 
+-			if ((tag = av_dict_get (format->metadata, "disc", NULL, 0))) {
++			if ((tag = av_dict_get (audio_stream->metadata, "disc", NULL, 0))) {
+ 				disc = atoi (tag->value);
+ 			}
+ 

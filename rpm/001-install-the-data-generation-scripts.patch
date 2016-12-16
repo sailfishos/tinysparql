@@ -1,0 +1,31 @@
+From 5b6a91770e356045b3ef755debbfb1588e0523bc Thu, 15 Dec 2016 17:28:54 +0100
+From: Reto Zingg <reto.zingg@jollamobile.com>
+Date: Thu, 30 May 2013 13:21:39 +0300
+Subject: [PATCH] install the data generation scripts
+
+
+this allows to generate the data for tests to be build during rpm
+installation instead of packaging in (~160MB)
+
+[tracker] install the data generation scripts
+
+diff --git a/utils/data-generators/cc/Makefile.am b/utils/data-generators/cc/Makefile.am
+index c41494c..42b23ed 100644
+--- a/utils/data-generators/cc/Makefile.am
++++ b/utils/data-generators/cc/Makefile.am
+@@ -18,3 +18,15 @@
+ 	tracker.py                                     \
+ 	convert_data.py                                \
+ 	source-data
++
++nemotestsdir = /opt/tests/tracker/bin
++nemotests_DATA = default.cfg max.cfg
++nemotests_SCRIPTS = generate
++nemotests_PYTHON = gen_data.py __init__.py mfo.py mlo.py mto.py ncal.py nco.py nfo.py nmm.py \
++                   nmo.py slo.py ontology_prefixes.py tools.py tracker.py convert_data.py
++
++nemotestdatadir = /opt/tests/tracker/bin/source-data
++nemotestdata_DATA = source-data/area-codes.txt source-data/equipment-manufacturers.txt source-data/job-titles.txt source-data/male-prefix.txt \
++                    source-data/company-names.txt source-data/equipment-models.txt source-data/last-name.txt source-data/street-names.txt \
++                    source-data/company-types.txt source-data/female-first-name.txt source-data/latin-words.txt source-data/street-types.txt \
++                    source-data/email-domains.txt source-data/female-prefix.txt source-data/male-first-name.txt source-data/zip-codes.txt
