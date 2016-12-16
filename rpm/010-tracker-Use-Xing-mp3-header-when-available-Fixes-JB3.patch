@@ -4,7 +4,7 @@ Date: Tue, 29 Nov 2016 10:41:19 +0100
 Subject: [PATCH] [tracker] Use Xing mp3 header when available. Fixes JB#36891
 
 diff --git a/src/tracker-extract/tracker-extract-mp3.c b/src/tracker-extract/tracker-extract-mp3.c
-index e80a8f4..3f57222 100644
+index ef30342..cf3b92e 100644
 --- a/src/tracker-extract/tracker-extract-mp3.c
 +++ b/src/tracker-extract/tracker-extract-mp3.c
 @@ -147,6 +147,12 @@
@@ -20,7 +20,7 @@ index e80a8f4..3f57222 100644
  	size_t size;
  	size_t id3v2_size;
  
-@@ -179,6 +185,7 @@
+@@ -180,6 +186,7 @@
  	id3v2tag id3v22;
  	id3v2tag id3v23;
  	id3v2tag id3v24;
@@ -28,7 +28,7 @@ index e80a8f4..3f57222 100644
  } MP3Data;
  
  enum {
-@@ -397,15 +404,18 @@
+@@ -398,15 +405,18 @@
  	"Synthpop"
  };
  
@@ -55,7 +55,7 @@ index e80a8f4..3f57222 100644
  	{   0,   0,   0,   0,   0,   0 },
  	{  32,  32,  32,  32,   8,   8 },
  	{  64,  48,  40,  48,  16,  16 },
-@@ -424,15 +434,28 @@
+@@ -425,15 +435,28 @@
  	{  -1,  -1,  -1,  -1,  -1,  -1 }
  };
  
@@ -86,7 +86,7 @@ index e80a8f4..3f57222 100644
  };
  
  #ifndef HAVE_STRNLEN
-@@ -845,6 +868,246 @@
+@@ -900,6 +923,246 @@
  	return TRUE;
  }
  
@@ -333,7 +333,7 @@ index e80a8f4..3f57222 100644
  /*
   * For the MP3 frame header description, see
   * http://www.mp3-tech.org/programmer/frame_header.html
-@@ -858,148 +1122,34 @@
+@@ -913,142 +1176,28 @@
                    MP3Data              *filedata)
  {
  	const gchar *dlna_profile, *dlna_mimetype;
@@ -456,13 +456,11 @@ index e80a8f4..3f57222 100644
 -		return FALSE;
 -	}
  
- 	tracker_sparql_builder_predicate (metadata, "nfo:codec");
- 	tracker_sparql_builder_object_string (metadata, "MPEG");
+ 	tracker_resource_set_string (resource, "nfo:codec", "MPEG");
  
 -	n_channels = ((header & ch_mask) == ch_mask) ? 1 : 2;
 -
- 	tracker_sparql_builder_predicate (metadata, "nfo:channels");
--	tracker_sparql_builder_object_int64 (metadata, n_channels);
+-	tracker_resource_set_int (resource, "nfo:channels", n_channels);
 -
 -	avg_bps /= frames;
 -
@@ -474,32 +472,28 @@ index e80a8f4..3f57222 100644
 -		/* Note that sample_rate is always > 0, checked before */
 -		length = spfp8 * 8 * frames / sample_rate;
 -	}
-+	tracker_sparql_builder_object_int64 (metadata, finfo.n_channels);
++	tracker_resource_set_int (resource, "nfo:channels", finfo.n_channels);
  
- 	tracker_sparql_builder_predicate (metadata, "nfo:duration");
- 	tracker_sparql_builder_object_int64 (metadata, length);
- 
- 	tracker_sparql_builder_predicate (metadata, "nfo:sampleRate");
--	tracker_sparql_builder_object_int64 (metadata, sample_rate);
-+	tracker_sparql_builder_object_int64 (metadata, finfo.sample_rate);
- 	tracker_sparql_builder_predicate (metadata, "nfo:averageBitrate");
--	tracker_sparql_builder_object_int64 (metadata, avg_bps*1000);
-+	tracker_sparql_builder_object_int64 (metadata, avg_bps);
+ 	tracker_resource_set_int64 (resource, "nfo:duration", length);
+-	tracker_resource_set_int64 (resource, "nfo:sampleRate", sample_rate);
+-	tracker_resource_set_int64 (resource, "nfo:averageBitrate", avg_bps*1000);
++	tracker_resource_set_int64 (resource, "nfo:sampleRate", finfo.sample_rate);
++	tracker_resource_set_int64 (resource, "nfo:averageBitrate", avg_bps);
  
 -	if (guess_dlna_profile (bitrate, sample_rate,
 -	                        mpeg_ver, layer_ver, n_channels,
 +	if (guess_dlna_profile (finfo.bitrate, finfo.sample_rate,
 +	                        finfo.version, finfo.layer, finfo.n_channels,
  	                        &dlna_profile, &dlna_mimetype)) {
- 		tracker_sparql_builder_predicate (metadata, "nmm:dlnaProfile");
- 		tracker_sparql_builder_object_string (metadata, dlna_profile);
-@@ -1030,8 +1180,7 @@
+ 		tracker_resource_set_string (resource, "nmm:dlnaProfile", dlna_profile);
+ 		tracker_resource_set_string (resource, "nmm:dlnaMime", dlna_mimetype);
+@@ -1077,8 +1226,7 @@
  
  		memcpy (&header, &data[pos], sizeof (header));
  
 -		if ((header & sync_mask) == sync_mask) {
 -			/* Found header sync */
 +		if (is_mpeg_frame_header(header)) {
- 			if (mp3_parse_header (data, size, pos, uri, metadata, filedata)) {
+ 			if (mp3_parse_header (data, size, pos, uri, resource, filedata)) {
  				return TRUE;
  			}

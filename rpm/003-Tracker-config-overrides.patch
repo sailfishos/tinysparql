@@ -13,7 +13,7 @@ Changing the default settings in the schema should hopefully reduce issues when 
 Harmonize ignore folders
 
 diff --git a/src/miners/fs/org.freedesktop.Tracker.Miner.Files.gschema.xml.in b/src/miners/fs/org.freedesktop.Tracker.Miner.Files.gschema.xml.in
-index 94f1a68..8884277 100644
+index 1dfa058..92ca377 100644
 --- a/src/miners/fs/org.freedesktop.Tracker.Miner.Files.gschema.xml.in
 +++ b/src/miners/fs/org.freedesktop.Tracker.Miner.Files.gschema.xml.in
 @@ -29,7 +29,7 @@
@@ -77,7 +77,7 @@ index 94f1a68..8884277 100644
      </key>
  
      <key name="index-single-directories" type="as">
-@@ -150,12 +150,12 @@
+@@ -150,13 +150,13 @@
      <key name="ignored-directories" type="as">
        <_summary>Ignored directories</_summary>
        <_description>List of directories to avoid</_description>
@@ -104,5 +104,6 @@ index f7c4565..9c29b0e 100644
 -      <default>1000</default>
 +      <default>350</default>
        <_summary>GraphUpdated delay</_summary>
-       <_description>Delay in ms. at which GraphUpdated will happen when signalling data is available.</_description>
+       <_description>Period in milliseconds between GraphUpdated signals being emitted when indexed data has changed inside the database.</_description>
      </key>
+

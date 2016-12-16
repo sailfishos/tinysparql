@@ -20,7 +20,7 @@ diff --git a/src/libtracker-miner/tracker-miner-fs.c b/src/libtracker-miner/trac
 index eb8cfac..487c5e9 100644
 --- a/src/libtracker-miner/tracker-miner-fs.c
 +++ b/src/libtracker-miner/tracker-miner-fs.c
-@@ -1511,7 +1511,7 @@
+@@ -1548,7 +1548,7 @@
  	 * created, its meta data might already be in the store
  	 * (possibly inserted by other application) - in such a case
  	 * we have to UPDATE, not INSERT. */

@@ -3,31 +3,29 @@ Name:       tracker
 %define enable_demo 0
 
 Summary:    An object database, tag/metadata database, search tool and indexer
-Version:    1.8.0
+Version:    1.12.4
 Release:    1
 Group:      Data Management/Content Framework
 License:    GPLv2+ and LGPLv2.1+ and BSD-3-clause
 URL:        http://ftp.gnome.org/pub/GNOME/sources/tracker/0.10/
 Source0:    http://ftp.gnome.org/pub/GNOME/sources/%{name}/0.14/%{name}-%{version}.tar.xz
 Source1:    tracker-libav-rpmlintrc
-Source2:    tracker-store.service
-Source3:    tracker-miner-fs.service
-Source4:    tracker-extract.service
 Source5:    tracker-configs.sh
 Patch1:     001-install-the-data-generation-scripts.patch
 Patch2:     002-Fix-CLEANFILE-for-automake.patch
-Patch3:     003-Add-Systemd-service-to-DBUS.patch
-Patch4:     004-Tracker-config-overrides.patch
-Patch6:     006-Bugfix-for-GB740920-ensure-sourceiri-is-filled-in-on.patch
-Patch7:     007-trackerlibav-get-metadata-from-audio-stream-instead-.patch
-Patch8:     008-trackerlibav-check-format-metadata-for-tags-and-fall.patch
-Patch9:     009-tracker-Drop-15gstreamerguessrule-Fixes-JB37082.patch
-Patch10:    010-tracker-Fix-flac-tag-extraction-Fixes-JB35939.patch
-Patch11:    011-tracker-Fix-memory-leak-trackerextractlibav-Fixes-JB.patch
-Patch12:    012-tracker-Add-album-art-extraction-for-libav-and-flac-.patch
-Patch13:    013-tracker-Use-Xing-mp3-header-when-available-Fixes-JB3.patch
-Patch14:    014-tracker-FLAC-metadata-iterator-wasnt-closed-Fixes-ME.patch
-Patch15:    015-tracker-Remove-nfo-language-and-fix-libmediaart-call.patch
+Patch3:     003-Tracker-config-overrides.patch
+Patch4:     004-tracker-Remove-nfo-language-and-fix-libmediaart-call.patch
+Patch5:     005-Bugfix-for-GB740920-ensure-sourceiri-is-filled-in-on.patch
+Patch6:     006-trackerlibav-get-metadata-from-audio-stream-instead-.patch
+Patch7:     007-tracker-Drop-15gstreamerguessrule-Fixes-JB37082.patch
+Patch8:     008-tracker-Fix-flac-tag-extraction-Fixes-JB35939.patch
+Patch9:     009-tracker-Add-album-art-extraction-for-libav-and-flac-.patch
+Patch10:    010-tracker-Use-Xing-mp3-header-when-available-Fixes-JB3.patch
+Patch11:    011-revert-libmediaart-disable.patch
+Patch12:    012-disable-tracker-remote.patch
+Patch13:    013-miner-Fix-mining-of-files-whose-data-was-inserted-by.patch
+Patch14:    014-fix-systemd-unit-files.patch
+
 Requires:   libmediaart
 Requires:   unzip
 Requires:   systemd
@@ -36,6 +34,7 @@ Requires:   qt5-plugin-platform-minimal
 Requires(post): /sbin/ldconfig
 Requires(post):  oneshot
 Requires(postun): /sbin/ldconfig
+BuildRequires:  gobject-introspection-devel
 BuildRequires:  pkgconfig(libmediaart-2.0)
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
 BuildRequires:  pkgconfig(enca)
@@ -56,7 +55,6 @@ BuildRequires:  pkgconfig(sqlite3) >= 3.11
 BuildRequires:  pkgconfig(taglib)
 BuildRequires:  pkgconfig(totem-plparser)
 BuildRequires:  pkgconfig(uuid)
-#BuildRequires:  pkgconfig(libvala-0.16)
 BuildRequires:  pkgconfig(vorbis)
 BuildRequires:  pkgconfig(flac)
 BuildRequires:  pkgconfig(zlib)
@@ -131,7 +129,7 @@ Development files for %{name}.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-#%patch5 -p1
+%patch5 -p1
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
@@ -141,7 +139,6 @@ Development files for %{name}.
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
-%patch15 -p1
 
 %build
 sed -i -e '/gtkdocize/d' autogen.sh
@@ -177,27 +174,18 @@ chmod +x tests/functional-tests/create-tests-xml.py
     --enable-libgif \
     --disable-cfg-man-pages
 
+touch tests/functional-tests/ttl/gen-test-data.stamp
+
 make %{?jobs:-j%jobs}
 
 %install
 rm -rf %{buildroot}
 
 %make_install
-mkdir -p %{buildroot}%{_libdir}/systemd/user/
-cp -a %{SOURCE2} %{buildroot}%{_libdir}/systemd/user/
-mkdir -p %{buildroot}%{_libdir}/systemd/user/
-cp -a %{SOURCE3} %{buildroot}%{_libdir}/systemd/user/
-cp -a %{SOURCE4} %{buildroot}%{_libdir}/systemd/user/
-
 mkdir -p %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants
 ln -s ../tracker-store.service %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants/
 ln -s ../tracker-miner-fs.service %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants/
 ln -s ../tracker-extract.service %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants/
-
-rm -rf %{buildroot}/%{_datadir}/icons/hicolor/
-rm -rf %{buildroot}/%{_datadir}/gtk-doc
-# this is 160MB of test data, let's create that during rpm install
-rm -f %{buildroot}/%{_datadir}/tracker-tests/ttl/*
 
 # oneshot run in install
 mkdir -p %{buildroot}%{_oneshotdir}
@@ -275,6 +263,7 @@ cd /usr/share/tracker-tests/
 %{_libdir}/systemd/user/tracker-miner-fs.service
 %{_libdir}/systemd/user/tracker-store.service
 %{_libdir}/systemd/user/tracker-extract.service
+%{_libdir}/systemd/user/tracker-writeback.service
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-miner-fs.service
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-store.service
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-extract.service
@@ -306,3 +295,4 @@ cd /usr/share/tracker-tests/
 %{_includedir}/tracker-*/libtracker-sparql/*.h
 %{_includedir}/tracker-*/libtracker-control/*.h
 %{_libdir}/pkgconfig/tracker-*.pc
+

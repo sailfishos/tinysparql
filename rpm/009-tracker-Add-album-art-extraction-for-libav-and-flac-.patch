@@ -6,7 +6,7 @@ Subject: [PATCH] [tracker] Add album art extraction for libav and flac. Fixes JB
 
 Album art video streams in various files were causing files to be incorrectly identified as videos.
 diff --git a/src/tracker-extract/tracker-extract-flac.c b/src/tracker-extract/tracker-extract-flac.c
-index cda8ca6..abe34d0 100644
+index 56092c6..5e03d5d 100644
 --- a/src/tracker-extract/tracker-extract-flac.c
 +++ b/src/tracker-extract/tracker-extract-flac.c
 @@ -28,6 +28,10 @@
@@ -38,8 +38,8 @@ index cda8ca6..abe34d0 100644
 +	FLAC__StreamMetadata *stream = NULL, *vorbis;
  	FLAC__bool success;
  	FlacData fd = { 0 };
- 	TrackerSparqlBuilder *preupdate, *metadata;
-@@ -201,13 +208,18 @@
+ 	TrackerResource *metadata, *artist, *album_disc, *album, *album_artist;
+@@ -196,13 +203,18 @@
  			parse_vorbis_comments (&(vorbis->data.vorbis_comment), &fd);
  			FLAC__metadata_object_delete (vorbis);
  			break;
@@ -63,9 +63,9 @@ index cda8ca6..abe34d0 100644
  		default:
  			break;
  		}
-@@ -458,6 +470,45 @@
- 		                                     stream->data.stream_info.total_samples /
- 		                                     stream->data.stream_info.sample_rate);
+@@ -289,6 +301,45 @@
+ 		tracker_extract_info_set_resource (info, metadata);
+ 		g_object_unref (metadata);
  	}
 +#ifdef HAVE_LIBMEDIAART
 +	if ((fd.albumartist || fd.artist) || fd.album) {
@@ -83,7 +83,7 @@ index cda8ca6..abe34d0 100644
 +			                                    fd.media_art_data,
 +			                                    fd.media_art_size,
 +			                                    fd.media_art_mime,
-+												fd.albumartist ? fd.albumartist : fd.artist,
++			                                    fd.albumartist ? fd.albumartist : fd.artist,
 +			                                    fd.album,
 +			                                    NULL,
 +			                                    &error);
@@ -92,7 +92,7 @@ index cda8ca6..abe34d0 100644
 +			                                  MEDIA_ART_ALBUM,
 +			                                  MEDIA_ART_PROCESS_FLAGS_NONE,
 +			                                  file,
-+											  fd.albumartist ? fd.albumartist : fd.artist,
++			                                  fd.albumartist ? fd.albumartist : fd.artist,
 +			                                  fd.album,
 +			                                  NULL,
 +			                                  &error);
@@ -109,7 +109,7 @@ index cda8ca6..abe34d0 100644
  
  	g_free (fd.artist);
  	g_free (fd.album);
-@@ -484,6 +535,8 @@
+@@ -315,6 +366,8 @@
  	g_free (fd.organisation);
  	g_free (fd.location);
  	g_free (fd.publisher);
@@ -119,7 +119,7 @@ index cda8ca6..abe34d0 100644
  
  	return TRUE;
 diff --git a/src/tracker-extract/tracker-extract-libav.c b/src/tracker-extract/tracker-extract-libav.c
-index 8c21e32..d763a75 100644
+index b2597f9..9a4f46e 100644
 --- a/src/tracker-extract/tracker-extract-libav.c
 +++ b/src/tracker-extract/tracker-extract-libav.c
 @@ -18,6 +18,7 @@
@@ -139,19 +139,20 @@ index 8c21e32..d763a75 100644
  #endif
  
  #include <libavcodec/avcodec.h>
-@@ -199,7 +200,7 @@
+@@ -110,7 +111,7 @@
  		}
  	}
  
 -	if (video_stream) {
 +	if (video_stream && !(video_stream->disposition & AV_DISPOSITION_ATTACHED_PIC)) {
- 		tracker_sparql_builder_predicate (metadata, "a");
- 		tracker_sparql_builder_object (metadata, "nmm:Video");
+ 		tracker_resource_add_uri(metadata, "rdf:type", "nmm:Video");
  
-@@ -247,6 +248,16 @@
- 		const char *album_artist = NULL;
- 		gchar *album_artist_uri = NULL;
- 		gchar *performer_uri = NULL;
+ 		if (video_stream->codec->width > 0 && video_stream->codec->height > 0) {
+@@ -156,6 +157,17 @@
+ 		TrackerResource *album_artist = NULL, *performer = NULL;
+ 		char *album_artist_name = NULL;
+ 		char *album_title = NULL;
++
 +#ifdef HAVE_LIBMEDIAART
 +		unsigned char *media_art_data = NULL;
 +		size_t media_art_size = 0;
@@ -163,9 +164,16 @@ index 8c21e32..d763a75 100644
 +		}
 +#endif
  
- 		tracker_sparql_builder_predicate (metadata, "a");
- 		tracker_sparql_builder_object (metadata, "nmm:MusicPiece");
-@@ -346,13 +357,28 @@
+ 		tracker_resource_add_uri (metadata, "rdf:type", "nmm:MusicPiece");
+ 		tracker_resource_add_uri (metadata, "rdf:type", "nfo:Audio");
+@@ -217,19 +229,34 @@
+ 		}
+ 
+ #ifdef HAVE_LIBMEDIAART
+-		if (album_artist && album_title) {
++		if (album_artist_name && album_title) {
+ 			MediaArtProcess *media_art_process;
+ 			GError *error = NULL;
  			gboolean success;
  
  			media_art_process = tracker_extract_info_get_media_art_process (info);
@@ -184,7 +192,7 @@ index 8c21e32..d763a75 100644
 +				                                    media_art_data,
 +				                                    media_art_size,
 +				                                    NULL,
-+				                                    album_artist,
++				                                    album_artist_name,
 +				                                    album_title,
 +				                                    NULL,
 +				                                    &error);
@@ -193,7 +201,7 @@ index 8c21e32..d763a75 100644
 +				                                  MEDIA_ART_ALBUM,
 +				                                  MEDIA_ART_PROCESS_FLAGS_NONE,
 +				                                  file,
-+				                                  album_artist,
++				                                  album_artist_name,
 +				                                  album_title,
 +				                                  NULL,
 +				                                  &error);
@@ -201,7 +209,7 @@ index 8c21e32..d763a75 100644
  
  			if (!success || error) {
  				g_warning ("Could not process media art for '%s', %s",
-@@ -361,6 +387,8 @@
+@@ -238,6 +265,8 @@
  				g_clear_error (&error);
  			}
  		}
@@ -209,12 +217,12 @@ index 8c21e32..d763a75 100644
 +		g_free (media_art_data);
  #endif
  
- 		g_free(performer_uri);
+ 		if (performer)
 diff --git a/src/tracker-extract/tracker-extract-mp3.c b/src/tracker-extract/tracker-extract-mp3.c
-index 50c3188..e80a8f4 100644
+index ef30342..15cf2a3 100644
 --- a/src/tracker-extract/tracker-extract-mp3.c
 +++ b/src/tracker-extract/tracker-extract-mp3.c
-@@ -1270,9 +1270,8 @@
+@@ -1317,9 +1317,8 @@
  			offset = pos + 1 + mime_len + 2;
  			offset += id3v2_strlen (text_type, desc, csize - offset) + id3v2_nul_size (text_type);
  
@@ -225,7 +233,7 @@ index 50c3188..e80a8f4 100644
  			filedata->media_art_size = csize - offset;
  		}
  		break;
-@@ -1460,9 +1459,8 @@
+@@ -1510,9 +1509,8 @@
  			offset = pos + 1 + mime_len + 2;
  			offset += id3v2_strlen (text_type, desc, csize - offset) + id3v2_nul_size (text_type);
  
@@ -236,7 +244,7 @@ index 50c3188..e80a8f4 100644
  			filedata->media_art_size = csize - offset;
  		}
  		break;
-@@ -1643,8 +1641,7 @@
+@@ -1693,8 +1691,7 @@
  			offset += id3v2_strlen (text_type, desc, csize - offset) + id3v2_nul_size (text_type);
  
  			filedata->media_art_mime = g_strndup (mime, 3);
@@ -246,3 +254,4 @@ index 50c3188..e80a8f4 100644
  			filedata->media_art_size = csize - offset;
  		}
  	} else {
+

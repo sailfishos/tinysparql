@@ -5,10 +5,10 @@ Subject: [PATCH] Bugfix for GB#740920, ensure source_iri is filled in on item_mo
 
 
 diff --git a/src/libtracker-miner/tracker-miner-fs.c b/src/libtracker-miner/tracker-miner-fs.c
-index df3fa0b..eb8cfac 100644
+index 02b4a47..ac55d7f 100644
 --- a/src/libtracker-miner/tracker-miner-fs.c
 +++ b/src/libtracker-miner/tracker-miner-fs.c
-@@ -1858,6 +1858,7 @@
+@@ -1872,6 +1872,7 @@
  	GFile *new_parent;
  	const gchar *new_parent_iri;
  	TrackerDirectoryFlags source_flags, flags;
@@ -16,7 +16,7 @@ index df3fa0b..eb8cfac 100644
  
  	uri = g_file_get_uri (file);
  	source_uri = g_file_get_uri (source_file);
-@@ -1899,6 +1900,37 @@
+@@ -1930,6 +1931,37 @@
  		tracker_thumbnailer_move_add (fs->priv->thumbnailer, source_uri,
  					      g_file_info_get_content_type (file_info),
  					      uri);
@@ -54,7 +54,7 @@ index df3fa0b..eb8cfac 100644
  
  	sparql = g_string_new ("");
  
-@@ -2005,6 +2037,7 @@
+@@ -2068,6 +2100,7 @@
  
  	g_free (uri);
  	g_free (source_uri);
@@ -62,3 +62,4 @@ index df3fa0b..eb8cfac 100644
  	g_object_unref (file_info);
  
  	return TRUE;
+
