@@ -279,14 +279,6 @@ cd /usr/share/tracker-tests/
 %files utils
 %defattr(-,root,root,-)
 %{_bindir}/tracker
-# Disable old tracker utils as all scripts have been migrated now
-#%{_bindir}/tracker-control
-#%{_bindir}/tracker-import
-#%{_bindir}/tracker-info
-#%{_bindir}/tracker-search
-#%{_bindir}/tracker-sparql
-#%{_bindir}/tracker-stats
-#%{_bindir}/tracker-tag
 %{_datadir}/bash-completion/completions/tracker
 
 %files devel
