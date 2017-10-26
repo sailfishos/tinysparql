@@ -1,0 +1,31 @@
+From 145469dd80f7d514bab3d9d7e3f69bfdb44060e1 Fri, 16 Dec 2016 12:43:56 +0100
+From: Richard Braakman <richard.braakman@jollamobile.com>
+Date: Fri, 27 Feb 2015 19:02:19 +0200
+Subject: [PATCH] [miner] Fix mining of files whose data was inserted by app
+
+
+If an app inserts file data into the store before a file is created,
+the tracker-miner will misbehave and construct bad sparql statements
+instead of extracting more data from the new file.
+
+User-visible effect: new pictures don't show up in Gallery, etc.
+
+This patch to fix it was taken from
+  https://bugzilla.gnome.org/show_bug.cgi?id=678986
+
+Upstream is still debating its inclusion because of performance
+concerns, but at least it fixes the problem for us.
+
+diff --git a/src/libtracker-miner/tracker-miner-fs.c b/src/libtracker-miner/tracker-miner-fs.c
+index eb8cfac..487c5e9 100644
+--- a/src/libtracker-miner/tracker-miner-fs.c
++++ b/src/libtracker-miner/tracker-miner-fs.c
+@@ -1548,7 +1548,7 @@
+ 	 * created, its meta data might already be in the store
+ 	 * (possibly inserted by other application) - in such a case
+ 	 * we have to UPDATE, not INSERT. */
+-	urn = lookup_file_urn (fs, file, FALSE);
++	urn = lookup_file_urn (fs, file, TRUE);
+ 
+ 	if (!tracker_indexing_tree_file_is_root (fs->priv->indexing_tree, file)) {
+ 		parent = g_file_get_parent (file);

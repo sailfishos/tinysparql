@@ -6,7 +6,7 @@ Summary:    An object database, tag/metadata database, search tool and indexer
 Version:    1.8.0
 Release:    1
 Group:      Data Management/Content Framework
-License:    GPLv2+
+License:    GPLv2+ and LGPLv2.1+ and BSD-3-clause
 URL:        http://ftp.gnome.org/pub/GNOME/sources/tracker/0.10/
 Source0:    http://ftp.gnome.org/pub/GNOME/sources/%{name}/0.14/%{name}-%{version}.tar.xz
 Source1:    tracker-rpmlintrc
@@ -32,7 +32,7 @@ BuildRequires:  pkgconfig(gee-0.8)
 BuildRequires:  pkgconfig(glib-2.0) >= 2.38.0
 BuildRequires:  pkgconfig(gmime-2.6)
 BuildRequires:  pkgconfig(gstreamer-1.0)
-BuildRequires:  pkgconfig(gstreamer-plugins-base-1.0)
+BuildRequires:  pkgconfig(gstreamer-base-1.0)
 BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  pkgconfig(id3tag)
 BuildRequires:  pkgconfig(libexif)
@@ -40,7 +40,6 @@ BuildRequires:  pkgconfig(libgsf-1)
 BuildRequires:  pkgconfig(libiptcdata)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libxml-2.0)
-BuildRequires:  pkgconfig(ossp-uuid)
 BuildRequires:  pkgconfig(poppler-glib)
 BuildRequires:  pkgconfig(sqlite3) >= 3.11
 BuildRequires:  pkgconfig(taglib)
@@ -123,29 +122,29 @@ export NOCONFIGURE=1
 %autogen
 chmod +x tests/functional-tests/create-tests-xml.py
 
-
 %configure --disable-static \
     --with-compile-warnings=no \
     --disable-gtk-doc \
     --disable-tracker-preferences \
-    --disable-tracker-search-bar \
-    --disable-tracker-explorer \
+	--disable-tracker-needle \
     --enable-unit-tests \
     --enable-functional-tests \
     --disable-miner-evolution \
-    --disable-miner-flickr \
+    --disable-miner-firefox \
+    --disable-miner-thunderbird \
     --disable-miner-rss \
     --disable-miner-user-guides \
     --disable-miner-apps \
     --enable-maemo --enable-nemo \
     --enable-guarantee-metadata \
     --with-unicode-support=libicu \
-    --disable-tracker-needle \
     --enable-libvorbis \
     --enable-libflac \
     --enable-generic-media-extractor=gstreamer \
     --disable-enca \
-    --disable-journal \
+    --enable-journal \
+    --disable-icon \
+    --disable-artwork \
     --enable-libgif \
     --disable-cfg-man-pages
 
@@ -160,7 +159,6 @@ cp -a %{SOURCE2} %{buildroot}%{_libdir}/systemd/user/
 mkdir -p %{buildroot}%{_libdir}/systemd/user/
 cp -a %{SOURCE3} %{buildroot}%{_libdir}/systemd/user/
 cp -a %{SOURCE4} %{buildroot}%{_libdir}/systemd/user/
-
 
 mkdir -p %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants
 ln -s ../tracker-store.service %{buildroot}%{_libdir}/systemd/user/post-user-session.target.wants/
@@ -223,6 +221,7 @@ cd /usr/share/tracker-tests/
 %{_datadir}/vala/vapi/*
 %{_datadir}/tracker/extract-rules/*
 %dir %{_datadir}/tracker
+%dir %{_datadir}/tracker/miners
 %dir %{_datadir}/tracker/stop-words
 %dir %{_datadir}/tracker/ontologies
 %dir %{_datadir}/tracker/extract-rules
@@ -242,6 +241,7 @@ cd /usr/share/tracker-tests/
 %{_libexecdir}/tracker-miner-fs
 %{_libexecdir}/tracker-store
 %{_libexecdir}/tracker-writeback
+%doc COPYING COPYING.GPL COPYING.LGPL
 %exclude %{_sysconfdir}/xdg/autostart/*.desktop
 %{_libdir}/systemd/user/tracker-miner-fs.service
 %{_libdir}/systemd/user/tracker-store.service
@@ -249,7 +249,7 @@ cd /usr/share/tracker-tests/
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-miner-fs.service
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-store.service
 %{_libdir}/systemd/user/post-user-session.target.wants/tracker-extract.service
-%{_oneshotdir}/tracker-configs.sh
+%attr(0755, -, -) %{_oneshotdir}/tracker-configs.sh
 
 %files tests
 %defattr(-,root,root,-)
@@ -261,6 +261,13 @@ cd /usr/share/tracker-tests/
 %files utils
 %defattr(-,root,root,-)
 %{_bindir}/tracker
+%{_bindir}/tracker-control
+%{_bindir}/tracker-import
+%{_bindir}/tracker-info
+%{_bindir}/tracker-search
+%{_bindir}/tracker-sparql
+%{_bindir}/tracker-stats
+%{_bindir}/tracker-tag
 %{_datadir}/bash-completion/completions/tracker
 
 %files devel

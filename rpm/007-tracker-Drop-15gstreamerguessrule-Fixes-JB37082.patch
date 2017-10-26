@@ -1,0 +1,15 @@
+From a868fcbe7070126df72f140ad1d47025980cef99 Fri, 16 Dec 2016 14:46:12 +0100
+From: Andrew Branson <andrew.branson@jollamobile.com>
+Date: Tue, 29 Nov 2016 10:33:12 +0100
+Subject: [PATCH] [tracker] Drop 15-gstreamer-guess.rule. Fixes JB#37082
+
+diff --git a/src/tracker-extract/15-gstreamer-guess.rule b/src/tracker-extract/15-gstreamer-guess.rule
+deleted file mode 100644
+index ad71d03..0000000
+--- a/src/tracker-extract/15-gstreamer-guess.rule
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[ExtractorRule]
+-ModulePath=libextract-gstreamer.so
+-MimeTypes=video/3gpp;video/mp4;video/x-ms-asf;application/vnd.ms-asf;application/vnd.rn-realmedia;
+-FallbackRdfTypes=nfo:Media;nfo:Video;

@@ -1,0 +1,36 @@
+From a0f8acab34b2b08efad802969e9a712b78ba80b8 Wed, 18 Oct 2017 13:40:45 +0200
+From: Andrew Branson <andrew.branson@jollamobile.com>
+Date: Wed, 18 Oct 2017 13:40:35 +0200
+Subject: [PATCH] Revert "configure: Disable libmediaart dependency"
+
+This reverts commit 6a05068624bfa55233e2c7e107f5749a7ad4deb8. Also, libmediaart
+won't work with libseccomp, so don't abort the build if that's not present.
+
+diff --git a/configure.ac b/configure.ac
+index 1f301c7..7b09c5d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1161,9 +1161,9 @@
+    LIBTRACKER_MINER_PC_REQUIRES="libmediaart-2.0"
+    AC_SUBST(LIBTRACKER_MINER_PC_REQUIRES)
+ 
+-#   if test "x$have_libmediaart" = "xyes"; then
+-#      AC_DEFINE(HAVE_LIBMEDIAART, [], [Define if we have libmediaart])
+-#   fi
++   if test "x$have_libmediaart" = "xyes"; then
++      AC_DEFINE(HAVE_LIBMEDIAART, [], [Define if we have libmediaart])
++   fi
+ else
+    have_libmediaart="no  (disabled)"
+ fi
+@@ -2626,8 +2626,8 @@
+    LIBTRACKER_COMMON_CFLAGS="$LIBTRACKER_COMMON_CFLAGS $LIBSECCOMP_CFLAGS"
+    AC_DEFINE(HAVE_LIBSECCOMP, [], [Define if we have libseccomp])
+ # seccomp is a linux thing
+-elif test "$tracker_os_linux" = "yes"; then
+-   AC_MSG_ERROR([Libseccomp is mandatory for sandboxed metadata extraction])
++#elif test "$tracker_os_linux" = "yes"; then
++#   AC_MSG_ERROR([Libseccomp is mandatory for sandboxed metadata extraction])
+ fi
+ 
+ ##################################################################

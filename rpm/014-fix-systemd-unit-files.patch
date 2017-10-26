@@ -1,0 +1,54 @@
+From 653cc4673c7c785ab3e1fe3951a3707ec9cadce9 Fri, 20 Oct 2017 15:04:23 +0200
+From: Andrew Branson <andrew.branson@jollamobile.com>
+Date: Fri, 20 Oct 2017 15:04:15 +0200
+Subject: [PATCH] Fix systemd unit files
+
+diff --git a/src/miners/fs/tracker-miner-fs.service.in b/src/miners/fs/tracker-miner-fs.service.in
+index fad973a..700348a 100644
+--- a/src/miners/fs/tracker-miner-fs.service.in
++++ b/src/miners/fs/tracker-miner-fs.service.in
+@@ -5,6 +5,8 @@
+ Type=dbus
+ BusName=org.freedesktop.Tracker1.Miner.Files
+ ExecStart=@libexecdir@/tracker-miner-fs
+-Restart=on-failure
+-# Don't restart after tracker daemon -k (aka tracker-control -k)
+-RestartPreventExitStatus=SIGKILL
++Restart=always
++RestartSec=5
++
++[Install]
++WantedBy=post-user-session.target
+diff --git a/src/tracker-extract/tracker-extract.service.in b/src/tracker-extract/tracker-extract.service.in
+index b7bc6c1..7b1e156 100644
+--- a/src/tracker-extract/tracker-extract.service.in
++++ b/src/tracker-extract/tracker-extract.service.in
+@@ -5,6 +5,8 @@
+ Type=dbus
+ BusName=org.freedesktop.Tracker1.Miner.Extract
+ ExecStart=@libexecdir@/tracker-extract
+-Restart=on-failure
+-# Don't restart after tracker daemon -k (aka tracker-control -k)
+-RestartPreventExitStatus=SIGKILL
++Restart=always
++RestartSec=5
++
++[Install]
++WantedBy=post-user-session.target
+diff --git a/src/tracker-store/tracker-store.service.in b/src/tracker-store/tracker-store.service.in
+index 928a789..f38007c 100644
+--- a/src/tracker-store/tracker-store.service.in
++++ b/src/tracker-store/tracker-store.service.in
+@@ -5,6 +5,8 @@
+ Type=dbus
+ BusName=org.freedesktop.Tracker1
+ ExecStart=@libexecdir@/tracker-store
+-Restart=on-failure
+-# Don't restart after tracker daemon -k (aka tracker-control -k)
+-RestartPreventExitStatus=SIGKILL
++Restart=always
++RestartSec=5
++
++[Install]
++WantedBy=post-user-session.target
+
