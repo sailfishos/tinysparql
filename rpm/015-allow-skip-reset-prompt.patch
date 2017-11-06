@@ -1,0 +1,36 @@
+From 1af11a9ac130024a7d8f5e76492934f910a672db Sat, 4 Nov 2017 01:04:58 +0100
+From: Andrew Branson <andrew.branson@jollamobile.com>
+Date: Sat, 4 Nov 2017 01:04:09 +0100
+Subject: [PATCH] no_prompt
+
+diff --git a/src/tracker/tracker-reset.c b/src/tracker/tracker-reset.c
+index d4821cd..8dee8ab 100644
+--- a/src/tracker/tracker-reset.c
++++ b/src/tracker/tracker-reset.c
+@@ -39,6 +39,7 @@
+ 
+ static gboolean hard_reset;
+ static gboolean soft_reset;
++static gboolean no_prompt;
+ static gboolean remove_config;
+ static gchar *filename = NULL;
+ 
+@@ -55,6 +56,9 @@
+ 	{ "soft", 'e', 0, G_OPTION_ARG_NONE, &soft_reset,
+ 	  N_("Same as --hard but the backup & journal are restored after restart"),
+ 	  NULL },
++	{ "yes", 'y', 0, G_OPTION_ARG_NONE, &no_prompt,
++	  N_("Skip interactive verification for reset."),
++	  NULL },
+ 	{ "config", 'c', 0, G_OPTION_ARG_NONE, &remove_config,
+ 	  N_("Remove all configuration files so they are re-generated on next start"),
+ 	  NULL },
+@@ -216,7 +220,7 @@
+ 		return EXIT_FAILURE;
+ 	}
+ 
+-	if (hard_reset || soft_reset) {
++	if (!no_prompt && (hard_reset || soft_reset)) {
+ 		gchar response[100] = { 0 };
+ 
+ 		g_print (CRIT_BEGIN "%s" CRIT_END "\n%s\n\n%s %s: ",
