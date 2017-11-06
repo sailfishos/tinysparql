@@ -25,6 +25,7 @@ Patch11:    011-revert-libmediaart-disable.patch
 Patch12:    012-disable-tracker-remote.patch
 Patch13:    013-miner-Fix-mining-of-files-whose-data-was-inserted-by.patch
 Patch14:    014-fix-systemd-unit-files.patch
+Patch15:    015-allow-skip-reset-prompt.patch
 
 Requires:   libmediaart
 Requires:   unzip
@@ -139,6 +140,7 @@ Development files for %{name}.
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
+%patch15 -p1
 
 %build
 sed -i -e '/gtkdocize/d' autogen.sh
