@@ -1035,19 +1035,21 @@ get_duration (const gchar *data, size_t size, size_t offset,
 	if (has_xing) {
 		samples_per_frame = samples_per_frame_table[finfo->layer - 1][finfo->version - 1];
 		*duration = filedata->xing.nb_frames * samples_per_frame / finfo->sample_rate;
-		if (filedata->xing.nb_bytes > 0) {
-			*avg_bps = filedata->xing.nb_bytes / *duration;
-		} else {
-			*avg_bps = (filedata->size - filedata->id3v2_size) / *duration;
+		if (*duration > 0) {
+			if (filedata->xing.nb_bytes > 0) {
+				*avg_bps = filedata->xing.nb_bytes / *duration;
+			} else {
+				*avg_bps = (filedata->size - filedata->id3v2_size) / *duration;
+			}
+			return TRUE;
 		}
-		return TRUE;
 	}
 
-	/* No Xing frame.
+	/* No usable Xing frame.
 	 * So scan some/all audio frames to compute/estimate the total duration.
 	 */
 
-	g_debug("No Xing, try to estimate duration...");
+	g_debug("No usable Xing, try to estimate duration...");
 
 	frames = 0;
 	total_bitrate = 0;
