@@ -1,0 +1,24 @@
+From af3af3c51cfc1b0b6fcaf997f8d257196dd34f09 Mon Sep 17 00:00:00 2001
+From: Andrew Branson <andrew.branson@jollamobile.com>
+Date: Fri, 8 Dec 2017 15:45:59 +0100
+Subject: [PATCH] Disable libtracker-sparql parallel build.
+
+Automake doesn't cope well with GLIB_MKENUMS
+---
+ src/libtracker-sparql/Makefile.am | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/libtracker-sparql/Makefile.am b/src/libtracker-sparql/Makefile.am
+index ef42a89..dc02d96 100644
+--- a/src/libtracker-sparql/Makefile.am
++++ b/src/libtracker-sparql/Makefile.am
+@@ -128,3 +128,6 @@ typelib_DATA = $(gir_DATA:.gir=.typelib)
+ # required when building from a tarball.
+ DISTCLEANFILES = $(gir_DATA) $(typelib_DATA)
+ endif
++
++# Parallel builds with 8 cores or more cause an error with the GLIB_MKENUMS, so disable that in here
++.NOTPARALLEL:
+-- 
+1.8.3-rc3
+
