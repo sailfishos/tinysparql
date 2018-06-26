@@ -7,9 +7,10 @@ Version:    1.12.4
 Release:    1
 Group:      Data Management/Content Framework
 License:    GPLv2+ and LGPLv2.1+ and BSD-3-clause
-URL:        http://ftp.gnome.org/pub/GNOME/sources/tracker/0.10/
-Source0:    http://ftp.gnome.org/pub/GNOME/sources/%{name}/0.14/%{name}-%{version}.tar.xz
+URL:        http://ftp.gnome.org/pub/GNOME/sources/tracker/1.12/
+Source0:    http://ftp.gnome.org/pub/GNOME/sources/%{name}/1.12/%{name}-%{version}.tar.xz
 Source1:    tracker-libav-rpmlintrc
+Source2:    10-rtf.rule
 Source5:    tracker-configs.sh
 Patch1:     001-install-the-data-generation-scripts.patch
 Patch2:     002-Fix-CLEANFILE-for-automake.patch
@@ -194,6 +195,7 @@ ln -s ../tracker-extract.service %{buildroot}%{_libdir}/systemd/user/post-user-s
 # oneshot run in install
 mkdir -p %{buildroot}%{_oneshotdir}
 cp -a %{SOURCE5} %{buildroot}%{_oneshotdir}
+cp -a %{SOURCE2} %{buildroot}%{_datadir}/tracker/extract-rules/
 
 %find_lang %{name}
 
