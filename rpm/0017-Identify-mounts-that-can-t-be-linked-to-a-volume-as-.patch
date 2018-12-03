@@ -1,0 +1,26 @@
+From e7f3403c4adf25ad44585f8427a210a2374329b7 Mon Sep 17 00:00:00 2001
+From: Andrew den Exter <andrew.den.exter@qinetic.com.au>
+Date: Tue, 4 Dec 2018 01:24:27 -0500
+Subject: [PATCH] Identify mounts that can't be linked to a volume as removable
+ if the mount path is under /run/media.
+
+---
+ src/miners/fs/tracker-storage.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/miners/fs/tracker-storage.c b/src/miners/fs/tracker-storage.c
+index 6114a6f..fc86395 100644
+--- a/src/miners/fs/tracker-storage.c
++++ b/src/miners/fs/tracker-storage.c
+@@ -671,6 +671,8 @@ mount_add (TrackerStorage *storage,
+ 				}
+ 
+ 				g_free (content_type);
++
++                is_removable = g_str_has_prefix (mount_path, "/run/media/");
+ 			} else {
+ 				g_debug ("  Being ignored because mount has no GVolume (i.e. not user mountable) "
+ 				         "and has no mount root path available");
+-- 
+1.8.3-rc3
+

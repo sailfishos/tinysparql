@@ -28,6 +28,7 @@ Patch13:    013-miner-Fix-mining-of-files-whose-data-was-inserted-by.patch
 Patch14:    014-fix-systemd-unit-files.patch
 Patch15:    015-allow-skip-reset-prompt.patch
 Patch16:    016-Disable-libtracker-sparql-parallel-build.patch
+Patch17:    0017-Identify-mounts-that-can-t-be-linked-to-a-volume-as-.patch
 
 Requires:   libmediaart
 Requires:   unzip
@@ -144,6 +145,7 @@ Development files for %{name}.
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
+%patch17 -p1
 
 %build
 sed -i -e '/gtkdocize/d' autogen.sh
