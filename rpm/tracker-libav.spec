@@ -6,7 +6,7 @@ Summary:    An object database, tag/metadata database, search tool and indexer
 Version:    1.12.4
 Release:    1
 Group:      Data Management/Content Framework
-License:    GPLv2+ and LGPLv2.1+ and BSD-3-clause
+License:    GPLv2+ and LGPLv2.1+ and BSD
 URL:        http://ftp.gnome.org/pub/GNOME/sources/tracker/1.12/
 Source0:    http://ftp.gnome.org/pub/GNOME/sources/%{name}/1.12/%{name}-%{version}.tar.xz
 Source1:    tracker-libav-rpmlintrc
@@ -126,6 +126,14 @@ Requires:   %{name} = %{version}-%{release}
 %description devel
 Development files for %{name}.
 
+%package doc
+Summary:   Documentation for %{name}
+Group:     Documentation
+Requires:  %{name} = %{version}-%{release}
+
+%description doc
+Man pages for %{name}.
+
 %prep
 %setup -q -n %{name}-%{version}/upstream
 %patch1 -p1
@@ -237,7 +245,6 @@ cd /usr/share/tracker-tests/
 %defattr(-, root, root, -)
 %{_datadir}/dbus-1/services/*
 %{_datadir}/tracker/miners/*
-%{_datadir}/man/man1/*
 %{_datadir}/tracker/*.xml
 %{_datadir}/tracker/stop-words/*
 %{_datadir}/tracker/ontologies/*
@@ -264,7 +271,7 @@ cd /usr/share/tracker-tests/
 %{_libexecdir}/tracker-miner-fs
 %{_libexecdir}/tracker-store
 %{_libexecdir}/tracker-writeback
-%doc COPYING COPYING.GPL COPYING.LGPL
+%license COPYING COPYING.GPL COPYING.LGPL
 %exclude %{_sysconfdir}/xdg/autostart/*.desktop
 %{_libdir}/systemd/user/tracker-miner-fs.service
 %{_libdir}/systemd/user/tracker-store.service
@@ -294,3 +301,6 @@ cd /usr/share/tracker-tests/
 %{_includedir}/tracker-*/libtracker-control/*.h
 %{_libdir}/pkgconfig/tracker-*.pc
 
+%files doc
+%defattr(-,root,root,-)
+%{_mandir}/man1/%{name}-*
