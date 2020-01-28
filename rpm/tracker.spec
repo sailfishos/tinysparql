@@ -63,7 +63,6 @@ BuildRequires:  python >= 2.6
 BuildRequires:  dbus-python
 BuildRequires:  fdupes
 BuildRequires:  giflib-devel
-BuildRequires:  gnome-common
 BuildRequires:  oneshot
 
 %description
