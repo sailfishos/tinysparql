@@ -1,0 +1,140 @@
+From 2a3a3fefe53571690a86aa0df8fad70e0243a003 Thu, 30 Jan 2020 10:31:41 +0100
+From: Jürg Billeter <j@bitron.ch>
+Date: Wed, 6 Feb 2019 17:28:01 +0100
+Subject: [PATCH] libtracker-data: Fix build with Vala 0.43
+
+
+https://gitlab.gnome.org/GNOME/tracker/issues/75
+
+Also include 2eedcef7ef3aa647b8d50da4606b3247aa0855c7
+libtracker-data: DBInterface.create_statement() may not be abstract in vala
+
+https://bugzilla.gnome.org/show_bug.cgi?id=796104
+
+Also 8aa8759c40259ebc5daf6dca577877e55e030a2a Thu, 30 Jan 2020 11:11:23 +0100
+From: Rico Tzschichholz <ricotz@ubuntu.com>
+Date: Wed, 30 May 2018 14:12:46 +0200
+Subject: [PATCH] libtracker-sparql: Use replacement for IOSchedulerJob.push() which is still deprecated
+
+And a similar piece of 85b8ff8859d7e7815a72568e86ed78376db2847e
+
+diff --git a/src/libtracker-data/tracker-sparql-pattern.vala b/src/libtracker-data/tracker-sparql-pattern.vala
+index 59810da..e03ed6f 100644
+--- a/src/libtracker-data/tracker-sparql-pattern.vala
++++ b/src/libtracker-data/tracker-sparql-pattern.vala
+@@ -243,10 +243,10 @@
+ 			base (query, parent_context);
+ 
+ 			tables = new List<DataTable> ();
+-			table_map = new HashTable<string,DataTable>.full (str_hash, str_equal, g_free, g_object_unref);
++			table_map = new HashTable<string,DataTable>.full (str_hash, str_equal, g_free, GLib.Object.unref);
+ 
+ 			variables = new List<Variable> ();
+-			var_bindings = new HashTable<Variable,VariableBindingList>.full (Variable.hash, Variable.equal, g_object_unref, g_object_unref);
++			var_bindings = new HashTable<Variable,VariableBindingList>.full (Variable.hash, Variable.equal, GLib.Object.unref, GLib.Object.unref);
+ 
+ 			bindings = new List<LiteralBinding> ();
+ 		}
+@@ -948,7 +948,7 @@
+ 
+ 			// only export selected variables
+ 			context.var_set = context.select_var_set;
+-			context.select_var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, g_object_unref, null);
++			context.select_var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, GLib.Object.unref, null);
+ 
+ 			expect (SparqlTokenType.CLOSE_BRACE);
+ 
+@@ -1229,7 +1229,7 @@
+ 
+ 	private void translate_group_or_union_graph_pattern (StringBuilder sql) throws Sparql.Error {
+ 		Variable[] all_vars = { };
+-		HashTable<Variable,int> all_var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, g_object_unref, null);
++		HashTable<Variable,int> all_var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, GLib.Object.unref, null);
+ 
+ 		Context[] contexts = { };
+ 		long[] offsets = { };
+diff --git a/src/libtracker-data/tracker-sparql-query.vala b/src/libtracker-data/tracker-sparql-query.vala
+index 54ce570..7944e78 100644
+--- a/src/libtracker-data/tracker-sparql-query.vala
++++ b/src/libtracker-data/tracker-sparql-query.vala
+@@ -125,12 +125,12 @@
+ 		public Context (Query query, Context? parent_context = null) {
+ 			this.query = query;
+ 			this.parent_context = parent_context;
+-			this.var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, g_object_unref, null);
++			this.var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, GLib.Object.unref, null);
+ 
+ 			if (parent_context == null) {
+-				select_var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, g_object_unref, null);
+-				var_map = new HashTable<string,Variable>.full (str_hash, str_equal, g_free, g_object_unref);
+-				predicate_variable_map = new HashTable<Variable,PredicateVariable>.full (Variable.hash, Variable.equal, g_object_unref, g_object_unref);
++				select_var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, GLib.Object.unref, null);
++				var_map = new HashTable<string,Variable>.full (str_hash, str_equal, g_free, GLib.Object.unref);
++				predicate_variable_map = new HashTable<Variable,PredicateVariable>.full (Variable.hash, Variable.equal, GLib.Object.unref, GLib.Object.unref);
+ 			} else {
+ 				select_var_set = parent_context.select_var_set;
+ 				var_map = parent_context.var_map;
+@@ -141,11 +141,11 @@
+ 		public Context.subquery (Query query, Context parent_context) {
+ 			this.query = query;
+ 			this.parent_context = parent_context;
+-			this.var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, g_object_unref, null);
++			this.var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, GLib.Object.unref, null);
+ 
+-			select_var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, g_object_unref, null);
++			select_var_set = new HashTable<Variable,int>.full (Variable.hash, Variable.equal, GLib.Object.unref, null);
+ 			var_map = parent_context.var_map;
+-			predicate_variable_map = new HashTable<Variable,PredicateVariable>.full (Variable.hash, Variable.equal, g_object_unref, g_object_unref);
++			predicate_variable_map = new HashTable<Variable,PredicateVariable>.full (Variable.hash, Variable.equal, GLib.Object.unref, GLib.Object.unref);
+ 			scalar_subquery = true;
+ 		}
+ 
+diff --git a/src/libtracker-data/libtracker-data.vapi b/src/libtracker-data/libtracker-data.vapi
+index ba09968..a9e446c 100644
+--- a/src/libtracker-data/libtracker-data.vapi
++++ b/src/libtracker-data/libtracker-data.vapi
+@@ -63,7 +63,7 @@
+ 	[CCode (cheader_filename = "libtracker-data/tracker-db-interface.h")]
+ 	public interface DBInterface : GLib.Object {
+ 		[PrintfFormat]
+-		public abstract DBStatement create_statement (DBStatementCacheType cache_type, ...) throws DBInterfaceError;
++		public DBStatement create_statement (DBStatementCacheType cache_type, ...) throws DBInterfaceError;
+ 		[PrintfFormat]
+ 		public void execute_query (...) throws DBInterfaceError;
+ 		[CCode (cheader_filename = "libtracker-data/tracker-db-interface-sqlite.h")]
+diff --git a/src/libtracker-direct/tracker-direct.vala b/src/libtracker-direct/tracker-direct.vala
+index da9feaa..aac1fe5 100644
+--- a/src/libtracker-direct/tracker-direct.vala
++++ b/src/libtracker-direct/tracker-direct.vala
+@@ -125,7 +244,7 @@
+ 		Sparql.Cursor result = null;
+ 		var context = MainContext.get_thread_default ();
+ 
+-		g_io_scheduler_push_job (job => {
++		IOSchedulerJob.push ((job, cancellable) => {
+ 			try {
+ 				result = query (sparql, cancellable);
+ 			} catch (IOError e_io) {
+diff --git a/src/libtracker-sparql-backend/tracker-backend.vala b/src/libtracker-sparql-backend/tracker-backend.vala
+index 23cc27c..4908840 100644
+--- a/src/libtracker-sparql-backend/tracker-backend.vala
++++ b/src/libtracker-sparql-backend/tracker-backend.vala
+@@ -287,7 +287,7 @@
+ 		Connection result = null;
+ 		var context = MainContext.get_thread_default ();
+ 
+-		g_io_scheduler_push_job (job => {
++		IOSchedulerJob.push (job => {
+ 			try {
+ 				result = get (cancellable);
+ 			} catch (IOError e_io) {
+@@ -308,7 +308,7 @@
+ 			source.attach (context);
+ 
+ 			return false;
+-		});
++		}, GLib.Priority.DEFAULT);
+ 		yield;
+ 
+ 		if (sparql_error != null) {
+ 			
