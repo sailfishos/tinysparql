@@ -3,7 +3,7 @@ Name:       tracker
 %define enable_demo 0
 
 Summary:    An object database, tag/metadata database, search tool and indexer
-Version:    1.12.4
+Version:    1.13.0
 Release:    1
 License:    GPLv2+ and LGPLv2.1+ and BSD
 URL:        http://ftp.gnome.org/pub/GNOME/sources/tracker/1.12/
