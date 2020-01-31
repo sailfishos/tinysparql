@@ -5,7 +5,6 @@ Name:       tracker
 Summary:    An object database, tag/metadata database, search tool and indexer
 Version:    1.12.4
 Release:    1
-Group:      Data Management/Content Framework
 License:    GPLv2+ and LGPLv2.1+ and BSD
 URL:        http://ftp.gnome.org/pub/GNOME/sources/tracker/1.12/
 Source0:    http://ftp.gnome.org/pub/GNOME/sources/%{name}/1.12/%{name}-%{version}.tar.xz
@@ -23,11 +22,11 @@ Patch8:     008-tracker-Fix-flac-tag-extraction-Fixes-JB35939.patch
 Patch9:     009-tracker-Add-album-art-extraction-for-libav-and-flac-.patch
 Patch10:    010-tracker-Use-Xing-mp3-header-when-available-Fixes-JB3.patch
 Patch11:    011-revert-libmediaart-disable.patch
-Patch12:    012-disable-tracker-remote.patch
 Patch13:    013-miner-Fix-mining-of-files-whose-data-was-inserted-by.patch
 Patch14:    014-fix-systemd-unit-files.patch
 Patch15:    015-allow-skip-reset-prompt.patch
 Patch16:    016-Disable-libtracker-sparql-parallel-build.patch
+Patch17:    017-libtracker-data-Fix-build-with-Vala-0.43.patch
 
 Requires:   libmediaart
 Requires:   unzip
@@ -65,6 +64,8 @@ BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(libavcodec)
 BuildRequires:  pkgconfig(libavformat)
 BuildRequires:  pkgconfig(libavutil)
+BuildRequires:  pkgconfig(libsoup-2.4)
+BuildRequires:  pkgconfig(json-glib-1.0)
 BuildRequires:  gettext
 BuildRequires:  libtool
 BuildRequires:  vala-devel >= 0.16
@@ -146,11 +147,11 @@ Man pages for %{name}.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
-%patch12 -p1
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
+%patch17 -p1
 
 %build
 sed -i -e '/gtkdocize/d' autogen.sh
