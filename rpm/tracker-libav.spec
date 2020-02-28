@@ -215,7 +215,7 @@ glib-compile-schemas   /usr/share/glib-2.0/schemas/
 if [ "$1" -ge 1 ]; then
 systemctl-user daemon-reload || :
 systemctl-user try-restart tracker-store.service tracker-miner-fs.service tracker-extract.service || :
-add-oneshot --user tracker-configs.sh
+add-oneshot --new-users --all-users tracker-configs.sh || :
 fi
 
 
