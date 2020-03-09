@@ -94,7 +94,7 @@ It provides additional features for file based objects including context
 linking and audit trails for a file object.
 
 It has the ability to index, store, harvest metadata. retrieve and search
-all types of files and other first class objects
+all types of files and other first class objects.
 
 
 %package tests
@@ -116,7 +116,7 @@ Group:      Development/Tools
 Requires:   %{name} = %{version}-%{release}
 
 %description utils
-Tracker command line applications to lookup data
+Tracker command line applications to lookup data.
 
 %package devel
 Summary:    Development files for %{name}
@@ -215,7 +215,7 @@ glib-compile-schemas   /usr/share/glib-2.0/schemas/
 if [ "$1" -ge 1 ]; then
 systemctl-user daemon-reload || :
 systemctl-user try-restart tracker-store.service tracker-miner-fs.service tracker-extract.service || :
-add-oneshot --user tracker-configs.sh
+add-oneshot --new-users --all-users tracker-configs.sh || :
 fi
 
 
@@ -284,10 +284,8 @@ cd /usr/share/tracker-tests/
 
 %files tests
 %defattr(-,root,root,-)
-%{_datadir}/tracker-tests/*
-#%{_sysconfdir}/dconf/profile/trackertest
-/opt/tests/tracker/bin/*
-
+%{_datadir}/tracker-tests
+/opt/tests/tracker
 
 %files utils
 %defattr(-,root,root,-)
@@ -296,9 +294,7 @@ cd /usr/share/tracker-tests/
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/tracker-*/libtracker-miner/*.h
-%{_includedir}/tracker-*/libtracker-sparql/*.h
-%{_includedir}/tracker-*/libtracker-control/*.h
+%{_includedir}/tracker-*
 %{_libdir}/pkgconfig/tracker-*.pc
 
 %files doc
