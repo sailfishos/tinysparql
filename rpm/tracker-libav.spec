@@ -27,6 +27,7 @@ Patch14:    014-fix-systemd-unit-files.patch
 Patch15:    015-allow-skip-reset-prompt.patch
 Patch16:    016-Disable-libtracker-sparql-parallel-build.patch
 Patch17:    017-libtracker-data-Fix-build-with-Vala-0.43.patch
+Patch18:    018-Use-date-instead-of-creationtime-for-ffmpeg-.patch
 
 Requires:   libmediaart
 Requires:   unzip
@@ -135,23 +136,7 @@ Requires:  %{name} = %{version}-%{release}
 Man pages for %{name}.
 
 %prep
-%setup -q -n %{name}-%{version}/upstream
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
+%autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
 sed -i -e '/gtkdocize/d' autogen.sh
