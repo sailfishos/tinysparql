@@ -25,7 +25,7 @@ index d4821cd..8dee8ab 100644
  	{ "config", 'c', 0, G_OPTION_ARG_NONE, &remove_config,
  	  N_("Remove all configuration files so they are re-generated on next start"),
  	  NULL },
-@@ -216,7 +220,7 @@
+@@ -176,7 +180,7 @@
  		return EXIT_FAILURE;
  	}
  
