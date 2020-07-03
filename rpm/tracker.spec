@@ -14,6 +14,7 @@ Patch3:     003-Disable-trackertestutils.patch
 Requires:   unzip
 Requires:   systemd
 Requires:   systemd-user-session-targets
+Obsoletes:  tracker-utils
 
 Requires(post): /sbin/ldconfig
 Requires(post):  oneshot
@@ -54,14 +55,6 @@ linking and audit trails for a file object.
 
 It has the ability to index, store, harvest metadata. retrieve and search
 all types of files and other first class objects.
-
-%package utils
-Summary:    Tracker command line applications to lookup data
-Group:      Development/Tools
-Requires:   %{name} = %{version}-%{release}
-
-%description utils
-Tracker command line applications to lookup data.
 
 %package devel
 Summary:    Development files for %{name}
@@ -116,6 +109,7 @@ fi
 %defattr(-,root,root,-)
 %{_datadir}/dbus-1/services/org.freedesktop.Tracker1.service
 %dir %{_datadir}/tracker
+%{_bindir}/tracker
 %{_datadir}/tracker/*.xml
 %{_datadir}/tracker/stop-words/*
 %{_datadir}/tracker/domain-ontologies/default.rule
@@ -132,10 +126,6 @@ fi
 %license COPYING COPYING.GPL COPYING.LGPL
 %{_libdir}/systemd/user/tracker-store.service
 %attr(0755, -, -) %{_oneshotdir}/tracker-configs.sh
-
-%files utils
-%defattr(-,root,root,-)
-%{_bindir}/tracker
 %{_datadir}/bash-completion/completions/tracker
 
 %files devel
