@@ -70,7 +70,8 @@ Development files for %{name}.
 %build
 %meson -Dman=false -Ddocs=false -Dfunctional_tests=false \
        -Dnetwork_manager=disabled -Dstemmer=disabled \
-       -Dunicode_support=icu
+       -Dunicode_support=icu \
+       -Dsystemd_user_services=%{_userunitdir}
 
 %install
 rm -rf %{buildroot}
@@ -124,7 +125,7 @@ fi
 %{_libdir}/tracker-2.0/libtracker-data.so
 %{_libexecdir}/tracker-store
 %license COPYING COPYING.GPL COPYING.LGPL
-%{_libdir}/systemd/user/tracker-store.service
+%{_userunitdir}/tracker-store.service
 %attr(0755, -, -) %{_oneshotdir}/tracker-configs.sh
 %{_datadir}/bash-completion/completions/tracker
 
