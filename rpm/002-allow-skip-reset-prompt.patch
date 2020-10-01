@@ -20,7 +20,7 @@ index d4821cd..8dee8ab 100644
  	  N_("Same as --hard but the backup & journal are restored after restart"),
  	  NULL },
 +	{ "yes", 'y', 0, G_OPTION_ARG_NONE, &no_prompt,
-+	  N_("Skip interactive verification for reset."),
++	  N_("Skip interactive verification for reset"),
 +	  NULL },
  	{ "config", 'c', 0, G_OPTION_ARG_NONE, &remove_config,
  	  N_("Remove all configuration files so they are re-generated on next start"),
