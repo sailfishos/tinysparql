@@ -7,6 +7,7 @@ URL:        https://wiki.gnome.org/Projects/Tracker
 Source0:    %{name}-%{version}.tar.bz2
 Source1:    remove-tracker2-db.sh
 Patch1:     0001-Always-insert-timestamps-into-the-database-as-string.patch
+Patch2:     0002-portal-Allow-D-Bus-activation-only-through-systemd.patch
 
 BuildRequires:  meson >= 0.50
 BuildRequires:  vala-devel >= 0.16
