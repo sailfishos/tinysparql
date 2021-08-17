@@ -5,6 +5,7 @@ Release:    1
 License:    LGPLv2+ and GPLv2+
 URL:        https://wiki.gnome.org/Projects/Tracker
 Source0:    %{name}-%{version}.tar.bz2
+Patch1:     0001-Always-insert-timestamps-into-the-database-as-string.patch
 
 BuildRequires:  meson >= 0.50
 BuildRequires:  vala-devel >= 0.16

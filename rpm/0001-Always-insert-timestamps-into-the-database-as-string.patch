@@ -1,0 +1,42 @@
+From 850a7e8275e74b4d8155ac3976e63da0bed50dbd Mon Sep 17 00:00:00 2001
+From: Andrew den Exter <andrew.den.exter@qinetic.com.au>
+Date: Tue, 17 Aug 2021 00:48:01 +0000
+Subject: [PATCH] Always insert timestamps into the database as strings.
+
+---
+ src/libtracker-data/tracker-data-update.c | 18 ++++--------------
+ 1 file changed, 4 insertions(+), 14 deletions(-)
+
+diff --git a/src/libtracker-data/tracker-data-update.c b/src/libtracker-data/tracker-data-update.c
+index 0de77755d..2b28a9ad2 100644
+--- a/src/libtracker-data/tracker-data-update.c
++++ b/src/libtracker-data/tracker-data-update.c
+@@ -771,21 +771,11 @@ statement_bind_gvalue (TrackerDBStatement *stmt,
+ 	default:
+ 		if (type == G_TYPE_DATE_TIME) {
+ 			GDateTime *datetime = g_value_get_boxed (value);
++			gchar *str;
+ 
+-			/* If we have anything that prevents a unix timestamp to be
+-			 * lossless, we use the ISO8601 string.
+-			 */
+-			if (g_date_time_get_utc_offset (datetime) != 0 ||
+-			    g_date_time_get_microsecond (datetime) != 0) {
+-				gchar *str;
+-
+-				str = tracker_date_format_iso8601 (datetime);
+-				tracker_db_statement_bind_text (stmt, (*idx)++, str);
+-				g_free (str);
+-			} else {
+-				tracker_db_statement_bind_int (stmt, (*idx)++,
+-				                               g_date_time_to_unix (datetime));
+-			}
++			str = tracker_date_format_iso8601 (datetime);
++			tracker_db_statement_bind_text (stmt, (*idx)++, str);
++			g_free (str);
+ 		} else if (type == G_TYPE_BYTES) {
+ 			GBytes *bytes;
+ 			gconstpointer data;
+-- 
+2.26.2
+
