@@ -5,6 +5,7 @@ Release:    1
 License:    LGPLv2+ and GPLv2+
 URL:        https://wiki.gnome.org/Projects/Tracker
 Source0:    %{name}-%{version}.tar.bz2
+Source1:    remove-tracker2-db.sh
 Patch1:     0001-Always-insert-timestamps-into-the-database-as-string.patch
 
 BuildRequires:  meson >= 0.50
@@ -25,10 +26,12 @@ BuildRequires:  pkgconfig(libsoup-2.4) >= 2.40
 BuildRequires:  pkgconfig(sqlite3) >= 3.11
 BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(json-glib-1.0) >= 1.0
+BuildRequires:  oneshot
 
 Requires:   systemd-user-session-targets
 Requires(post):   /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
+%{_oneshot_requires_post}
 
 Obsoletes:  tracker-utils
 
@@ -68,10 +71,16 @@ Development files for %{name}.
 %install
 %meson_install
 
+install -D -m 755 %{SOURCE1} %{buildroot}/%{_oneshotdir}/remove-tracker2-db.sh
+
 %find_lang tracker3
 
 %post
 /sbin/ldconfig
+
+if [ "$1" -ge 1 ]; then
+add-oneshot --all-users remove-tracker2-db.sh || :
+fi
 
 %postun
 /sbin/ldconfig
@@ -87,6 +96,7 @@ Development files for %{name}.
 %{_datadir}/tracker3/stop-words/
 %{_datadir}/tracker3/ontologies/
 %{_userunitdir}/tracker-xdg-portal-3.service
+%attr(0755, -, -) %{_oneshotdir}/remove-tracker2-db.sh
 
 %files devel
 %defattr(-,root,root,-)
