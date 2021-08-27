@@ -1,0 +1,26 @@
+From 9fc48334f8e244503ebaf5d359144600d2ac5b85 Mon Sep 17 00:00:00 2001
+From: Simo Piiroinen <simo.piiroinen@jolla.com>
+Date: Thu, 12 Aug 2021 07:54:31 +0300
+Subject: [PATCH] portal: Allow D-Bus activation only through systemd
+
+Starting D-Bus services should happen only via systemd. Using a dummy
+Exec line in D-Bus configuration ensures that systemd can't be bypassed.
+
+Signed-off-by: Simo Piiroinen <simo.piiroinen@jolla.com>
+---
+ src/portal/org.freedesktop.portal.Tracker.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/portal/org.freedesktop.portal.Tracker.service.in b/src/portal/org.freedesktop.portal.Tracker.service.in
+index 0894a108d..601405022 100644
+--- a/src/portal/org.freedesktop.portal.Tracker.service.in
++++ b/src/portal/org.freedesktop.portal.Tracker.service.in
+@@ -1,4 +1,4 @@
+ [D-BUS Service]
+ Name=org.freedesktop.portal.Tracker
+-Exec=@libexecdir@/tracker-xdg-portal-3
++Exec=/bin/false
+ SystemdService=tracker-xdg-portal-3.service
+-- 
+2.17.1
+
