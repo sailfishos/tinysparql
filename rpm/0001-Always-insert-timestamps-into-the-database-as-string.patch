@@ -1,4 +1,4 @@
-From 850a7e8275e74b4d8155ac3976e63da0bed50dbd Mon Sep 17 00:00:00 2001
+From 9dd4df1b4d49966615a0f905ac11c94abc3b1401 Mon Sep 17 00:00:00 2001
 From: Andrew den Exter <andrew.den.exter@qinetic.com.au>
 Date: Tue, 17 Aug 2021 00:48:01 +0000
 Subject: [PATCH] Always insert timestamps into the database as strings.
@@ -8,7 +8,7 @@ Subject: [PATCH] Always insert timestamps into the database as strings.
  1 file changed, 4 insertions(+), 14 deletions(-)
 
 diff --git a/src/libtracker-data/tracker-data-update.c b/src/libtracker-data/tracker-data-update.c
-index 0de77755d..2b28a9ad2 100644
+index 437859af3..c19b3acfa 100644
 --- a/src/libtracker-data/tracker-data-update.c
 +++ b/src/libtracker-data/tracker-data-update.c
 @@ -771,21 +771,11 @@ statement_bind_gvalue (TrackerDBStatement *stmt,
@@ -38,5 +38,5 @@ index 0de77755d..2b28a9ad2 100644
  			GBytes *bytes;
  			gconstpointer data;
 -- 
-2.26.2
+2.31.1
 

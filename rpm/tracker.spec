@@ -1,6 +1,6 @@
 Name:       tracker
 Summary:    Desktop-neutral metadata database and search tool
-Version:    3.1.2
+Version:    3.2.0
 Release:    1
 License:    LGPLv2+ and GPLv2+
 URL:        https://wiki.gnome.org/Projects/Tracker
@@ -27,14 +27,13 @@ BuildRequires:  pkgconfig(libsoup-2.4) >= 2.40
 BuildRequires:  pkgconfig(sqlite3) >= 3.11
 BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(json-glib-1.0) >= 1.0
+BuildRequires:  python3-gobject
 BuildRequires:  oneshot
 
 Requires:   systemd-user-session-targets
 Requires(post):   /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 %{_oneshot_requires_post}
-
-Obsoletes:  tracker-utils
 
 %description
 Tracker is a powerful desktop-neutral first class object database,
@@ -93,6 +92,7 @@ fi
 %{_libexecdir}/tracker3/
 %{_libexecdir}/tracker-xdg-portal-3
 %{_libdir}/libtracker-sparql-*.so.*
+%{_libdir}/tracker-3.0/libtracker-remote-soup2.so
 %{_datadir}/dbus-1/services/org.freedesktop.portal.Tracker.service
 %{_datadir}/tracker3/stop-words/
 %{_datadir}/tracker3/ontologies/
