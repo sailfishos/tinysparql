@@ -1,9 +1,9 @@
 Name:       tracker
 Summary:    Desktop-neutral metadata database and search tool
-Version:    3.2.0
+Version:    3.2.1
 Release:    1
 License:    LGPLv2+ and GPLv2+
-URL:        https://wiki.gnome.org/Projects/Tracker
+URL:        https://gnome.pages.gitlab.gnome.org/tracker/
 Source0:    %{name}-%{version}.tar.bz2
 Source1:    remove-tracker2-db.sh
 Patch1:     0001-Always-insert-timestamps-into-the-database-as-string.patch
