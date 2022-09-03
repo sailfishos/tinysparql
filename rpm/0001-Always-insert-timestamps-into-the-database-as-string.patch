@@ -8,10 +8,10 @@ Subject: [PATCH] Always insert timestamps into the database as strings.
  1 file changed, 4 insertions(+), 14 deletions(-)
 
 diff --git a/src/libtracker-data/tracker-data-update.c b/src/libtracker-data/tracker-data-update.c
-index c94fdc532..2ca7b5a78 100644
+index 6aa65c9117ed66ff7e801eecaf812315efa9248b..6ed966299b975cc04d7f60a7bc52cea490306d66 100644
 --- a/src/libtracker-data/tracker-data-update.c
 +++ b/src/libtracker-data/tracker-data-update.c
-@@ -771,21 +771,11 @@ statement_bind_gvalue (TrackerDBStatement *stmt,
+@@ -782,21 +782,11 @@ statement_bind_gvalue (TrackerDBStatement *stmt,
  	default:
  		if (type == G_TYPE_DATE_TIME) {
  			GDateTime *datetime = g_value_get_boxed (value);
@@ -37,6 +37,3 @@ index c94fdc532..2ca7b5a78 100644
  		} else if (type == G_TYPE_BYTES) {
  			GBytes *bytes;
  			gconstpointer data;
--- 
-2.31.1
-

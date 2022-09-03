@@ -1,6 +1,6 @@
 Name:       tracker
 Summary:    Desktop-neutral metadata database and search tool
-Version:    3.2.1
+Version:    3.3.3
 Release:    1
 License:    LGPLv2+ and GPLv2+
 URL:        https://gnome.pages.gitlab.gnome.org/tracker/
