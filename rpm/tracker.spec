@@ -12,7 +12,6 @@ Patch2:     0002-portal-Allow-D-Bus-activation-only-through-systemd.patch
 BuildRequires:  meson >= 0.50
 BuildRequires:  vala-devel >= 0.16
 BuildRequires:  gettext
-BuildRequires:  intltool
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.60
 BuildRequires:  pkgconfig(gio-2.0) >= 2.46.0
 BuildRequires:  pkgconfig(gio-unix-2.0) >= 2.46.0
