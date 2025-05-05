@@ -12,12 +12,12 @@ Signed-off-by: Simo Piiroinen <simo.piiroinen@jolla.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/portal/org.freedesktop.portal.Tracker.service.in b/src/portal/org.freedesktop.portal.Tracker.service.in
-index 0894a108dce87632c7aa228e10df69595fbd4f37..60140502274178d8b8652a25e4878f7f3f1bbf33 100644
+index b9f0e030d..ff3b41644 100644
 --- a/src/portal/org.freedesktop.portal.Tracker.service.in
 +++ b/src/portal/org.freedesktop.portal.Tracker.service.in
 @@ -1,4 +1,4 @@
  [D-BUS Service]
  Name=org.freedesktop.portal.Tracker
--Exec=@libexecdir@/tracker-xdg-portal-3
+-Exec=@libexecdir@/tinysparql-xdg-portal-3
 +Exec=/bin/false
- SystemdService=tracker-xdg-portal-3.service
+ SystemdService=tinysparql-xdg-portal-3.service
