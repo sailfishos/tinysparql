@@ -1,9 +1,9 @@
-Name:       tracker
+Name:       tinysparql
 Summary:    Desktop-neutral metadata database and search tool
 Version:    3.9.2
 Release:    1
 License:    LGPLv2+ and GPLv2+
-URL:        https://gnome.pages.gitlab.gnome.org/tracker/
+URL:        https://gnome.pages.gitlab.gnome.org/tinysparql/
 Source0:    %{name}-%{version}.tar.bz2
 Patch1:     0001-Always-insert-timestamps-into-the-database-as-string.patch
 Patch2:     0002-portal-Allow-D-Bus-activation-only-through-systemd.patch
@@ -31,8 +31,11 @@ Requires:   systemd-user-session-targets
 Requires(post):   /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
+Obsoletes:      tracker < 3.8
+Provides:       tracker = %{version}-%{release}
+
 %description
-Tracker is a powerful desktop-neutral first class object database,
+Tinysparql is a powerful desktop-neutral first class object database,
 tag/metadata database and search tool.
 
 It consists of a common object database that allows entities to have an
@@ -43,11 +46,12 @@ links to other entities.
 It provides additional features for file based objects including context
 linking and audit trails for a file object.
 
-Metadata indexers are provided by the tracker-miners package.
+Metadata indexers are provided by the localsearch package.
 
 %package devel
 Summary:    Development files for %{name}
 Requires:   %{name} = %{version}-%{release}
+Obsoletes:  tracker-devel < 3.8
 
 %description devel
 Development files for %{name}.
